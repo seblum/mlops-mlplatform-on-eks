@@ -29,6 +29,8 @@ project
 - [ ] refactor tf code with subdirs
 - [ ] own directory for yaml 
 - [ ] deploy yamls on rollout
+- [ ] add pre-commit hooks for formating yaml
+- [ ] terraform state on s3
 
 ```bash
 aws eks --region eu-central-1 update-kubeconfig --name eks_education-eks-ueIuFx6S -raw cluster_name
@@ -38,4 +40,9 @@ aws eks --region eu-central-1 update-kubeconfig --name eks_education-eks-ueIuFx6
 https://learn.hashicorp.com/tutorials/terraform/eks
 
 
+
+### Airflow
+
+kubectl create namespace airflow
+helm install airflow apache-airflow/airflow --namespace airflow --debug
 

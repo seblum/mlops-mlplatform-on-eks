@@ -59,7 +59,7 @@ resource "kubernetes_secret" "airflow_db_credentials" {
     namespace = kubernetes_namespace.airflow.metadata[0].name
   }
   data = {
-    "postgresql-password" = module.rds.rds_password
+    "postgresql-password" = var.rds_password
   }
 }
 

@@ -1,6 +1,4 @@
 # variable "vpc" {}
-variable "cidr_blocks" {}
 variable "vpc_id" {}
-variable "vpc_private_subnets" {
-
-}
+variable "vpc_private_subnets" {}
+variable "private_subnets_cidr_blocks" {}

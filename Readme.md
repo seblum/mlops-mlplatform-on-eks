@@ -8,7 +8,7 @@ project
 │   README.md
 │   .gitignore
 │
-└───deployments
+└───distribution
 │   │   file011.txt
 │   │   file012.txt
 │   │
@@ -23,7 +23,7 @@ project
 ```
 
 ## ToDo
-
+- [ ] make helm work
 - [ ] write github actions to deploy automatically
 - [ ] secrets to github actions
 - [ ] refactor tf code with subdirs

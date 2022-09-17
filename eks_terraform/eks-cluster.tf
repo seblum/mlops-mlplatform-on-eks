@@ -7,6 +7,8 @@ module "eks" {
 
   vpc_id = module.vpc.vpc_id
 
+  cluster_endpoint_public_access  = true
+
   workers_group_defaults = {
     root_volume_type = "gp2"
   }
@@ -16,14 +18,14 @@ module "eks" {
       name                          = "worker-group-1"
       instance_type                 = "t2.small"
       additional_userdata           = "echo foo bar"
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+      additional_security_group_ids = [module.vpc.worker_group_mgmt_one_id]
       asg_desired_capacity          = 2
     },
     {
       name                          = "worker-group-2"
       instance_type                 = "t2.medium"
       additional_userdata           = "echo foo bar"
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+      additional_security_group_ids = [module.vpc.worker_group_mgmt_two_id]
       asg_desired_capacity          = 1
     },
   ]

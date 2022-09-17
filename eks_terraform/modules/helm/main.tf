@@ -31,5 +31,5 @@ resource "helm_release" "airflow" {
   chart      = "airflow"
   version    = "8.6.1"
 
-  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/helm/airflow/values.yaml")}"]
+  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/helm_applications/airflow/values.yaml")}"]
 }

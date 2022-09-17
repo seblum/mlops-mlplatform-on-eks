@@ -1,2 +1,6 @@
-variable "vpc" {}
-variable "vpc_security_group_ids" {}
+# variable "vpc" {}
+variable "cidr_blocks" {}
+variable "vpc_id" {}
+variable "vpc_private_subnets" {
+
+}

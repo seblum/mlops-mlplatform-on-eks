@@ -15,7 +15,7 @@ resource "aws_db_instance" "airflow" {
   engine_version         = "13.3"
   instance_class         = "db.t3.micro"
   db_name                = "airflow_db"
-  username               = "airflow_admin"
+  username               = "airflow_admin" # push to main
   password               = random_password.password.result
   parameter_group_name   = "default.postgres13"
   identifier             = "airflow-postgres"

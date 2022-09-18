@@ -8,6 +8,7 @@ provider "aws" {
 
 locals {
   cluster_name = "airflow-seblum-eks"
+  vpc_name     = "airflow-seblum-vpc"
 }
 
 module "eks" {
@@ -18,11 +19,13 @@ module "eks" {
   security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
   vpc_id                = module.vpc.vpc_id
   rds_password          = module.rds.rds_password
+  github_ssh            = var.AIRFLOW_GITHUB_SSH
 }
 
 module "vpc" {
   source       = "./modules/vpc"
   cluster_name = local.cluster_name
+  vpc_name     = local.vpc_name
 }
 
 module "rds" {
@@ -33,13 +36,12 @@ module "rds" {
   # vpc                    = module.vpc
 }
 
-module "helm" {
-  source                = "./modules/helm"
+module "applications" {
+  source                = "./applications"
   cluster_name          = local.cluster_name
   cluster_endpoint      = module.eks.cluster_endpoint
   eks_cluster_authority = module.eks.kubeconfig_certificate_authority
 }
-
 
 
 # terraform {

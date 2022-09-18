@@ -1,3 +1,8 @@
+
+### ------------ ###
+###     HELM     ###
+### ------------ ###
+
 provider "helm" {
   kubernetes {
     host                   = var.cluster_endpoint
@@ -31,5 +36,16 @@ resource "helm_release" "airflow" {
   chart      = "airflow"
   version    = "8.6.1"
 
-  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/helm_applications/airflow/values.yaml")}"]
+  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/airflow/values.yaml")}"]
+}
+
+resource "helm_release" "mlflow" {
+  name      = "mlflow"
+  namespace = "mlflow"
+
+  repository = "https://community-charts.github.io/helm-charts"
+  chart      = "community-charts/mlflow"
+  version    = "0.7.13"
+
+  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/values.yaml")}"]
 }

@@ -12,3 +12,7 @@ variable "region" {
   default     = "eu-central-1"
   description = "AWS region"
 }
+
+variable "AIRFLOW_GITHUB_SSH" {
+  default = ""
+}

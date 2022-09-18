@@ -7,3 +7,6 @@ variable "cluster_name" {}
 variable "rds_password" {
 
 }
+variable "github_ssh" {
+
+}

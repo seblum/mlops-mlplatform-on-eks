@@ -1,3 +1,4 @@
+
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "17.24.0"
@@ -31,6 +32,19 @@ module "eks" {
   ]
 }
 
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_id
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_id
+}
+
+### ------------ ###
+###  KUBERNETES  ###
+### ------------ ###
+
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   token                  = data.aws_eks_cluster_auth.cluster.token
@@ -48,11 +62,19 @@ resource "kubernetes_namespace" "namespace-monitoring" {
   }
 }
 
-resource "kubernetes_namespace" "airflow" {
+resource "kubernetes_namespace" "namespace-airflow" {
   metadata {
     name = "airflow"
   }
 }
+
+resource "kubernetes_namespace" "namespace-mlflow" {
+  metadata {
+    name = "mlflow"
+  }
+}
+
+
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
     name      = "airflow-db-auth"
@@ -63,11 +85,15 @@ resource "kubernetes_secret" "airflow_db_credentials" {
   }
 }
 
-
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_id
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id
+resource "kubernetes_secret" "airflow_git_ssh_secret" {
+  metadata {
+    name      = "airflow-git-ssh-secret"
+    namespace = kubernetes_namespace.airflow.metadata[0].name
+  }
+  data = {
+    "gitSshKey" = var.github_ssh
+    # "${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/ssh/airflow_dag")}"
+    #"known_hosts" = "${file("/Users/sebastian.blum/.ssh/known_hosts")}"
+    #"id_ed25519.pub" = "${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/ssh/airflow_dag.pub")}"
+  }
 }

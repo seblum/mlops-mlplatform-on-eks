@@ -812,7 +812,7 @@ web:
 workers:
   ## if the airflow workers StatefulSet should be deployed
   ##
-  enabled: true
+  enabled: false
 
   ## the number of worker Pods to run
   ## - if you set this >1 we recommend defining a `workers.podDisruptionBudget`
@@ -1094,7 +1094,7 @@ triggerer:
 flower:
   ## if the airflow flower UI should be deployed
   ##
-  enabled: true
+  enabled: false
 
   ## the number of flower Pods to run
   ## - if you set this >1 we recommend defining a `flower.podDisruptionBudget`
@@ -1825,7 +1825,7 @@ postgresql:
   ## - [WARNING] consider using an external database with `externalDatabase.*`
   ## - set to `false` if using `externalDatabase.*`
   ##
-  enabled: true
+  enabled: false
 
   ## the postgres database to use
   ##
@@ -1905,7 +1905,7 @@ externalDatabase:
 
   ## the host of the external database
   ##
-  host: localhost
+  host: airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com # TODO dynamic input
 
   ## the port of the external database
   ##
@@ -1913,31 +1913,15 @@ externalDatabase:
 
   ## the database/scheme to use within the external database
   ##
-  database: airflow
+  database: airflow_db
 
-  ## the username for the external database
+  ## the user of the external database
   ##
-  user: airflow
-
-  ## the name of a pre-created secret containing the external database user
-  ## - if set, this overrides `externalDatabase.user`
-  ##
-  userSecret: ""
-
-  ## the key within `externalDatabase.userSecret` containing the user string
-  ##
-  userSecretKey: "postgresql-user"
-
-  ## the password for the external database
-  ## - [WARNING] to avoid storing the password in plain-text within your values,
-  ##   create a Kubernetes secret and use `externalDatabase.passwordSecret`
-  ##
-  password: ""
+  user: airflow_admin
 
   ## the name of a pre-created secret containing the external database password
-  ## - if set, this overrides `externalDatabase.password`
   ##
-  passwordSecret: ""
+  passwordSecret: "airflow-db-auth"
 
   ## the key within `externalDatabase.passwordSecret` containing the password string
   ##

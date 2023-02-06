@@ -8,11 +8,27 @@ variable "AWS_SECRET_KEY" {
   description = "AWS secret access key"
 }
 
-variable "region" {
+variable "aws_region" {
   default     = "eu-central-1"
   description = "AWS region"
 }
 
 variable "AIRFLOW_GITHUB_SSH" {
+  default = ""
+}
+
+variable "cluster_name" {
+  default = "airflow-seblum-eks"
+}
+
+variable "vpc_name" {
+  default = "airflow-seblum-vpc"
+}
+
+variable "port_airflow" {
+  default = ""
+}
+
+variable "port_mlflow" {
   default = ""
 }

@@ -29,4 +29,6 @@ override.tf.json
 # example: *tfplan*
 
 .DS_Store
-eks_terraform/.DS_Store
+*.DS_Store
+*/.DS_Store
+*/*/.DS_Store

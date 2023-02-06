@@ -1,18 +1,15 @@
 
-provider "aws" {
-  region     = var.region
-  access_key = var.AWS_ACCESS_KEY
-  secret_key = var.AWS_SECRET_KEY
-
-}
-
 locals {
-  cluster_name = "airflow-seblum-eks"
-  vpc_name     = "airflow-seblum-vpc"
+  cluster_name = var.cluster_name
+  vpc_name     = var.vpc_name
+  port_airflow = port_airflow
+  port_mlflow  = port_mlflow
 }
+
+# Infrastructure
 
 module "eks" {
-  source                = "./modules/eks"
+  source                = "./infrastructure/eks"
   cluster_name          = local.cluster_name
   private_subnets       = module.vpc.private_subnets
   security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
@@ -23,12 +20,17 @@ module "eks" {
 }
 
 module "vpc" {
-  source       = "./modules/vpc"
+  source       = "./infrastructure/vpc"
   cluster_name = local.cluster_name
   vpc_name     = local.vpc_name
 }
 
-module "rds" {
+
+
+# MODULES
+
+# write within mlflow
+module "rds-mlflow" {
   source                      = "./modules/rds"
   vpc_private_subnets         = module.vpc.private_subnets
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
@@ -36,6 +38,19 @@ module "rds" {
   # vpc                    = module.vpc
 }
 
+
+# create within airflow
+module "rds-airflow" {
+  source                      = "./modules/rds"
+  vpc_private_subnets         = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  vpc_id                      = module.vpc.vpc_id
+  port                        = local.port_airflow
+  # vpc                    = module.vpc
+}
+
+# will be calles within mlflow and airflow
+# might also think whether creating this in terraform or helm
 module "applications" {
   source                = "./applications"
   cluster_name          = local.cluster_name

@@ -23,6 +23,6 @@ output "config_map_aws_auth" {
   value       = module.eks.config_map_aws_auth
 }
 
-output "kubeconfig_certificate_authority" {
-  value = data.aws_eks_cluster.cluster.certificate_authority.0.data
+output "aws_eks_cluster" {
+  value = module.eks.cluster_id
 }

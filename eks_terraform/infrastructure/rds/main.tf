@@ -1,5 +1,12 @@
+locals {
+  rds_name           = var.rds_name
+  rds_engine         = var.rds_engine
+  rds_engine_version = var.rds_engine_version
+  rds_port           = var.rds_port
+}
+
 resource "aws_db_subnet_group" "default" {
-  name       = "vpc-subnet-group-airflow"
+  name       = "vpc-subnet-group-${local.rds_name}"
   subnet_ids = var.vpc_private_subnets
 }
 
@@ -8,18 +15,18 @@ resource "random_password" "password" {
   special = false
 }
 
-resource "aws_db_instance" "airflow" {
-  allocated_storage      = 20
-  storage_type           = "gp2"
-  engine                 = "postgres"
-  engine_version         = "13.3"
+resource "aws_db_instance" "rds_instance" {
+  allocated_storage      = var.max_allocated_storage
+  storage_type           = var.storage_type
+  engine                 = local.rds_engine
+  engine_version         = local.rds_engine_version
   instance_class         = "db.t3.micro"
-  db_name                = "airflow_db"
-  username               = "airflow_admin" # push to main
+  db_name                = "${local.rds_name}_db"
+  username               = "${local.rds_name}_admin" # push to main
   password               = random_password.password.result
-  parameter_group_name   = "default.postgres13"
-  identifier             = "airflow-postgres"
-  port                   = 5432
+  parameter_group_name   = "default.-${local.rds_engine}--${local.rds_engine_version}"
+  identifier             = "${local.rds_name}-${local.rds_engine}"
+  port                   = local.rds_port
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
   skip_final_snapshot    = true
@@ -27,13 +34,13 @@ resource "aws_db_instance" "airflow" {
 
 
 resource "aws_security_group" "rds_sg" {
-  name   = "airflow-postgres-sg"
+  name   = "${local.rds_name}-${local.rds_engine}-sg"
   vpc_id = var.vpc_id
 
   ingress {
     description = "Enable postgres access"
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = local.rds_port
+    to_port     = local.rds_port
     protocol    = "tcp"
     cidr_blocks = var.private_subnets_cidr_blocks
   }

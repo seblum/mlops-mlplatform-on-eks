@@ -1,8 +1,6 @@
-
-
 output "region" {
   description = "AWS region"
-  value       = var.region
+  value       = var.aws_region
 }
 
 output "cluster_name" {
@@ -12,5 +10,5 @@ output "cluster_name" {
 
 output "rds_host" {
   description = "Kubernetes Cluster Name"
-  value       = module.rds.rds_host
+  value       = module.airflow.rds_host
 }

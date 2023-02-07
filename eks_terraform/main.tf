@@ -1,91 +1,83 @@
 
 locals {
-  cluster_name = var.cluster_name
-  vpc_name     = var.vpc_name
-  port_airflow = port_airflow
-  port_mlflow  = port_mlflow
+  cluster_name            = "${var.name_prefix}-eks"
+  vpc_name                = "${var.name_prefix}-vpc"
+  port_airflow            = 5432
+  port_mlflow             = 5000
+  mlflow_s3_bucket_name   = "mlflow"
+  force_destroy_s3_bucket = true
+  storage_type            = "gp2"
+  max_allocated_storage   = var.max_allocated_storage
+  airflow_github_ssh      = var.AIRFLOW_GITHUB_SSH
 }
 
-# Infrastructure
-
-module "eks" {
-  source                = "./infrastructure/eks"
-  cluster_name          = local.cluster_name
-  private_subnets       = module.vpc.private_subnets
-  security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
-  security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
-  vpc_id                = module.vpc.vpc_id
-  rds_password          = module.rds.rds_password
-  github_ssh            = var.AIRFLOW_GITHUB_SSH
+data "aws_caller_identity" "current" {
+}
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_id
+}
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_id
 }
 
+
+# INFRASTRUCTURE
 module "vpc" {
   source       = "./infrastructure/vpc"
   cluster_name = local.cluster_name
   vpc_name     = local.vpc_name
 }
 
+module "eks" {
+  source                = "./infrastructure/eks"
+  cluster_name          = local.cluster_name
+  vpc_id                = module.vpc.vpc_id
+  private_subnets       = module.vpc.private_subnets
+  security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
+  security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
+}
 
 
 # MODULES
-
-# write within mlflow
-module "rds-mlflow" {
-  source                      = "./modules/rds"
-  vpc_private_subnets         = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  vpc_id                      = module.vpc.vpc_id
-  # vpc                    = module.vpc
-}
-
-
-# create within airflow
-module "rds-airflow" {
-  source                      = "./modules/rds"
-  vpc_private_subnets         = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  vpc_id                      = module.vpc.vpc_id
-  port                        = local.port_airflow
-  # vpc                    = module.vpc
-}
-
-# will be calles within mlflow and airflow
-# might also think whether creating this in terraform or helm
-module "applications" {
-  source                = "./applications"
+module "airflow" {
+  source                = "./modules/airflow"
+  tag_name              = "airflow"
   cluster_name          = local.cluster_name
-  cluster_endpoint      = module.eks.cluster_endpoint
-  eks_cluster_authority = module.eks.kubeconfig_certificate_authority
+  cluster_endpoint      = data.aws_eks_cluster.cluster.endpoint
+  eks_cluster_authority = data.aws_eks_cluster.cluster.certificate_authority.0.data
+  storage_type          = local.storage_type
+  max_allocated_storage = local.max_allocated_storage
+  rds_password          = ""
+  github_ssh            = local.airflow_github_ssh
+
+  # RDS
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  vpc_id                      = module.vpc.vpc_id
+  rds_port                    = local.port_airflow
+  rds_name                    = "airflow"
+  rds_engine                  = "postgres"
+  rds_engine_version          = "13.3"
+
+  # HELM
+  helm_chart_repository = "https://airflow-helm.github.io/charts"
+  helm_chart_name       = "airflow"
+  helm_chart_version    = "8.6.1"
 }
 
+module "mlflow" {
+  source                = "./modules/mlflow"
+  account_id            = data.aws_caller_identity.current.account_id
+  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
+  s3_force_destroy      = local.force_destroy_s3_bucket
+  storage_type          = local.storage_type
 
-# terraform {
-#   required_providers {
-#     aws = {
-#       source  = "hashicorp/aws"
-#       version = ">= 3.20.0"
-#     }
-
-#     random = {
-#       source  = "hashicorp/random"
-#       version = "3.1.0"
-#     }
-
-#     local = {
-#       source  = "hashicorp/local"
-#       version = "2.1.0"
-#     }
-
-#     null = {
-#       source  = "hashicorp/null"
-#       version = "3.1.0"
-#     }
-
-#     kubernetes = {
-#       source  = "hashicorp/kubernetes"
-#       version = ">= 2.0.1"
-#     }
-#   }
-
-#   required_version = ">= 0.14"
-# }
+  # RDS
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  vpc_id                      = module.vpc.vpc_id
+  rds_port                    = local.port_mlflow
+  rds_name                    = "mlflow"
+  rds_engine                  = "postgres"
+  rds_engine_version          = "13.3"
+}

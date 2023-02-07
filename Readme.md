@@ -45,3 +45,20 @@ https://learn.hashicorp.com/tutorials/terraform/eks
 
 kubectl create namespace airflow
 helm install airflow apache-airflow/airflow --namespace airflow --debug
+
+
+# Deployment
+
+
+1. set aws und kubectl cli
+2. Run `terraform apply` or `terraform apply -var-file="testing.tfvars"`
+3. The endpoint is currently public, access it under the given endpoint url printed after applying
+
+
+
+Set up Airflow ssh keys
+https://airflow.apache.org/docs/helm-chart/stable/manage-dags-files.html
+
+create ssh key
+set it to deploy key in private github repo
+reference to it within your terraform code OR put it into Github actions secret

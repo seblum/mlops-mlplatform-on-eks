@@ -1,5 +1,5 @@
 variable "github_ssh" {}
-variable "rds_password" {}
+#variable "rds_password" {}
 
 variable "vpc_id" {}
 variable "private_subnets" {}
@@ -27,4 +27,12 @@ variable "max_allocated_storage" {
   type        = number
   description = "The upper limit of scalable storage (Gb)"
   default     = 500
+}
+
+variable "parameter_group_name" {
+
+}
+
+variable "rds_instance_class" {
+
 }

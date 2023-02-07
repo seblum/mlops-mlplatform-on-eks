@@ -20,11 +20,11 @@ resource "aws_db_instance" "rds_instance" {
   storage_type           = var.storage_type
   engine                 = local.rds_engine
   engine_version         = local.rds_engine_version
-  instance_class         = "db.t3.micro"
+  instance_class         = var.rds_instance_class
   db_name                = "${local.rds_name}_db"
   username               = "${local.rds_name}_admin" # push to main
   password               = random_password.password.result
-  parameter_group_name   = "default.-${local.rds_engine}--${local.rds_engine_version}"
+  parameter_group_name   = var.parameter_group_name
   identifier             = "${local.rds_name}-${local.rds_engine}"
   port                   = local.rds_port
   vpc_security_group_ids = [aws_security_group.rds_sg.id]

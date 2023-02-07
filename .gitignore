@@ -34,3 +34,4 @@ override.tf.json
 */*/.DS_Store
 
 mlflow_test
+*.tfvars

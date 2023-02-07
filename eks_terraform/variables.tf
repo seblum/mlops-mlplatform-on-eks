@@ -16,15 +16,21 @@ variable "aws_region" {
 variable "AIRFLOW_GITHUB_SSH" {
   default = ""
 }
-
 variable "name_prefix" {
   default = "airflow-seblum"
 }
-
-
 
 variable "max_allocated_storage" {
   type        = number
   description = "The upper limit of scalable storage (Gb)"
   default     = 500
+}
+
+variable "port_mlflow" {
+
+}
+
+
+variable "port_airflow" {
+
 }

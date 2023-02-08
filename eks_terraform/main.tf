@@ -68,22 +68,22 @@ module "airflow" {
   helm_chart_version    = "8.6.1"
 }
 
-module "mlflow" {
-  source                = "./modules/mlflow"
-  account_id            = data.aws_caller_identity.current.account_id
-  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
-  s3_force_destroy      = local.force_destroy_s3_bucket
+# module "mlflow" {
+#   source                = "./modules/mlflow"
+#   account_id            = data.aws_caller_identity.current.account_id
+#   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
+#   s3_force_destroy      = local.force_destroy_s3_bucket
 
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_mlflow
-  rds_name                    = "mlflow"
-  rds_engine                  = "postgres"
-  rds_engine_version          = "13.3"
-  parameter_group_name        = "default.postgres13"
-  rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
-}
+#   # RDS
+#   vpc_id                      = module.vpc.vpc_id
+#   private_subnets             = module.vpc.private_subnets
+#   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+#   rds_port                    = local.port_mlflow
+#   rds_name                    = "mlflow"
+#   rds_engine                  = "postgres"
+#   rds_engine_version          = "13.3"
+#   parameter_group_name        = "default.postgres13"
+#   rds_instance_class          = "db.t3.micro"
+#   storage_type                = local.storage_type
+#   max_allocated_storage       = local.max_allocated_storage
+# }

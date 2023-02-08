@@ -47,3 +47,8 @@ variable "parameter_group_name" {
 variable "rds_instance_class" {
 
 }
+
+
+variable "rds_password" {
+
+}

@@ -13,9 +13,10 @@ variable "aws_region" {
   description = "AWS region"
 }
 
-variable "AIRFLOW_GITHUB_SSH" {
+variable "airflow_github_ssh" {
   default = ""
 }
+
 variable "name_prefix" {
   default = "airflow-seblum"
 }
@@ -27,10 +28,16 @@ variable "max_allocated_storage" {
 }
 
 variable "port_mlflow" {
+}
+
+variable "port_airflow" {
 
 }
 
+variable "git_username" {
 
-variable "port_airflow" {
+}
+
+variable "git_token" {
 
 }

@@ -1,5 +1,4 @@
-variable "github_ssh" {}
-#variable "rds_password" {}
+variable "airflow_github_ssh" {}
 
 variable "vpc_id" {}
 variable "private_subnets" {}
@@ -35,4 +34,17 @@ variable "parameter_group_name" {
 
 variable "rds_instance_class" {
 
+}
+
+variable "git_username" {
+
+}
+variable "git_token" {
+
+}
+
+variable "rds_password" {
+  type        = string
+  description = "Database admin account password"
+  default     = null
 }

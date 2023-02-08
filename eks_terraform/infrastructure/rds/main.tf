@@ -10,10 +10,7 @@ resource "aws_db_subnet_group" "default" {
   subnet_ids = var.vpc_private_subnets
 }
 
-resource "random_password" "password" {
-  length  = 16
-  special = false
-}
+
 
 resource "aws_db_instance" "rds_instance" {
   allocated_storage      = var.max_allocated_storage
@@ -23,7 +20,7 @@ resource "aws_db_instance" "rds_instance" {
   instance_class         = var.rds_instance_class
   db_name                = "${local.rds_name}_db"
   username               = "${local.rds_name}_admin" # push to main
-  password               = random_password.password.result
+  password               = var.rds_password
   parameter_group_name   = var.parameter_group_name
   identifier             = "${local.rds_name}-${local.rds_engine}"
   port                   = local.rds_port

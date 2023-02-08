@@ -1,4 +1,22 @@
 airflow:
+  users:
+    ## define the user called "admin"  # TODO
+    - username: admin
+      password: admin
+      role: Admin
+      email: admin@example.com
+      firstName: admin
+      lastName: admin
+    ## define the user called "user"  # TODO
+    - username: user
+      password: user123
+      role:
+        - User
+        - Viewer
+      email: user@example.com
+      firstName: user
+      lastName: user
+  usersUpdate: true
   legacyCommands: false
   image:
     repository: apache/airflow
@@ -21,7 +39,7 @@ redis:
 externalDatabase:
   type: postgres
   host: airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com # TODO dynamic input
-  port: 5432
+  port: "" # TODO
   database: airflow_db
   user: airflow_admin
   passwordSecret: "airflow-db-auth"
@@ -30,8 +48,9 @@ externalDatabase:
 dags:
   gitSync:
     enabled: true
-    repo: ssh://git@github.com/seblum/Airflow_DAGs.git
+    repo: https://github.com/seblum/Airflow_DAGs.git
     branch: main
     revision: HEAD
-    sshSecret: airflow-git-ssh-secret
-    sshSecretKey: gitSshKey
+    httpSecret: "airflow-https-git-secret"
+    httpSecretUsernameKey: username # TODO
+    httpSecretPasswordKey: password # TODO

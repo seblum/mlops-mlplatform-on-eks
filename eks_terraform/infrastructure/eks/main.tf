@@ -1,32 +1,49 @@
+locals {
+  cluster_name = var.cluster_name
+}
+data "aws_eks_cluster" "cluster" {
+  name = var.cluster_name
+  depends_on = [
+    module.eks
+  ]
+}
+
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  version         = "17.24.0"
-  cluster_name    = var.cluster_name
-  cluster_version = var.eks_cluster_version
-  subnets         = var.private_subnets
-  vpc_id          = var.vpc_id
+  source  = "terraform-aws-modules/eks/aws"
+  version = "19.5.1"
 
+  cluster_name    = local.cluster_name
+  cluster_version = "1.24"
+
+  vpc_id                         = var.vpc_id
+  subnet_ids                     = var.private_subnets
   cluster_endpoint_public_access = true
 
-  workers_group_defaults = {
-    root_volume_type = "gp2"
+  eks_managed_node_group_defaults = {
+    ami_type = "AL2_x86_64"
+
   }
 
-  worker_groups = [
-    {
-      name                          = "worker-group-1"
-      instance_type                 = "t2.small"
-      additional_userdata           = "echo foo bar"
-      additional_security_group_ids = var.security_group_id_one
-      asg_desired_capacity          = 2
-    },
-    {
-      name                          = "worker-group-2"
-      instance_type                 = "t2.medium"
-      additional_userdata           = "echo foo bar"
-      additional_security_group_ids = var.security_group_id_two
-      asg_desired_capacity          = 1
-    },
-  ]
+  eks_managed_node_groups = {
+    one = {
+      name = "node-group-small"
+
+      instance_types = ["t3.small"]
+
+      min_size     = 1
+      max_size     = 3
+      desired_size = 2
+    }
+
+    two = {
+      name = "node-group-medium"
+
+      instance_types = ["t3.medium"]
+
+      min_size     = 1
+      max_size     = 2
+      desired_size = 1
+    }
+  }
 }

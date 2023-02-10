@@ -21,7 +21,6 @@ resource "aws_db_instance" "rds_instance" {
   db_name                = "${local.rds_name}_db"
   username               = "${local.rds_name}_admin" # push to main
   password               = var.rds_password
-  parameter_group_name   = var.parameter_group_name
   identifier             = "${local.rds_name}-${local.rds_engine}"
   port                   = local.rds_port
   vpc_security_group_ids = [aws_security_group.rds_sg.id]

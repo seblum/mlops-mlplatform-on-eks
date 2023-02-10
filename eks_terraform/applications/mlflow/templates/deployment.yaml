@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  labels:
+    app: mlflow
+  namespace: mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccount: default
+      containers:
+        - name: mlflow
+          securityContext: {}
+          image: {{ .Values.deployment.image }}
+          imagePullPolicy: Always
+          env:
+            - name: MLFLOW_PORT
+              value: "5000"
+            - name: MLFLOW_BACKEND_STORE_URI
+              value: mysql://$(RDS_USERNAME):$(RDS_PASSWORD)@$(RDS_HOST):$(RDS_PORT)/$(DB_NAME)
+            - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
+              value: s3://$(ARTIFACT_S3_BUCKET)/$(ARTIFACT_S3_KEY_PREFIX)
+          envFrom:
+            - secretRef:
+                name: mlflow-secret
+            - configMapRef:
+                name: mlflow-config
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+      initContainers:
+        - name: mlflow-database-creation
+          image: {{ .Values.deployment.image }}
+          imagePullPolicy: Always
+          command:
+            [
+              "sh",
+              "-c",
+              'mariadb --host=${RDS_HOST} --port=${RDS_PORT} --user=${RDS_USERNAME} --password=${RDS_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}"',
+            ]
+          envFrom:
+            - secretRef:
+                name: mlflow-secret
+            - configMapRef:
+                name: mlflow-config
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"

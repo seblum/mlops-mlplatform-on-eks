@@ -13,8 +13,9 @@ locals {
   git_token               = var.git_token
 }
 
-data "aws_caller_identity" "current" {
-}
+
+
+data "aws_caller_identity" "current" {}
 
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
@@ -23,6 +24,7 @@ data "aws_eks_cluster" "cluster" {
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
+
 
 # INFRASTRUCTURE
 module "vpc" {
@@ -43,14 +45,12 @@ module "eks" {
 }
 
 
-# MODULES
+# CUSTOM TOOLS
 module "airflow" {
-  source                = "./modules/airflow"
-  tag_name              = "airflow"
-  cluster_name          = local.cluster_name
-  cluster_endpoint      = data.aws_eks_cluster.cluster.endpoint
-  eks_cluster_authority = data.aws_eks_cluster.cluster.certificate_authority.0.data
-  airflow_github_ssh    = local.airflow_github_ssh # TODO delete
+  source           = "./modules/airflow"
+  tag_name         = "airflow"
+  cluster_name     = local.cluster_name
+  cluster_endpoint = module.eks.cluster_endpoint
 
   # RDS
   vpc_id                      = module.vpc.vpc_id
@@ -60,7 +60,6 @@ module "airflow" {
   rds_name                    = "airflow"
   rds_engine                  = "postgres"
   rds_engine_version          = "13.3"
-  parameter_group_name        = "default.postgres13"
   rds_instance_class          = "db.t3.micro"
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
@@ -86,9 +85,8 @@ module "mlflow" {
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
   rds_port                    = local.port_mlflow
   rds_name                    = "mlflow"
-  rds_engine                  = "postgres"
-  rds_engine_version          = "13.3"
-  parameter_group_name        = "default.postgres13"
+  rds_engine                  = "mysql"
+  rds_engine_version          = "8.0.30"
   rds_instance_class          = "db.t3.micro"
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage

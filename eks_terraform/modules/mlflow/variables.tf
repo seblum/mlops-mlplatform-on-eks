@@ -35,6 +35,6 @@ variable "s3_force_destroy" {
 
 }
 
-variable "parameter_group_name" {
+# variable "parameter_group_name" {
 
-}
+# }

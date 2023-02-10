@@ -40,9 +40,9 @@ variable "max_allocated_storage" {
   default     = 500
 }
 
-variable "parameter_group_name" {
-  type = string
-}
+# variable "parameter_group_name" {
+#   type = string
+# }
 
 variable "rds_instance_class" {
 

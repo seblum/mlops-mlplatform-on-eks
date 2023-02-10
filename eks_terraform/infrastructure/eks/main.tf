@@ -1,13 +1,6 @@
 locals {
   cluster_name = var.cluster_name
 }
-data "aws_eks_cluster" "cluster" {
-  name = var.cluster_name
-  depends_on = [
-    module.eks
-  ]
-}
-
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"

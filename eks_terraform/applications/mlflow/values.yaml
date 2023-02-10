@@ -1,1 +1,11 @@
-# write own mlflow file
+
+RDS_USERNAME:
+RDS_PASSWORD:
+RDS_HOST:
+RDS_PORT:
+ARTIFACT_S3_BUCKET:
+ARTIFACT_S3_KEY_PREFIX:
+DB_NAME:
+
+deployment:
+  image: seblum/mlflow:mlflow

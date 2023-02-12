@@ -97,3 +97,13 @@ variable "git_token" {
   type        = string
   description = "Github token"
 }
+
+variable "git_repository_url" {
+  type        = string
+  description = "Https URL to the Github repository to sync Airflow with"
+}
+
+variable "git_branch" {
+  type        = string
+  description = "Branch of the Github repository"
+}

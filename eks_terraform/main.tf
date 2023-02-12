@@ -75,6 +75,8 @@ module "airflow" {
   helm_chart_version    = "8.6.1"
   git_username          = local.git_username
   git_token             = local.git_token
+  git_repository_url    = "https://github.com/seblum/Airflow_DAGs.git"
+  git_branch            = "main"
 }
 
 

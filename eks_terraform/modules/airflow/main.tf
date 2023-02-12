@@ -69,18 +69,18 @@ resource "helm_release" "airflow" {
   }
   set {
     name  = "externalDatabase.host"
-    value = "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com" # TODO
+    value = module.rds-airflow.rds_host # "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com" # module.rds-airflow.rds_host
   }
   set {
     name  = "dags.gitSync.repo"
-    value = "https://github.com/seblum/Airflow_DAGs.git"
+    value = var.git_repository_url # "https://github.com/seblum/Airflow_DAGs.git" # var.git_repository_url
   }
   set {
-    name  = "dags.gitSync.branch"
-    value = "main"
+    name  = "dags.gitSync.branch" # var.git_branch
+    value = var.git_branch
   }
   set {
     name  = "dags.gitSync.httpSecret"
-    value = "airflow-https-git-secret"
+    value = kubernetes_secret.airflow_https_git_secret.id
   }
 }

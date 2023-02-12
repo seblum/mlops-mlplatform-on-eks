@@ -17,10 +17,13 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+# this does not
 data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
+  name = module.eks.cluster_id
+  #cluster_id = module.eks.cluster_id
 }
 
+# this works
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
@@ -63,6 +66,8 @@ module "airflow" {
   rds_instance_class          = "db.t3.micro"
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
+  # periodic updates
+  # log airflow to s3
 
   # HELM
   helm_chart_repository = "https://airflow-helm.github.io/charts"
@@ -90,4 +95,25 @@ module "mlflow" {
   rds_instance_class          = "db.t3.micro"
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
+}
+
+module "coder" {
+  source                = "./modules/coder"
+  tag_name              = "coder"
+  helm_chart_repository = "https://helm.coder.com"
+  helm_chart_name       = "coder"
+  helm_chart_version    = "1.39.1"
+
+  # RDS
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  rds_port                    = "5432" # coder port
+  rds_name                    = "coder"
+  rds_engine                  = "postgres"
+  rds_engine_version          = "13.3"
+  rds_instance_class          = "db.t3.micro"
+  storage_type                = local.storage_type
+  max_allocated_storage       = local.max_allocated_storage
+
 }

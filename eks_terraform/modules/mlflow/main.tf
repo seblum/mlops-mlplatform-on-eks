@@ -1,7 +1,7 @@
 
 resource "kubernetes_namespace" "namespace-mlflow" {
   metadata {
-    name = "mlflow"
+    name = "mlflow" # TODO variable
   }
 }
 

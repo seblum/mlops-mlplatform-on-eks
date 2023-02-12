@@ -7,7 +7,7 @@ postgres:
   user: ""
   # postgres.database -- Name of the database that Coder will use.
   # You must create this database first.
-  database: ""
+  # database: ""
   # This should be set to an empty string if the database does not
   # require a password to connect.
   passwordSecret: ""

@@ -23,10 +23,9 @@ module "rds-coder" {
   rds_password                = coalesce(var.rds_password, random_password.rds_password.result)
   rds_engine                  = var.rds_engine
   rds_engine_version          = var.rds_engine_version
-  #parameter_group_name        = var.parameter_group_name
-  rds_instance_class    = var.rds_instance_class
-  storage_type          = var.storage_type
-  max_allocated_storage = var.max_allocated_storage
+  rds_instance_class          = var.rds_instance_class
+  storage_type                = var.storage_type
+  max_allocated_storage       = var.max_allocated_storage
 }
 
 
@@ -62,11 +61,22 @@ resource "helm_release" "coder" {
   }
   set {
     name  = "postgres.database"
-    value = var.rds_name
+    value = module.rds-coder.rds_dbname
   }
   set {
     name  = "postgres.passwordSecret"
-    value = module.rds-coder.rds_password
+    value = "rds-password-secret"
+  }
+}
+
+resource "kubernetes_secret" "coder-secret" {
+  metadata {
+    name      = "rds-password-secret"
+    namespace = var.tag_name
+  }
+  data = {
+    password = module.rds-coder.rds_password
   }
 
+  type = "kubernetes.io/basic-auth"
 }

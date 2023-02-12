@@ -19,7 +19,7 @@ data "aws_caller_identity" "current" {}
 
 # this does not
 data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_id
+  name = module.eks.cluster_name
   #cluster_id = module.eks.cluster_id
 }
 

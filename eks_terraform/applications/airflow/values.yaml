@@ -38,8 +38,8 @@ redis:
   enabled: false
 externalDatabase:
   type: postgres
-  host: airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com # TODO dynamic input
-  port: "" # TODO
+  host: ""
+  port: ""
   database: airflow_db
   user: airflow_admin
   passwordSecret: "airflow-db-auth"
@@ -48,9 +48,9 @@ externalDatabase:
 dags:
   gitSync:
     enabled: true
-    repo: https://github.com/seblum/Airflow_DAGs.git
-    branch: main
+    repo: ""
+    branch: ""
     revision: HEAD
-    httpSecret: "airflow-https-git-secret"
+    httpSecret: ""
     httpSecretUsernameKey: username # TODO
     httpSecretPasswordKey: password # TODO

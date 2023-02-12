@@ -68,4 +68,20 @@ resource "helm_release" "airflow" {
     name  = "externalDatabase.port"
     value = var.rds_port
   }
+  set {
+    name  = "externalDatabase.host"
+    value = "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com"
+  }
+  set {
+    name  = "dags.gitSync.repo"
+    value = "https://github.com/seblum/Airflow_DAGs.git"
+  }
+  set {
+    name  = "dags.gitSync.branch"
+    value = "main"
+  }
+  set {
+    name  = "dags.gitSync.httpSecret"
+    value = "airflow-https-git-secret"
+  }
 }

@@ -10,7 +10,7 @@ deploy: init \
 
 
 destroy: init \
-	destroy-mlflow
+	destroy-mlflow \
 	destroy-airflow \
 	destroy-coder \
 	destroy-eks-cluster \
@@ -38,12 +38,12 @@ deploy-mlflow:
 deploy-coder:
 	terraform apply -target="module.coder" -var-file=$(VARS_FILE) -auto-approve
 
-# TERRAFORM DESTRY
+# TERRAFORM DESTROY
 destroy-vpc:
-	terraform destroy	-target="module.vpc" -var-file=$(VARS_FILE) -auto-approve
+	terraform destroy -target="module.vpc" -var-file=$(VARS_FILE) -auto-approve
 
 destroy-eks-cluster:
-	terraform destroy	-target="module.eks" -var-file=$(VARS_FILE) -auto-approve
+	terraform destroy -target="module.eks" -var-file=$(VARS_FILE) -auto-approve
 
 destroy-airflow:
 	terraform destroy -target="module.airflow" -var-file=$(VARS_FILE) -auto-approve

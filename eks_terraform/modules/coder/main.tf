@@ -1,10 +1,12 @@
+locals {
+  k8s_secret_name = "rds-password-secret"
+}
+
 resource "kubernetes_namespace" "namespace_coder" {
   metadata {
     name = var.tag_name
   }
 }
-
-
 
 resource "random_password" "rds_password" {
   length  = 16
@@ -16,7 +18,7 @@ resource "random_password" "rds_password" {
 module "rds-coder" {
   source                      = "../../infrastructure/rds"
   vpc_id                      = var.vpc_id
-  vpc_private_subnets         = var.private_subnets
+  private_subnets             = var.private_subnets
   private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
   rds_port                    = var.rds_port
   rds_name                    = var.rds_name
@@ -41,12 +43,6 @@ resource "helm_release" "coder" {
   #   values     = [file("${path.root}/helm/airflow.yml")]
   values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/coder/values.yaml")}"]
 
-  # - database       = "coder"
-  # - host           = "coder-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com"
-  # - passwordSecret = "(Rh*F):F*$Y]MTp("
-  # - port           = 5432
-  # - user           = "coder_admin"
-
   set {
     name  = "postgres.host"
     value = module.rds-coder.rds_host
@@ -65,13 +61,13 @@ resource "helm_release" "coder" {
   }
   set {
     name  = "postgres.passwordSecret"
-    value = "rds-password-secret"
+    value = local.k8s_secret_name
   }
 }
 
 resource "kubernetes_secret" "coder-secret" {
   metadata {
-    name      = "rds-password-secret"
+    name      = local.k8s_secret_name
     namespace = var.tag_name
   }
   data = {

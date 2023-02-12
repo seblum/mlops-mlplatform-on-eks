@@ -7,7 +7,7 @@ locals {
 
 resource "aws_db_subnet_group" "default" {
   name       = "vpc-subnet-group-${local.rds_name}"
-  subnet_ids = var.vpc_private_subnets
+  subnet_ids = var.private_subnets
 }
 
 

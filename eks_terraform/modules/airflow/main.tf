@@ -36,17 +36,16 @@ resource "random_password" "rds_password" {
 module "rds-airflow" {
   source                      = "../../infrastructure/rds"
   vpc_id                      = var.vpc_id
-  vpc_private_subnets         = var.private_subnets
+  private_subnets             = var.private_subnets
   private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
   rds_port                    = var.rds_port
   rds_name                    = var.rds_name
   rds_password                = coalesce(var.rds_password, random_password.rds_password.result)
   rds_engine                  = var.rds_engine
   rds_engine_version          = var.rds_engine_version
-  #parameter_group_name        = var.parameter_group_name
-  rds_instance_class    = var.rds_instance_class
-  storage_type          = var.storage_type
-  max_allocated_storage = var.max_allocated_storage
+  rds_instance_class          = var.rds_instance_class
+  storage_type                = var.storage_type
+  max_allocated_storage       = var.max_allocated_storage
 }
 
 
@@ -70,7 +69,7 @@ resource "helm_release" "airflow" {
   }
   set {
     name  = "externalDatabase.host"
-    value = "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com"
+    value = "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com" # TODO
   }
   set {
     name  = "dags.gitSync.repo"

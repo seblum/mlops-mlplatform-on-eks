@@ -1,3 +1,9 @@
+variable "cluster_name" {
+  type        = string
+  description = "Name of the EKS Cluster"
+}
 
-variable "cluster_name" {}
-variable "vpc_name" {}
+variable "vpc_name" {
+  type        = string
+  description = "Name of the VPC"
+}

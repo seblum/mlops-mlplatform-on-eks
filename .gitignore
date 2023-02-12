@@ -40,3 +40,4 @@ eks_terraform/.terraform.lock.hcl
 .DS_Store
 eks_terraform/.DS_Store
 eks_terraform/.DS_Store
+eks_terraform/.terraform.lock.hcl

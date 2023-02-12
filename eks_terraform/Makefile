@@ -5,8 +5,8 @@ deploy: init \
 	create-vpc \
 	create-eks-cluster \
 	deploy-coder \
-	#deploy-airflow \
-	#deploy-mlflow
+	deploy-airflow \
+	deploy-mlflow
 
 
 destroy: init \
@@ -14,7 +14,7 @@ destroy: init \
 	destroy-airflow \
 	destroy-coder \
 	destroy-eks-cluster \
-	destroy-vpc \
+	destroy-vpc
 
 # $(eval AWS_CALLER_ID:=$(shell aws sts get-caller-identity | jq -r ".Account"))
 # 		-backend-config="bucket=$(AWS_CALLER_ID)-terraform-states" \

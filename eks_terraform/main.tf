@@ -17,16 +17,16 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
-# this does not
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-  #cluster_id = module.eks.cluster_id
-}
+# # this does not
+# data "aws_eks_cluster" "cluster" {
+#   name = module.eks.cluster_name
+#   #cluster_id = module.eks.cluster_id
+# }
 
-# this works
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-}
+# # this works
+# data "aws_eks_cluster_auth" "cluster" {
+#   name = module.eks.cluster_name
+# }
 
 
 # INFRASTRUCTURE
@@ -40,11 +40,11 @@ module "vpc" {
 module "eks" {
   source                = "./infrastructure/eks"
   cluster_name          = local.cluster_name
+  eks_cluster_version   = "1.23"
   vpc_id                = module.vpc.vpc_id
   private_subnets       = module.vpc.private_subnets
   security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
   security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
-  eks_cluster_version   = "1.23"
 }
 
 
@@ -79,8 +79,8 @@ module "airflow" {
 
 
 module "mlflow" {
-  source = "./modules/mlflow"
-  # account_id            = data.aws_caller_identity.current.account_id
+  source                = "./modules/mlflow"
+  tag_name              = "mlflow"
   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
   s3_force_destroy      = local.force_destroy_s3_bucket
 
@@ -98,11 +98,8 @@ module "mlflow" {
 }
 
 module "coder" {
-  source                = "./modules/coder"
-  tag_name              = "coder"
-  helm_chart_repository = "https://helm.coder.com"
-  helm_chart_name       = "coder"
-  helm_chart_version    = "1.39.1"
+  source   = "./modules/coder"
+  tag_name = "coder"
 
   # RDS
   vpc_id                      = module.vpc.vpc_id
@@ -116,4 +113,8 @@ module "coder" {
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
 
+  # HELM
+  helm_chart_repository = "https://helm.coder.com"
+  helm_chart_name       = "coder"
+  helm_chart_version    = "1.39.1"
 }

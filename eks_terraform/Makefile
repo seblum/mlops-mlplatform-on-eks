@@ -1,10 +1,12 @@
 SHELL := /bin/bash # Use bash syntax
 VARS_FILE ?= testing.tfvars
 
+apply: init \
+	terraform apply -var-file=$(VARS_FILE) -auto-approve
+
 deploy: init \
 	create-vpc \
 	create-eks-cluster \
-	deploy-coder \
 	deploy-airflow \
 	deploy-mlflow
 
@@ -12,7 +14,6 @@ deploy: init \
 destroy: init \
 	destroy-mlflow \
 	destroy-airflow \
-	destroy-coder \
 	destroy-eks-cluster \
 	destroy-vpc
 

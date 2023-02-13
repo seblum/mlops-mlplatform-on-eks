@@ -1,3 +1,7 @@
+locals {
+  k8s_airflow_db_secret_name = "${var.tag_name}-db-auth"
+}
+
 resource "kubernetes_namespace" "namespace_airflow" {
   metadata {
     name = var.tag_name
@@ -6,7 +10,7 @@ resource "kubernetes_namespace" "namespace_airflow" {
 
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
-    name      = "${var.tag_name}-db-auth"
+    name      = local.k8s_airflow_db_secret_name
     namespace = kubernetes_namespace.namespace_airflow.metadata[0].name
   }
   data = {
@@ -81,6 +85,6 @@ resource "helm_release" "airflow" {
   }
   set {
     name  = "dags.gitSync.httpSecret"
-    value = kubernetes_secret.airflow_https_git_secret.id
+    value = local.k8s_airflow_db_secret_name
   }
 }

@@ -46,8 +46,9 @@ module "rds-mlflow" {
 
 
 resource "helm_release" "mlflow" {
-  name  = "mlflow"
-  chart = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
+  name      = "mlflow"
+  chart     = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
+  namespace = var.tag_name
 
   #values = ["eks_terraform/applications/airflow/values.yaml"]
   #   values     = [file("${path.root}/helm/airflow.yml")]

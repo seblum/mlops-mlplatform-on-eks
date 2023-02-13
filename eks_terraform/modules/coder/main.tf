@@ -1,5 +1,6 @@
 locals {
-  k8s_secret_name = "rds-password-secret"
+  k8s_rds_secret_name   = "rds-password-secret"
+  k8s_coder_secret_name = "coder-admin-secret"
 }
 
 resource "kubernetes_namespace" "namespace_coder" {
@@ -8,9 +9,31 @@ resource "kubernetes_namespace" "namespace_coder" {
   }
 }
 
+resource "kubernetes_secret" "coder-admin-secret" {
+  metadata {
+    name      = local.k8s_coder_secret_name
+    namespace = var.tag_name
+  }
+  data = {
+    password = var.coder_admin_secret
+  }
+}
+
+resource "kubernetes_secret" "coder-rds-secret" {
+  metadata {
+    name      = local.k8s_rds_secret_name
+    namespace = var.tag_name
+  }
+  data = {
+    password = module.rds-coder.rds_password
+  }
+
+  type = "kubernetes.io/basic-auth"
+}
+
 resource "random_password" "rds_password" {
   length  = 16
-  special = false
+  special = false # TODO set to true
 }
 
 
@@ -44,6 +67,10 @@ resource "helm_release" "coder" {
   values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/coder/values.yaml")}"]
 
   set {
+    name  = "coderd.superAdmin.passwordSecret"
+    value = local.k8s_coder_secret_name
+  }
+  set {
     name  = "postgres.host"
     value = module.rds-coder.rds_host
   }
@@ -61,18 +88,6 @@ resource "helm_release" "coder" {
   }
   set {
     name  = "postgres.passwordSecret"
-    value = local.k8s_secret_name
+    value = local.k8s_rds_secret_name
   }
-}
-
-resource "kubernetes_secret" "coder-secret" {
-  metadata {
-    name      = local.k8s_secret_name
-    namespace = var.tag_name
-  }
-  data = {
-    password = module.rds-coder.rds_password
-  }
-
-  type = "kubernetes.io/basic-auth"
 }

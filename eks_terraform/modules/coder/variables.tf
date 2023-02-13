@@ -1,6 +1,7 @@
 
 variable "tag_name" {}
 
+
 # RDS
 
 variable "vpc_id" {
@@ -76,4 +77,9 @@ variable "helm_chart_name" {
 variable "helm_chart_version" {
   type        = string
   description = "Version of the helm chart"
+}
+
+variable "coder_admin_secret" {
+  type        = string
+  description = "Admin secret for initial coder login"
 }

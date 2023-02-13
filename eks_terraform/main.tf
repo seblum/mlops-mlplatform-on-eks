@@ -122,3 +122,33 @@ module "code-server" {
   # helm_chart_version    = "1.39.1"
   # coder_admin_secret    = "password123"
 }
+
+module "jupyterhub" {
+  source           = "./modules/jupyterhub"
+  tag_name         = "jupyterhub"
+  cluster_name     = local.cluster_name
+  cluster_endpoint = module.eks.cluster_endpoint
+
+  # RDS
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  rds_port                    = local.port_airflow
+  rds_name                    = "airflow"
+  rds_engine                  = "postgres"
+  rds_engine_version          = "13.3"
+  rds_instance_class          = "db.t3.micro"
+  storage_type                = local.storage_type
+  max_allocated_storage       = local.max_allocated_storage
+  # periodic updates
+  # log airflow to s3
+
+  # HELM
+  helm_chart_repository = "https://airflow-helm.github.io/charts"
+  helm_chart_name       = "airflow"
+  helm_chart_version    = "8.6.1"
+  git_username          = local.git_username
+  git_token             = local.git_token
+  git_repository_url    = "https://github.com/seblum/Airflow_DAGs.git"
+  git_branch            = "main"
+}

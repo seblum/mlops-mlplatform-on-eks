@@ -1,0 +1,31 @@
+coderd:
+  superAdmin:
+    # Options for configuring the secret used to specify the password for the
+    # built-in super admin account.
+    passwordSecret:
+      # coderd.superAdmin.passwordSecret.name -- Name of a secret that should
+      # be used to determine the password for the super admin account. The
+      # password should be contained in the field `password`, or the manually
+      # specified one.
+      name: ""
+      # coderd.superAdmin.passwordSecret.key -- The key of the secret that
+      # contains the super admin password.
+      key: "password"
+postgres:
+  # postgres.host -- Host of the external PostgreSQL instance.
+  host: ""
+  # postgres.port -- Port of the external PostgreSQL instance.
+  port: ""
+  # postgres.user -- User of the external PostgreSQL instance.
+  user: ""
+  # postgres.database -- Name of the database that Coder will use.
+  # You must create this database first.
+  # database: ""
+  # This should be set to an empty string if the database does not
+  # require a password to connect.
+  passwordSecret: ""
+  default:
+    # postgres.default.enable -- Deploys a PostgreSQL instance. We recommend
+    # using an external PostgreSQL instance in production.
+    # If true, all other values are ignored.
+    enable: false

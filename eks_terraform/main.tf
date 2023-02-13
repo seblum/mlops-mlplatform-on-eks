@@ -99,29 +99,6 @@ module "mlflow" {
   max_allocated_storage       = local.max_allocated_storage
 }
 
-# module "coder" {
-#   source   = "./modules/coder"
-#   tag_name = "coder"
-
-#   # RDS
-#   vpc_id                      = module.vpc.vpc_id
-#   private_subnets             = module.vpc.private_subnets
-#   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-#   rds_port                    = "5432" # coder port
-#   rds_name                    = "coder"
-#   rds_engine                  = "postgres"
-#   rds_engine_version          = "13.3"
-#   rds_instance_class          = "db.t3.micro"
-#   storage_type                = local.storage_type
-#   max_allocated_storage       = local.max_allocated_storage
-
-#   # HELM
-#   helm_chart_repository = "https://helm.coder.com"
-#   helm_chart_name       = "coder"
-#   helm_chart_version    = "1.39.1"
-#   coder_admin_secret    = "password123"
-# }
-
 
 module "code-server" {
   source   = "./modules/code-server"

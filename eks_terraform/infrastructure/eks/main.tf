@@ -25,10 +25,10 @@ module "eks" {
   cluster_addons = {
     aws-ebs-csi-driver = {
       service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ebs_csi_service_account_role_name}"
-    },
-    cluster-autoscaler = {
-      service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.autoscaler_service_account_role_name}"
     }
+    # cluster-autoscaler = {
+    #   service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.autoscaler_service_account_role_name}"
+    # }
   }
 
   eks_managed_node_group_defaults = {
@@ -102,36 +102,36 @@ resource "aws_iam_policy" "ebs_csi_controller_sa" {
 }
 
 # EKS Cluster autoscaler
-#
-module "autoscaler_role" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "5.11.1"
-  create_role                   = true
-  role_name                     = local.autoscaler_service_account_role_name
-  provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = [aws_iam_policy.autoscaler_controller_sa.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_namespace}:${local.autoscaler_service_account_name}"]
-}
+# #
+# module "autoscaler_role" {
+#   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+#   version                       = "5.11.1"
+#   create_role                   = true
+#   role_name                     = local.autoscaler_service_account_role_name
+#   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
+#   role_policy_arns              = [aws_iam_policy.autoscaler_controller_sa.arn]
+#   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_namespace}:${local.autoscaler_service_account_name}"]
+# }
 
-resource "aws_iam_policy" "autoscaler_controller_sa" {
-  name        = local.autoscaler_service_account_name
-  description = "EKS autoscaler controller policy for cluster ${var.cluster_name}"
+# resource "aws_iam_policy" "autoscaler_controller_sa" {
+#   name        = local.autoscaler_service_account_name
+#   description = "EKS autoscaler controller policy for cluster ${var.cluster_name}"
 
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Action" : [
-          "autoscaling:DescribeAutoScalingGroups",
-          "autoscaling:DescribeAutoScalingInstances",
-          "autoscaling:DescribeLaunchConfigurations",
-          "autoscaling:DescribeTags",
-          "autoscaling:SetDesiredCapacity",
-          "autoscaling:TerminateInstanceInAutoScalingGroup",
-          "ec2:DescribeLaunchTemplateVersions"
-        ],
-        "Effect" : "Allow",
-        "Resource" : "*"
-      }
-  ] })
-}
+#   policy = jsonencode({
+#     "Version" : "2012-10-17",
+#     "Statement" : [
+#       {
+#         "Action" : [
+#           "autoscaling:DescribeAutoScalingGroups",
+#           "autoscaling:DescribeAutoScalingInstances",
+#           "autoscaling:DescribeLaunchConfigurations",
+#           "autoscaling:DescribeTags",
+#           "autoscaling:SetDesiredCapacity",
+#           "autoscaling:TerminateInstanceInAutoScalingGroup",
+#           "ec2:DescribeLaunchTemplateVersions"
+#         ],
+#         "Effect" : "Allow",
+#         "Resource" : "*"
+#       }
+#   ] })
+# }

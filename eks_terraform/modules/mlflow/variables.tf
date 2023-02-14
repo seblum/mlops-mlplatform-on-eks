@@ -1,5 +1,5 @@
 
-variable "tag_name" {}
+variable "name" {}
 
 variable "mlflow_s3_bucket_name" {
   type        = string

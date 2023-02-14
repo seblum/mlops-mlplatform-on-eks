@@ -1,7 +1,7 @@
 
 resource "kubernetes_namespace" "namespace-mlflow" {
   metadata {
-    name = var.tag_name
+    name = var.name
   }
 }
 
@@ -48,7 +48,7 @@ module "rds-mlflow" {
 resource "helm_release" "mlflow" {
   name      = "mlflow"
   chart     = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
-  namespace = var.tag_name
+  namespace = var.name
 
   #values = ["eks_terraform/applications/airflow/values.yaml"]
   #   values     = [file("${path.root}/helm/airflow.yml")]

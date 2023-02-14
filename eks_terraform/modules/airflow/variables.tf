@@ -1,5 +1,5 @@
 
-variable "tag_name" {}
+variable "name" {}
 variable "cluster_name" {
   type        = string
   description = "Name of the EKS Cluster"

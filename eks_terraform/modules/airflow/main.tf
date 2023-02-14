@@ -1,10 +1,10 @@
 locals {
-  k8s_airflow_db_secret_name = "${var.tag_name}-db-auth"
+  k8s_airflow_db_secret_name = "${var.name}-db-auth"
 }
 
 resource "kubernetes_namespace" "namespace_airflow" {
   metadata {
-    name = var.tag_name
+    name = var.name
   }
 }
 
@@ -21,7 +21,7 @@ resource "kubernetes_secret" "airflow_db_credentials" {
 
 resource "kubernetes_secret" "airflow_https_git_secret" {
   metadata {
-    name      = "${var.tag_name}-https-git-secret"
+    name      = "${var.name}-https-git-secret"
     namespace = kubernetes_namespace.namespace_airflow.metadata[0].name
   }
   data = {
@@ -55,8 +55,8 @@ module "rds-airflow" {
 
 
 resource "helm_release" "airflow" {
-  name      = var.tag_name
-  namespace = var.tag_name
+  name      = var.name
+  namespace = var.name
 
   repository = "https://airflow-helm.github.io/charts" #var.helm_chart_repository
   chart      = var.helm_chart_name
@@ -77,7 +77,7 @@ resource "helm_release" "airflow" {
   }
   set {
     name  = "dags.gitSync.repo"
-    value = var.git_repository_url # "https://github.com/seblum/Airflow_DAGs.git" # var.git_repository_url
+    value = var.git_repository_url
   }
   set {
     name  = "dags.gitSync.branch" # var.git_branch

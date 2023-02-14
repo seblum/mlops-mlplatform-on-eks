@@ -1,10 +1,4 @@
 
-resource "kubernetes_namespace" "namespace-mlflow" {
-  metadata {
-    name = var.name
-  }
-}
-
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
   bucket = var.mlflow_s3_bucket_name
@@ -46,9 +40,11 @@ module "rds-mlflow" {
 
 
 resource "helm_release" "mlflow" {
-  name      = "mlflow"
-  chart     = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
-  namespace = var.name
+  name             = var.name
+  namespace        = var.name
+  create_namespace = var.create_namespace
+
+  chart = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
 
   #values = ["eks_terraform/applications/airflow/values.yaml"]
   #   values     = [file("${path.root}/helm/airflow.yml")]

@@ -1,5 +1,12 @@
 
-variable "tag_name" {}
+variable "name" {}
+
+variable "create_namespace" {
+  type        = bool
+  description = "Should the namespace be created, if it does not exists?"
+  default     = true
+}
+
 variable "cluster_name" {
   type        = string
   description = "Name of the EKS Cluster"

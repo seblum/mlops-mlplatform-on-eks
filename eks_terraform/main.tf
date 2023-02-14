@@ -102,11 +102,10 @@ module "mlflow" {
 }
 
 
-
 module "jupyterhub" {
   count            = var.deploy_jupyterhub ? 1 : 0
   source           = "./modules/jupyterhub"
-  tag_name         = "jupyterhub"
+  name             = "jupyterhub"
   cluster_name     = local.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
 

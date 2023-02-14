@@ -9,8 +9,9 @@
 # https://z2jh.jupyter.org/en/latest/jupyterhub/installation.html
 
 resource "helm_release" "jupyterhub" {
-  name = var.tag_name
-  #namespace = var.tag_name
+  name             = var.name
+  namespace        = var.name
+  create_namespace = var.create_namespace
 
   repository = "https://jupyterhub.github.io/helm-chart/"
   chart      = var.helm_chart_name

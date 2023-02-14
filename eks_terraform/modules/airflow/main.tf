@@ -2,11 +2,6 @@ locals {
   k8s_airflow_db_secret_name = "${var.name}-db-auth"
 }
 
-resource "kubernetes_namespace" "namespace_airflow" {
-  metadata {
-    name = var.name
-  }
-}
 
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
@@ -55,8 +50,9 @@ module "rds-airflow" {
 
 
 resource "helm_release" "airflow" {
-  name      = var.name
-  namespace = var.name
+  name             = var.name
+  namespace        = var.name
+  create_namespace = var.create_namespace
 
   repository = "https://airflow-helm.github.io/charts" #var.helm_chart_repository
   chart      = var.helm_chart_name

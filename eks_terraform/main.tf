@@ -48,80 +48,80 @@ module "eks" {
 }
 
 
-# CUSTOM TOOLS
-module "airflow" {
-  source           = "./modules/airflow"
-  tag_name         = "airflow"
-  cluster_name     = local.cluster_name
-  cluster_endpoint = module.eks.cluster_endpoint
+# # CUSTOM TOOLS
+# module "airflow" {
+#   source           = "./modules/airflow"
+#   tag_name         = "airflow"
+#   cluster_name     = local.cluster_name
+#   cluster_endpoint = module.eks.cluster_endpoint
 
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_airflow
-  rds_name                    = "airflow"
-  rds_engine                  = "postgres"
-  rds_engine_version          = "13.3"
-  rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
-  # periodic updates
-  # log airflow to s3
+#   # RDS
+#   vpc_id                      = module.vpc.vpc_id
+#   private_subnets             = module.vpc.private_subnets
+#   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+#   rds_port                    = local.port_airflow
+#   rds_name                    = "airflow"
+#   rds_engine                  = "postgres"
+#   rds_engine_version          = "13.3"
+#   rds_instance_class          = "db.t3.micro"
+#   storage_type                = local.storage_type
+#   max_allocated_storage       = local.max_allocated_storage
+#   # periodic updates
+#   # log airflow to s3
 
-  # HELM
-  helm_chart_repository = "https://airflow-helm.github.io/charts"
-  helm_chart_name       = "airflow"
-  helm_chart_version    = "8.6.1"
-  git_username          = local.git_username
-  git_token             = local.git_token
-  git_repository_url    = "https://github.com/seblum/Airflow_DAGs.git"
-  git_branch            = "main"
-}
-
-
-module "mlflow" {
-  source                = "./modules/mlflow"
-  tag_name              = "mlflow"
-  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
-  s3_force_destroy      = local.force_destroy_s3_bucket
-
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_mlflow
-  rds_name                    = "mlflow"
-  rds_engine                  = "mysql"
-  rds_engine_version          = "8.0.30"
-  rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
-}
+#   # HELM
+#   helm_chart_repository = "https://airflow-helm.github.io/charts"
+#   helm_chart_name       = "airflow"
+#   helm_chart_version    = "8.6.1"
+#   git_username          = local.git_username
+#   git_token             = local.git_token
+#   git_repository_url    = "https://github.com/seblum/Airflow_DAGs.git"
+#   git_branch            = "main"
+# }
 
 
-module "code-server" {
-  source   = "./modules/code-server"
-  tag_name = "code-server"
+# module "mlflow" {
+#   source                = "./modules/mlflow"
+#   tag_name              = "mlflow"
+#   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
+#   s3_force_destroy      = local.force_destroy_s3_bucket
 
-  # # RDS
-  # vpc_id                      = module.vpc.vpc_id
-  # private_subnets             = module.vpc.private_subnets
-  # private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  # rds_port                    = "5432" # coder port
-  # rds_name                    = "code-server"
-  # rds_engine                  = "postgres"
-  # rds_engine_version          = "13.3"
-  # rds_instance_class          = "db.t3.micro"
-  # storage_type                = local.storage_type
-  # max_allocated_storage       = local.max_allocated_storage
+#   # RDS
+#   vpc_id                      = module.vpc.vpc_id
+#   private_subnets             = module.vpc.private_subnets
+#   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+#   rds_port                    = local.port_mlflow
+#   rds_name                    = "mlflow"
+#   rds_engine                  = "mysql"
+#   rds_engine_version          = "8.0.30"
+#   rds_instance_class          = "db.t3.micro"
+#   storage_type                = local.storage_type
+#   max_allocated_storage       = local.max_allocated_storage
+# }
 
-  # # HELM
-  # helm_chart_repository = "https://helm.coder.com"
-  # helm_chart_name       = "code-server"
-  # helm_chart_version    = "1.39.1"
-  # coder_admin_secret    = "password123"
-}
+
+# module "code-server" {
+#   source   = "./modules/code-server"
+#   tag_name = "code-server"
+
+# # RDS
+# vpc_id                      = module.vpc.vpc_id
+# private_subnets             = module.vpc.private_subnets
+# private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+# rds_port                    = "5432" # coder port
+# rds_name                    = "code-server"
+# rds_engine                  = "postgres"
+# rds_engine_version          = "13.3"
+# rds_instance_class          = "db.t3.micro"
+# storage_type                = local.storage_type
+# max_allocated_storage       = local.max_allocated_storage
+
+# # HELM
+# helm_chart_repository = "https://helm.coder.com"
+# helm_chart_name       = "code-server"
+# helm_chart_version    = "1.39.1"
+# coder_admin_secret    = "password123"
+# }
 
 module "jupyterhub" {
   source           = "./modules/jupyterhub"
@@ -129,26 +129,22 @@ module "jupyterhub" {
   cluster_name     = local.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
 
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_airflow
-  rds_name                    = "airflow"
-  rds_engine                  = "postgres"
-  rds_engine_version          = "13.3"
-  rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
-  # periodic updates
-  # log airflow to s3
+  # # RDS
+  # vpc_id                      = module.vpc.vpc_id
+  # private_subnets             = module.vpc.private_subnets
+  # private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  # rds_port                    = local.port_airflow
+  # rds_name                    = "jupyterhub"
+  # rds_engine                  = "postgres"
+  # rds_engine_version          = "13.3"
+  # rds_instance_class          = "db.t3.micro"
+  # storage_type                = local.storage_type
+  # max_allocated_storage       = local.max_allocated_storage
+  # # periodic updates
+  # # log airflow to s3
 
   # HELM
-  helm_chart_repository = "https://airflow-helm.github.io/charts"
-  helm_chart_name       = "airflow"
-  helm_chart_version    = "8.6.1"
-  git_username          = local.git_username
-  git_token             = local.git_token
-  git_repository_url    = "https://github.com/seblum/Airflow_DAGs.git"
-  git_branch            = "main"
+  helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
+  helm_chart_name       = "jupyterhub"
+  helm_chart_version    = "2.0.0"
 }

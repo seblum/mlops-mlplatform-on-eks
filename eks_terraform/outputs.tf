@@ -8,7 +8,7 @@ output "cluster_name" {
   value       = local.cluster_name
 }
 
-output "rds_host" {
-  description = "Kubernetes Cluster Name"
-  value       = module.airflow.rds_host
-}
+# output "rds_host" {
+#   description = "Kubernetes Cluster Name"
+#   value       = module.airflow.rds_host
+# }

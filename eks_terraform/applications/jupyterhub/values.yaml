@@ -1,6 +1,5 @@
 # singleuser relates to the configuration of KubeSpawner which runs in the hub
 # pod, and its spawning of user pods such as jupyter-myusername.
-
 singleuser:
   # Use the code-server image
   image:
@@ -11,7 +10,10 @@ singleuser:
   # the coder user
   storage:
     homeMountPath: "/home/coder"
-
+  lifecycleHooks:
+      postStart:
+        exec:
+          command: ["git", "clone", "https://github.com/seblum/Airflow_DAGs.git"]
 proxy:
   chp:
     # Make sure the code server does never get to know about
@@ -20,9 +22,25 @@ proxy:
     - "--no-include-prefix"
   # secret token
   secretToken: "fa0de87c9732798f659077c9c6155494594d0b764d409da8cb6cb68a1cee110a" # TODO: Fill with the result of `openssl rand -hex 32`
-
-
+cull:
+  enabled: true
+  users: true
 hub:
+  config:
+      JupyterHub:
+        admin_access: false
+      Authenticator:
+        admin_users:
+          - user1
+          - user2
+        allowed_users:
+          - user3
+          - user4
+      DummyAuthenticator:
+        password: a-shared-secret-password
+      JupyterHub:
+        authenticator_class: dummy
+
   # The code-server needs different arguments
   # than the jupyter notebook image
   extraConfig:

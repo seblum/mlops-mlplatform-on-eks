@@ -22,8 +22,9 @@ resource "helm_release" "jupyterhub" {
   values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/jupyterhub/values.yaml")}"]
 
   # set {
-  #   name  = "externalDatabase.port"
-  #   value = var.rds_port
+  #   name  = "singleuser.lifecycleHooks.postStart.exec.command"
+  #   value = ["git", "clone", "https://github.com/seblum/Airflow_DAGs.git"]
+  #   type = list
   # }
 
 }

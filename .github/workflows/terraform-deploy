@@ -1,0 +1,52 @@
+name: Terraform Deploy
+
+on:
+  #push:
+  #  branches: master
+  #  paths: $DIRECTORY/**
+  #pull_request:
+  #  branches: [ master ]
+  workflow_dispatch: # Put here!!
+
+jobs:
+  terraform_apply:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install Terraform
+      env:
+        TERRAFORM_VERSION: "1.2.5"
+      run: |
+        tf_version=$TERRAFORM_VERSION
+        wget https://releases.hashicorp.com/terraform/"$tf_version"/terraform_"$tf_version"_linux_amd64.zip
+        unzip terraform_"$tf_version"_linux_amd64.zip
+        sudo mv terraform /usr/local/bin/
+
+    - name: Verify Terraform version
+      run: terraform --version
+
+    - name: Terraform init
+      working-directory: ./infrastructure/aws_EC2 # global env name
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: terraform init -input=false
+
+    - name: Terraform validation
+      working-directory: ./infrastructure/aws_EC2
+      run: terraform validate
+
+    - name: Terraform apply
+      working-directory: ./infrastructure/aws_EC2
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        octiv_username: ${{ secrets.octiv_username }}
+        octiv_password: ${{ secrets.octiv_password }}
+      run:  |
+        terraform apply -auto-approve -input=false \
+          -var "octiv_username=${{ secrets.octiv_username }}" \
+          -var "octiv_password=${{ secrets.octiv_password }}" \
+          -var "public_pem_key=${{ secrets.public_pem_key }}"
+      # make deploy

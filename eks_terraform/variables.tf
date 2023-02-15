@@ -41,3 +41,34 @@ variable "git_username" {
 variable "git_token" {
 
 }
+
+
+# AIRFLOW
+variable "deploy_airflow" {
+  type        = bool
+  description = "Should Airflow be deployed?"
+  default     = true
+}
+
+variable "git_repository_url" {
+  type        = string
+  description = "Https git url to the Airflow DAG repository"
+}
+
+variable "git_branch" {
+  type        = string
+  description = "Name of the git branch of the Airflow DAG repository"
+}
+
+# MLFLOW
+variable "deploy_mlflow" {
+  type        = bool
+  description = "Should MLflow be deployed?"
+  default     = true
+}
+# JUPYTERHUB
+variable "deploy_jupyterhub" {
+  type        = bool
+  description = "Should Jupyterhub be deployed?"
+  default     = true
+}

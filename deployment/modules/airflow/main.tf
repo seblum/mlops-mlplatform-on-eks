@@ -1,5 +1,6 @@
 locals {
   k8s_airflow_db_secret_name = "${var.name}-db-auth"
+  git_airflow_repo_secret_name = "${var.name}-https-git-secret"
 }
 
 
@@ -16,7 +17,7 @@ resource "kubernetes_secret" "airflow_db_credentials" {
 
 resource "kubernetes_secret" "airflow_https_git_secret" {
   metadata {
-    name      = "${var.name}-https-git-secret"
+    name      = local.git_airflow_repo_secret_name
     namespace = helm_release.airflow.namespace
   }
   data = {
@@ -63,6 +64,10 @@ resource "helm_release" "airflow" {
     "${file("${path.module}/../../applications/airflow/values.yaml")}"
     ]
   
+  # set {
+  #   name = "externalDatabase.database"
+  #   value = "airflow_db"
+  # }
   set {
     name  = "externalDatabase.port"
     value = var.rds_port
@@ -70,6 +75,10 @@ resource "helm_release" "airflow" {
   set {
     name  = "externalDatabase.host"
     value = module.rds-airflow.rds_host
+  }
+  set {
+    name = "externalDatabase.passwordSecret"
+    value = local.k8s_airflow_db_secret_name
   }
   set {
     name  = "dags.gitSync.repo"
@@ -81,6 +90,6 @@ resource "helm_release" "airflow" {
   }
   set {
     name  = "dags.gitSync.httpSecret"
-    value = local.k8s_airflow_db_secret_name
+    value = local.git_airflow_repo_secret_name
   }
 }

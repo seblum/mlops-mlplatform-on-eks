@@ -28,18 +28,19 @@ variable "max_allocated_storage" {
 }
 
 variable "port_mlflow" {
+  default = 5432
 }
 
 variable "port_airflow" {
-
+  default = 5000
 }
 
 variable "git_username" {
-
+type = string
 }
 
 variable "git_token" {
-
+type = string
 }
 
 

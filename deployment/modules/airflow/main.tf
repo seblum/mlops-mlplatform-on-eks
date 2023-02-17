@@ -59,9 +59,8 @@ resource "helm_release" "airflow" {
   version    = var.helm_chart_version
   wait       = false # deactivate post install hooks otherwise will fail
 
-  #values = ["eks_terraform/applications/airflow/values.yaml"]
-  #   values     = [file("${path.root}/helm/airflow.yml")]
-  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/airflow/values.yaml")}"]
+  values     = ["${file("${path.root}/applications/airflow/values.yml")}"]
+  #values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/airflow/values.yaml")}"]
 
   set {
     name  = "externalDatabase.port"

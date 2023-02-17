@@ -44,11 +44,13 @@ resource "helm_release" "mlflow" {
   namespace        = var.name
   create_namespace = var.create_namespace
 
-  chart = "/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
+  chart = ["${file("${path.root}/applications/mlflow")}"]
+  # /Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/"
 
+  values = ["${file("${path.root}/applications/mlflow/yaml.yml")}"]
   #values = ["eks_terraform/applications/airflow/values.yaml"]
   #   values     = [file("${path.root}/helm/airflow.yml")]
-  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/values.yaml")}"]
+  #values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/mlflow/values.yaml")}"]
 
   set {
     name  = "RDS_USERNAME"

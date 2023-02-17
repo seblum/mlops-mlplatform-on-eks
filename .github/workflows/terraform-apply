@@ -1,12 +1,19 @@
 name: Terraform Deploy
 
 on:
-  #push:
-  #  branches: master
-  #  paths: $DIRECTORY/**
-  #pull_request:
-  #  branches: [ master ]
+  # push:
+  #   branches: master
+  #   paths: $DIRECTORY/**
+  # pull_request:
+  #   branches: [ main ]
   workflow_dispatch: # Put here!!
+
+env:
+  DIRECTORY: ./deployment
+
+# defaults:
+#   run:
+#     working-directory: ./deployment # The working directory path
 
 jobs:
   terraform_apply:
@@ -27,26 +34,19 @@ jobs:
       run: terraform --version
 
     - name: Terraform init
-      working-directory: ./infrastructure/aws_EC2 # global env name
+      working-directory: ${{ env.DIRECTORY }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform init -input=false
 
     - name: Terraform validation
-      working-directory: ./infrastructure/aws_EC2
+      working-directory: ${{ env.DIRECTORY }}
       run: terraform validate
 
     - name: Terraform apply
-      working-directory: ./infrastructure/aws_EC2
+      working-directory: ${{ env.DIRECTORY }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        octiv_username: ${{ secrets.octiv_username }}
-        octiv_password: ${{ secrets.octiv_password }}
-      run:  |
-        terraform apply -auto-approve -input=false \
-          -var "octiv_username=${{ secrets.octiv_username }}" \
-          -var "octiv_password=${{ secrets.octiv_password }}" \
-          -var "public_pem_key=${{ secrets.public_pem_key }}"
-      # make deploy
+      run: terraform make deploy

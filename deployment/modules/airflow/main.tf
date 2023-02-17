@@ -59,7 +59,11 @@ resource "helm_release" "airflow" {
   version    = var.helm_chart_version
   wait       = false # deactivate post install hooks otherwise will fail
 
-  values     = ["${file("${path.root}/applications/airflow/values.yml")}"]
+  values = [
+    "${file("${path.module}/../../applications/airflow/values.yaml")}"
+    ]
+  
+  #values     = ["${file("./applications/airflow/values.yml")}"]
   #values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/airflow/values.yaml")}"]
 
   set {

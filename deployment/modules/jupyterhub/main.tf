@@ -20,7 +20,12 @@ resource "helm_release" "jupyterhub" {
   #values = ["eks_terraform/applications/airflow/values.yaml"]
   #   values     = [file("${path.root}/helm/airflow.yml")]
   #values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/jupyterhub/values.yaml")}"]
-  values = ["${file("${path.root}/applications/jupyterhub/values.yml")}"]
+  values = [
+    "${file("${path.module}/../../applications/jupyterhub/values.yaml")}"
+    ]
+    #"${file("${path.root}/../applications/jupyterhub/values.yml")}"
+  #     file("${path.module}/helm-values/fluentbit/values.yaml")
+  #     templatefile("${path.module}/helm-values/values.yaml", {
 
   # set {
   #   name  = "singleuser.lifecycleHooks.postStart.exec.command"

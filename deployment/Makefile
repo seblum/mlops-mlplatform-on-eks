@@ -8,14 +8,16 @@ deploy: init \
 	create-vpc \
 	create-eks-cluster \
 	deploy-airflow \
-	deploy-mlflow
+	deploy-mlflow \
+	deploy-jupyterhub
 
 
 destroy: init \
 	destroy-mlflow \
+	destroy-jupyterhub \
 	destroy-airflow \
 	destroy-eks-cluster \
-	destroy-vpc
+	destroy-vpc \
 
 init:
 	terraform init
@@ -33,8 +35,8 @@ deploy-airflow:
 deploy-mlflow:
 	terraform apply -target="module.mlflow" -var-file=$(VARS_FILE) -auto-approve
 
-deploy-coder:
-	terraform apply -target="module.coder" -var-file=$(VARS_FILE) -auto-approve
+deploy-jupyterhub:
+	terraform apply -target="module.jupyterhub" -var-file=$(VARS_FILE) -auto-approve
 
 apply-all:
 	terraform apply -var-file=$(VARS_FILE) -auto-approve
@@ -52,8 +54,8 @@ destroy-airflow:
 destroy-mlflow:
 	terraform destroy -target="module.mlflow" -var-file=$(VARS_FILE) -auto-approve
 
-destroy-coder:
-	terraform destroy -target="module.coder" -var-file=$(VARS_FILE) -auto-approve
+destroy-jupyterhub:
+	terraform destroy -target="module.jupyterhub" -var-file=$(VARS_FILE) -auto-approve
 
 # wipe-tf-state:
 # 	terraform state rm $$(terraform state list)

@@ -61,3 +61,15 @@ deploy_airflow     = <TRUE-OR-FALSE> (default true)
 deploy_mlflow      = <TRUE-OR-FALSE> (default true)
 deploy_jupyterhub  = <TRUE-OR-FALSE> (default true)
 ```
+
+
+
+
+## Links
+
+* https://archive.eksworkshop.com/beginner/080_scaling/deploy_ca/
+* https://github.com/jupyterhub/zero-to-jupyterhub-k8s
+* https://hub.jupyter.org/helm-chart/
+* https://nils-braun.medium.com
+* deploying-a-free-multi-user-browser-only-ide-in-just-a-few-minutes-d891f803224b
+* https://z2jh.jupyter.org/en/latest/jupyterhub/installation.html

@@ -2,7 +2,7 @@ SHELL := /bin/bash # Use bash syntax
 VARS_FILE ?= testing.tfvars
 
 apply: init \
-	terraform apply -var-file=$(VARS_FILE) -auto-approve
+	apply-all
 
 deploy: init \
 	create-vpc \
@@ -17,9 +17,6 @@ destroy: init \
 	destroy-eks-cluster \
 	destroy-vpc
 
-# $(eval AWS_CALLER_ID:=$(shell aws sts get-caller-identity | jq -r ".Account"))
-# 		-backend-config="bucket=$(AWS_CALLER_ID)-terraform-states" \
-#    	-backend-config="dynamodb_table=$(AWS_CALLER_ID)-terraform-states-lock"
 init:
 	terraform init
 
@@ -38,6 +35,9 @@ deploy-mlflow:
 
 deploy-coder:
 	terraform apply -target="module.coder" -var-file=$(VARS_FILE) -auto-approve
+
+apply-all:
+	terraform apply -var-file=$(VARS_FILE) -auto-approve
 
 # TERRAFORM DESTROY
 destroy-vpc:

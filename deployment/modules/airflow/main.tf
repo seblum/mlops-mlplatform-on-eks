@@ -1,12 +1,13 @@
 locals {
   k8s_airflow_db_secret_name = "${var.name}-db-auth"
+  git_airflow_repo_secret_name = "${var.name}-https-git-secret"
 }
 
 
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
     name      = local.k8s_airflow_db_secret_name
-    namespace = var.name
+    namespace = helm_release.airflow.namespace
   }
   data = {
     "postgresql-password" = module.rds-airflow.rds_password
@@ -16,8 +17,8 @@ resource "kubernetes_secret" "airflow_db_credentials" {
 
 resource "kubernetes_secret" "airflow_https_git_secret" {
   metadata {
-    name      = "${var.name}-https-git-secret"
-    namespace = var.name
+    name      = local.git_airflow_repo_secret_name
+    namespace = helm_release.airflow.namespace
   }
   data = {
     "username" = var.git_username
@@ -59,28 +60,36 @@ resource "helm_release" "airflow" {
   version    = var.helm_chart_version
   wait       = false # deactivate post install hooks otherwise will fail
 
-  #values = ["eks_terraform/applications/airflow/values.yaml"]
-  #   values     = [file("${path.root}/helm/airflow.yml")]
-  values = ["${file("/Users/sebastian.blum/Documents/Personal/Airflow_on_EKS/eks_terraform/applications/airflow/values.yaml")}"]
-
+  values = [
+    "${file("${path.module}/../../applications/airflow/values.yaml")}"
+    ]
+  
+  # set {
+  #   name = "externalDatabase.database"
+  #   value = "airflow_db"
+  # }
   set {
     name  = "externalDatabase.port"
     value = var.rds_port
   }
   set {
     name  = "externalDatabase.host"
-    value = module.rds-airflow.rds_host # "airflow-postgres.cwnjgv0wsmee.eu-central-1.rds.amazonaws.com" # module.rds-airflow.rds_host
+    value = module.rds-airflow.rds_host
+  }
+  set {
+    name = "externalDatabase.passwordSecret"
+    value = local.k8s_airflow_db_secret_name
   }
   set {
     name  = "dags.gitSync.repo"
     value = var.git_repository_url
   }
   set {
-    name  = "dags.gitSync.branch" # var.git_branch
+    name  = "dags.gitSync.branch"
     value = var.git_branch
   }
   set {
     name  = "dags.gitSync.httpSecret"
-    value = local.k8s_airflow_db_secret_name
+    value = local.git_airflow_repo_secret_name
   }
 }

@@ -26,7 +26,7 @@ airflow:
     uid: 50000
     gid: 0
   executor: KubernetesExecutor
-  fernetKey: "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc="
+  fernetKey: "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc=" # auslagern?
   webserverSecretKey: "THIS IS UNSAFE!"
 workers:
   enabled: false
@@ -40,10 +40,10 @@ externalDatabase:
   type: postgres
   host: ""
   port: ""
-  database: airflow_db
-  user: airflow_admin
-  passwordSecret: "airflow-db-auth"
-  passwordSecretKey: "postgresql-password"
+  database: airflow_db # auslagern?
+  user: airflow_admin # auslagern?
+  passwordSecret: ""
+  passwordSecretKey: "postgresql-password" # auslagern?
   properties: ""
 dags:
   gitSync:
@@ -52,5 +52,5 @@ dags:
     branch: ""
     revision: HEAD
     httpSecret: ""
-    httpSecretUsernameKey: username # TODO
-    httpSecretPasswordKey: password # TODO
+    httpSecretUsernameKey: username # auslagern?
+    httpSecretPasswordKey: password # auslagern?

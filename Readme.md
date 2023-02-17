@@ -1,5 +1,6 @@
-DO NOT FORGET **terraform destroy** & **variable deletion**!!!
+# MLOps Airflow on EKS
 
+This project aims to build a MLops plattform on AWS EKS utilizing Airflow, MLFlow, and Jupyterhub.
 
 ## Structure
 
@@ -8,57 +9,67 @@ project
 │   README.md
 │   .gitignore
 │
-└───distribution
-│   │   file011.txt
-│   │   file012.txt
-│   │
-│   └───subfolder1
-│       │   file111.txt
-│       │   file112.txt
-│       │   ...
+└─── deployment
+│    │   main.tf
+│    │
+│    └─── applications
+│    │    │ ...  
+│    │
+│    └─── infrastructure
+│    │    │ ...
+│    │
+│    └─── modules
+│         │ ...  
 │
-└───eks_terraform
-    │   file021.txt
-    │   file022.txt
+└─── .github.workflows
+
 ```
 
 ## ToDo
-- [ ] make helm work
-- [ ] write github actions to deploy automatically
-- [ ] secrets to github actions
-- [ ] refactor tf code with subdirs
-- [ ] own directory for yaml
-- [ ] deploy yamls on rollout
-- [ ] add pre-commit hooks for formating yaml
+- [ ] test github actions to deploy automatically
 - [ ] terraform state on s3
+- [ ] secrets to github actions
+- [ ] add pre-commit hooks for formating yaml
+- [ ] Airflow log storage
+- [ ] implement monitoring, probably grafana
+- [ ] check for serving tool
+- [ ] autoscaling 
+- [ ] airflow GPUs
+- [ ] Airflow DAGs with mlflow and tensorflow
+- [ ] make cluster secure (endpoint is currently public)
+- [ ] consistent users for airflow & jupyter? (mlflow?)
+- [ ] Jupyterhub multiple images
+- [ ] Jupyterhub helm list input (airflow dag repository)
 
-```bash
-aws eks --region eu-central-1 update-kubeconfig --name eks_education-eks-ueIuFx6S -raw cluster_name
-```
-
-### References
-https://learn.hashicorp.com/tutorials/terraform/eks
-
-
-
-### Airflow
-
-kubectl create namespace airflow
-helm install airflow apache-airflow/airflow --namespace airflow --debug
-
-
-# Deployment
-
+## Deployment
 
 1. set aws und kubectl cli
-2. Run `terraform apply` or `terraform apply -var-file="testing.tfvars"`
-3. The endpoint is currently public, access it under the given endpoint url printed after applying
+2. specify `<NAME>.tfvar` with below parameters
+3. Run `terraform apply` or `terraform apply -var-file="<NAME>.tfvars"`
+4. The endpoint is currently public, access it under the given endpoint url printed after applying
+
+
+**`<NAME>.tfvar`**
+
+```yaml
+aws_region         = <AWS-REGION>
+git_username       = <GIT-USERNAME>
+git_token          = <GIT-TOKEN> 
+git_repository_url = <GIT-REPOSITORY-TO-DAGS>
+git_branch         = <GIT-REPOSITORY-TO-DAGS-BRANCH>
+deploy_airflow     = <TRUE-OR-FALSE> (default true)
+deploy_mlflow      = <TRUE-OR-FALSE> (default true)
+deploy_jupyterhub  = <TRUE-OR-FALSE> (default true)
+```
 
 
 
-Set up Airflow ssh keys
-https://airflow.apache.org/docs/helm-chart/stable/manage-dags-files.html
 
-create ssh key
-set it to deploy key in private github repo
-reference to it within your terraform code OR put it into Github actions secret
+## Links
+
+* https://archive.eksworkshop.com/beginner/080_scaling/deploy_ca/
+* https://github.com/jupyterhub/zero-to-jupyterhub-k8s
+* https://hub.jupyter.org/helm-chart/
+* https://nils-braun.medium.com
+* deploying-a-free-multi-user-browser-only-ide-in-just-a-few-minutes-d891f803224b
+* https://z2jh.jupyter.org/en/latest/jupyterhub/installation.html

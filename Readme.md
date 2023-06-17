@@ -13,13 +13,13 @@ project
 │    │   main.tf
 │    │
 │    └─── applications
-│    │    │ ...  
+│    │    │ ...
 │    │
 │    └─── infrastructure
 │    │    │ ...
 │    │
 │    └─── modules
-│         │ ...  
+│         │ ...
 │
 └─── .github.workflows
 
@@ -33,7 +33,7 @@ project
 - [ ] Airflow log storage
 - [ ] implement monitoring, probably grafana
 - [ ] check for serving tool
-- [ ] autoscaling 
+- [ ] autoscaling
 - [ ] airflow GPUs
 - [ ] Airflow DAGs with mlflow and tensorflow
 - [ ] make cluster secure (endpoint is currently public)
@@ -54,7 +54,7 @@ project
 ```yaml
 aws_region         = <AWS-REGION>
 git_username       = <GIT-USERNAME>
-git_token          = <GIT-TOKEN> 
+git_token          = <GIT-TOKEN>
 git_repository_url = <GIT-REPOSITORY-TO-DAGS>
 git_branch         = <GIT-REPOSITORY-TO-DAGS-BRANCH>
 deploy_airflow     = <TRUE-OR-FALSE> (default true)

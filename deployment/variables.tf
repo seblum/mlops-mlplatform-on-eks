@@ -11,6 +11,7 @@ variable "AWS_SECRET_KEY" {
 variable "aws_region" {
   default     = "eu-central-1"
   description = "AWS region"
+  type        = string
 }
 
 variable "airflow_github_ssh" {
@@ -36,11 +37,11 @@ variable "port_airflow" {
 }
 
 variable "git_username" {
-type = string
+  type = string
 }
 
 variable "git_token" {
-type = string
+  type = string
 }
 
 
@@ -71,5 +72,14 @@ variable "deploy_mlflow" {
 variable "deploy_jupyterhub" {
   type        = bool
   description = "Should Jupyterhub be deployed?"
+  default     = true
+}
+
+
+# MONITORING
+
+variable "deploy_monitoring" {
+  type        = bool
+  description = "Should Monitoring be deployed?"
   default     = true
 }

@@ -13,7 +13,7 @@ resource "helm_release" "jupyterhub" {
 
   values = [
     "${file("${path.module}/../../applications/jupyterhub/values.yaml")}"
-    ]
+  ]
 
   # set {
   #   name  = "singleuser.lifecycleHooks.postStart.exec.command"

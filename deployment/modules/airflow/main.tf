@@ -1,5 +1,5 @@
 locals {
-  k8s_airflow_db_secret_name = "${var.name}-db-auth"
+  k8s_airflow_db_secret_name   = "${var.name}-db-auth"
   git_airflow_repo_secret_name = "${var.name}-https-git-secret"
 }
 
@@ -62,8 +62,8 @@ resource "helm_release" "airflow" {
 
   values = [
     "${file("${path.module}/../../applications/airflow/values.yaml")}"
-    ]
-  
+  ]
+
   # set {
   #   name = "externalDatabase.database"
   #   value = "airflow_db"
@@ -77,7 +77,7 @@ resource "helm_release" "airflow" {
     value = module.rds-airflow.rds_host
   }
   set {
-    name = "externalDatabase.passwordSecret"
+    name  = "externalDatabase.passwordSecret"
     value = local.k8s_airflow_db_secret_name
   }
   set {

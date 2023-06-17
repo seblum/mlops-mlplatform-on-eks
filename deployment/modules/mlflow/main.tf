@@ -47,8 +47,8 @@ resource "helm_release" "mlflow" {
   chart = "${path.module}/../../applications/mlflow/"
   values = [
     "${file("${path.module}/../../applications/mlflow/values.yaml")}"
-    ]
-  
+  ]
+
   set {
     name  = "RDS_USERNAME"
     value = module.rds-mlflow.rds_username

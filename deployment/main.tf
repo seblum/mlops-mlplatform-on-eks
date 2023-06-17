@@ -31,12 +31,14 @@ module "eks" {
   cluster_name          = local.cluster_name
   eks_cluster_version   = "1.23"
   vpc_id                = module.vpc.vpc_id
+  aws_region            = var.aws_region
   private_subnets       = module.vpc.private_subnets
   security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
   security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
-  depends_on = [
-    module.vpc
-  ]
+  # depends_on = [
+  #   module.vpc
+  # ]
+  # if this is in, I get an for_each error. weird
 }
 
 
@@ -131,4 +133,10 @@ module "jupyterhub" {
   depends_on = [
     module.eks
   ]
+}
+
+module "monitoring" {
+  count  = var.deploy_monitoring ? 1 : 0
+  source = "./modules/monitoring"
+  name   = "monitoring"
 }

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medium-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medium-node
+  template:
+    metadata:
+      labels:
+        app: medium-node
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: medium-node
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+              memory: "4Gi"
+      nodeSelector:
+        role: "t3.medium_large"
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "t3.medium_large"
+          effect: "NoSchedule"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: large-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: large-node
+  template:
+    metadata:
+      labels:
+        app: large-node
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: large-node
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+              memory: "8Gi"
+      nodeSelector:
+        role: "t3.medium_large"
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "t3.medium_large"
+          effect: "NoSchedule"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-node
+  template:
+    metadata:
+      labels:
+        app: gpu-node
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: gpu-node
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+      nodeSelector:
+        role: "g4dn.xlarge"
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "g4dn.xlarge"
+          effect: "NoSchedule"

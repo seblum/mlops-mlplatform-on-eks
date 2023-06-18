@@ -24,3 +24,7 @@ output "cluster_name" {
   description = "Kubernetes Cluster Name"
   value       = module.eks.cluster_name
 }
+
+output "eks_managed_node_groups_autoscaling_group_names" {
+  value = module.eks.eks_managed_node_groups_autoscaling_group_names
+}

@@ -5,20 +5,21 @@ locals {
   ebs_csi_service_account_role_name    = "${var.cluster_name}-ebs-csi-controller"
   autoscaler_service_account_name      = "autoscaler-controller-sa"
   autoscaler_service_account_role_name = "${var.cluster_name}-autoscaler-controller"
-  nodegroup_t3_small_label             = "t3.small"
-  nodegroup_t3_medium_large_label      = "t3.medium_large"
-  nodegroup_g4dn_xlarge_label          = "g4dn.xlarge"
+
+  nodegroup_t3_small_label             = "t3_small"
+  nodegroup_t3_medium_label            = "t3_medium"
+  nodegroup_g4dn_xlarge_label          = "g4dn_xlarge"
   eks_asg_tag_list_nodegroup_t3_small_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
     "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_t3_small_label
   }
 
-  eks_asg_tag_list_nodegroup_t3_medium_large_label = {
+  eks_asg_tag_list_nodegroup_t3_medium_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
-    "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_t3_medium_large_label
-    "k8s.io/cluster-autoscaler/node-template/taint/dedicated" : "${local.nodegroup_t3_medium_large_label}:NoSchedule"
+    "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_t3_medium_label
+    "k8s.io/cluster-autoscaler/node-template/taint/dedicated" : "${local.nodegroup_t3_medium_label}:NoSchedule"
   }
 
   eks_asg_tag_list_nodegroup_g4dn_xlarge_label = {
@@ -74,7 +75,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     group_t3_small = {
-      name = "t3_small"
+      name = "ng0_t3_small"
 
       instance_types = ["t3.small"]
 
@@ -91,34 +92,34 @@ module "eks" {
         "k8s.io/cluster-autoscaler/node-template/label/role" = "${local.nodegroup_t3_small_label}"
       }
     }
-    group_t3_medium_large = {
-      name = "t3_medium_large"
+    group_t3_medium = {
+      name = "ng1_t3_medium"
 
-      instance_types = ["t3.medium", "t3.large"]
+      instance_types = ["t3.medium"]
 
       min_size      = 0
       max_size      = 5
       desired_size  = 0
       capacity_type = "ON_DEMAND"
       labels = {
-        role = local.nodegroup_t3_medium_large_label
+        role = local.nodegroup_t3_medium_label
       }
       taints = [
         {
           key    = "dedicated"
-          value  = local.nodegroup_t3_medium_large_label
+          value  = local.nodegroup_t3_medium_label
           effect = "NO_SCHEDULE"
         }
       ]
       tags = {
         "k8s.io/cluster-autoscaler/enabled"                       = "true"
         "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
-        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_medium_large_label}"
-        "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_t3_medium_large_label}:NoSchedule"
+        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_medium_label}"
+        "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_t3_medium_label}:NoSchedule"
       }
     }
     group_g4dn_xlarge = {
-      name = "g4dn_xlarge"
+      name = "ng2_g4dn_xlarge"
 
       instance_types = ["g4dn.xlarge"]
 
@@ -228,7 +229,7 @@ resource "aws_iam_role_policy_attachment" "additional" {
 # Tags for the ASG to support cluster-autoscaler scale up from 0 for nodegroup2
 resource "aws_autoscaling_group_tag" "nodegroup_t3_small" {
   for_each               = local.eks_asg_tag_list_nodegroup_t3_small_label
-  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 0)
+  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 2)
   tag {
     key                 = each.key
     value               = each.value
@@ -236,8 +237,8 @@ resource "aws_autoscaling_group_tag" "nodegroup_t3_small" {
   }
 }
 
-resource "aws_autoscaling_group_tag" "nodegronodegroup_t3_medium_largeup2" {
-  for_each               = local.eks_asg_tag_list_nodegroup_t3_medium_large_label
+resource "aws_autoscaling_group_tag" "nodegroup_t3_medium" {
+  for_each               = local.eks_asg_tag_list_nodegroup_t3_medium_label
   autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 1)
   tag {
     key                 = each.key
@@ -248,7 +249,7 @@ resource "aws_autoscaling_group_tag" "nodegronodegroup_t3_medium_largeup2" {
 
 resource "aws_autoscaling_group_tag" "nodegroup_g4dn_xlarge" {
   for_each               = local.eks_asg_tag_list_nodegroup_g4dn_xlarge_label
-  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 1)
+  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 0)
   tag {
     key                 = each.key
     value               = each.value

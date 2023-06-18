@@ -40,6 +40,7 @@ project
 - [ ] consistent users for airflow & jupyter? (mlflow?)
 - [ ] Jupyterhub multiple images
 - [ ] Jupyterhub helm list input (airflow dag repository)
+- [ ] service quota für g instances
 
 ## Deployment
 

@@ -1,0 +1,102 @@
+airflow:
+  users:
+    ## define the user called "admin"  # TODO
+    - username: admin
+      password: admin
+      role: Admin
+      email: admin@example.com
+      firstName: admin
+      lastName: admin
+    ## define the user called "user"  # TODO
+    - username: user
+      password: user123
+      role:
+        - User
+        - Viewer
+      email: user@example.com
+      firstName: user
+      lastName: user
+  usersUpdate: true
+  legacyCommands: false
+  image:
+    repository: seblum/airflow # auslagers
+    tag: 2.6.2-python3.11-custom # auslagers
+    pullPolicy: IfNotPresent
+    pullSecret: ""
+    uid: 50000
+    gid: 0
+  executor: KubernetesExecutor # auslagern?
+  fernetKey: "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc=" # auslagern?
+  webserverSecretKey: "THIS IS UNSAFE!"
+  config:
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: "30.0"
+    # AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 30.0
+    AIRFLOW__LOGGING__LOGGING_LEVEL: "DEBUG" 
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    # https://stackoverflow.com/questions/74399085/setting-airflow-connections-using-values-yaml-in-helm-kubernetes
+    AIRFLOW_CONN_AWSS3_LOG_STORAGE: "s3://AKIA4OKBSADP42HN7LOZ:AbXUPnTz049BwStYX7dlIZ13iT07anXoqF13u3fi@S3"
+    # AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
+    # AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://airflow-bucket-logs/logs"
+    # AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "AWSS3_Log_Storage"
+
+    # AIRFLOW__WEBSERVER__BASE_URL: "http://a9511ce63a59b4f9abb60d731d89d9d9-409923492.eu-central-1.elb.amazonaws.com/airflow"
+  # extraEnv:
+  #   - name: "AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT"
+  #     value: "300.0"
+    logging:
+      remote_logging: "True"
+      remote_log_conn_id: AWSS3_Log_Storage
+      remote_base_log_folder: "s3://airflow-bucket-logs/logs"
+      # Use server-side encryption for logs stored in S3
+      encrypt_s3_logs: False
+workers:
+  enabled: false
+flower:
+  enabled: false
+postgresql:
+  enabled: false
+redis:
+  enabled: false
+externalDatabase:
+  type: postgres
+  host: ""
+  port: ""
+  database: airflow_db # auslagern?
+  user: airflow_admin # auslagern?
+  passwordSecret: ""
+  passwordSecretKey: "postgresql-password" # auslagern?
+  properties: ""
+scheduler:
+  replicas: 1
+dags:
+  gitSync:
+    enabled: true
+    repo: ""
+    branch: ""
+    revision: HEAD
+    repoSubPath: "dags"
+    httpSecret: ""
+    httpSecretUsernameKey: username # auslagern?
+    httpSecretPasswordKey: password # auslagern?
+    syncWait: 60 # default
+    syncTimeout: 120 # default
+ingress:
+  enabled: true
+  web:
+    #path: "/airflow"
+    host: airflow-web
+web:
+  replicas: 1
+  service:
+    annotations:
+      app: airflow
+      component: web
+    type: LoadBalancer
+  # precedingPaths:
+  #   - path: "/airflow"
+  #     serviceName: "my-service"
+  #     servicePort: "port-name"
+# secret:
+#   - envName: "AIRFLOW_CONN_S3_BUCKET_URI"
+#     secretName: "airflow-s3-secret"
+#     secretKey: "AIRFLOW_CONN_S3_BUCKET_URI"

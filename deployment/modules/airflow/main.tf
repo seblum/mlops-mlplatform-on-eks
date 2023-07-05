@@ -3,6 +3,11 @@ locals {
   git_airflow_repo_secret_name = "${var.name}-https-git-secret"
 }
 
+resource "aws_s3_bucket" "airflow" {
+  bucket = "airflow-bucket-logs"
+  # tags          = var.tags
+  force_destroy = var.s3_force_destroy
+}
 
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
@@ -13,6 +18,34 @@ resource "kubernetes_secret" "airflow_db_credentials" {
     "postgresql-password" = module.rds-airflow.rds_password
   }
 }
+
+
+resource "kubernetes_secret" "airflow_tasks_aws_access_credentials" {
+  metadata {
+    name      = "airflow-tasks-aws-access-credentials"
+    namespace = helm_release.airflow.namespace
+  }
+  data = {
+    "AWS_REGION" = "eu-central-1"
+    "AWS_BUCKET"="airflowdatabucket"
+    "AWS_ACCESS_KEY_ID"="AKIA4OKBSADPRSFYYETY"
+    "AWS_SECRET_ACCESS_KEY"="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"
+    "AWS_ROLE_NAME"="airflow-test-role"
+  }
+}
+
+
+# resource "kubernetes_secret" "airflow_aws_s3_log_secret" {
+#   metadata {
+#     name      = "airflow-aws-s3-log-secret"
+#     namespace = helm_release.airflow.namespace
+#   }
+#   data = {
+#     "AWS_REGION" = "eu-central-1"
+#     "AWS_ACCESS_KEY_ID"="AKIA4OKBSADPRSFYYETY"
+#     "AWS_SECRET_ACCESS_KEY"="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"
+#   }
+# }
 
 
 resource "kubernetes_secret" "airflow_https_git_secret" {
@@ -28,7 +61,7 @@ resource "kubernetes_secret" "airflow_https_git_secret" {
 
 resource "random_password" "rds_password" {
   length  = 16
-  special = true
+  special = false
 }
 
 
@@ -61,7 +94,7 @@ resource "helm_release" "airflow" {
   wait       = false # deactivate post install hooks otherwise will fail
 
   values = [
-    "${file("${path.module}/../../applications/airflow/values.yaml")}"
+    "${file("${path.module}/helm/values.yaml")}"
   ]
 
   # set {
@@ -92,4 +125,13 @@ resource "helm_release" "airflow" {
     name  = "dags.gitSync.httpSecret"
     value = local.git_airflow_repo_secret_name
   }
+  # set {
+  #   name = "env[0].name"
+  #   value = "MLFLOW_TRACKING_URI"
+  # }
+  # set {
+  #   name = "env[0].value"
+  #   value = var.mlflow_tracking_uri
+  # }
+
 }

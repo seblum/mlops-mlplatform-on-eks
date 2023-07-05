@@ -1,0 +1,38 @@
+SHELL := /bin/bash
+
+TERRAFORM_PLAN := .tfplan
+VARIABLE_FILE_PATH := ./environment
+ENV ?= local.rancher
+
+.terraform:
+	terraform init
+	terraform providers lock \
+    -platform=windows_amd64 \
+    -platform=darwin_amd64 \
+    -platform=linux_amd64 \
+    -platform=darwin_arm64
+init: .terraform
+
+validate: init
+	terraform validate
+
+${TERRAFORM_PLAN}: validate
+	terraform plan -out=${TERRAFORM_PLAN} -var-file=${VARIABLE_FILE_PATH}/${ENV}.tfvars
+plan: ${TERRAFORM_PLAN}
+
+apply: plan
+	terraform apply -auto-approve ${TERRAFORM_PLAN}
+
+destroy: clean-plan
+	terraform destroy -auto-approve -var-file=${VARIABLE_FILE_PATH}/${ENV}.tfvars
+
+fmt:
+	terraform fmt -recursive .
+
+clean-plan:
+	rm -rf ${TERRAFORM_PLAN}
+
+clean: clean-plan
+	rm -rf .terraform
+
+.PHONY: init validate fmt plan apply destroy clean clean-plan

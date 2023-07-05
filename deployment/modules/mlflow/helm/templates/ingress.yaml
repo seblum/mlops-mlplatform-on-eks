@@ -1,14 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress
+  name: mlflow-ingress
   namespace: mlflow
 spec:
   rules:
     - host:  mlflow
       http:
         paths:
-          - path: /
+          - path: /mlflow
             pathType: Prefix
             backend:
               service:

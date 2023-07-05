@@ -1,3 +1,4 @@
+data "aws_caller_identity" "current" {}
 
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
@@ -14,6 +15,75 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_state_encr
     }
   }
 }
+# "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.eks_oidc_provider}"
+#  "arn:aws:iam::855372857567:oidc-provider/oidc.eks.eu-central-1.amazonaws.com/id/875EEDFE09B23389C7CCE0A5CBFD14E8"
+resource "aws_iam_role" "mlflow_s3_role" {
+  name = "${var.namespace}-s3-access-role"
+
+  assume_role_policy = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action" : "sts:AssumeRoleWithWebIdentity",
+        "Effect": "Allow",
+        "Principal" : {
+          "Federated" : [
+            "${var.oidc_provider_arn}" 
+          ]
+        }
+      }
+    ]
+  }
+  EOF
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+resource "aws_iam_policy" "mlflow_s3_policy" {
+  name = "${var.namespace}-s3-access-policy"
+  path = "/"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowUsersToAccessFolder2Only",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*Object",
+          "s3:GetObjectVersion"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/test/*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
+        ],
+        "Condition" : {
+          "StringLike" : {
+            "s3:prefix" : [
+              "test/*"
+            ]
+          }
+        }
+      }
+  ] })
+}
+
+resource "aws_iam_role_policy_attachment" "mlflow_s3_policy" {
+  role       = aws_iam_role.mlflow_s3_role.name
+  policy_arn = aws_iam_policy.mlflow_s3_policy.arn
+}
+
 
 resource "random_password" "rds_password" {
   #count  = var.generate_db_password ? 1 : 0
@@ -41,12 +111,12 @@ module "rds-mlflow" {
 
 resource "helm_release" "mlflow" {
   name             = var.name
-  namespace        = var.name
+  namespace        = var.namespace
   create_namespace = var.create_namespace
 
-  chart = "${path.module}/../../applications/mlflow/"
+  chart = "${path.module}/helm/"
   values = [
-    "${file("${path.module}/../../applications/mlflow/values.yaml")}"
+    "${file("${path.module}/helm/values.yaml")}"
   ]
 
   set {
@@ -74,7 +144,13 @@ resource "helm_release" "mlflow" {
     value = "test"
   }
   set {
+    name = "ARTIFACT_S3_ROLE_ARN"
+    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}" # "arn:aws:iam::855372857567:role/mlflow-s3-access-mlflow-role"
+  }
+  set {
     name  = "DB_NAME"
     value = module.rds-mlflow.rds_dbname
   }
 }
+
+

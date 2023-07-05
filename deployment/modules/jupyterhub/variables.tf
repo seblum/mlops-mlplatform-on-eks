@@ -94,3 +94,8 @@ variable "helm_chart_version" {
   type        = string
   description = "Version of the helm chart"
 }
+
+variable "mlflow_tracking_uri" {
+  type        = string
+  description = "The internal address of MLflow, to make it easily accessible from Jupyter."
+}

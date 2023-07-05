@@ -64,6 +64,9 @@ module "eks" {
     aws-ebs-csi-driver = {
       service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ebs_csi_service_account_role_name}"
     }
+    # external-dns = {
+
+    # }
   }
 
   eks_managed_node_group_defaults = {
@@ -78,10 +81,11 @@ module "eks" {
       name = "ng0_t3_small"
 
       instance_types = ["t3.small"]
+      #instance_types = ["t3.medium"] # for testing airflow now.
 
-      min_size      = 2
+      min_size      = 3
       max_size      = 6
-      desired_size  = 3
+      desired_size  = 4
       capacity_type = "ON_DEMAND"
       labels = {
         role = local.nodegroup_t3_small_label
@@ -118,32 +122,32 @@ module "eks" {
         "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_t3_medium_label}:NoSchedule"
       }
     }
-    group_g4dn_xlarge = {
-      name = "ng2_g4dn_xlarge"
+    # group_g4dn_xlarge = {
+    #   name = "ng2_g4dn_xlarge"
 
-      instance_types = ["g4dn.xlarge"]
+    #   instance_types = ["g4dn.xlarge"]
 
-      min_size      = 0
-      max_size      = 1
-      desired_size  = 0
-      capacity_type = "ON_DEMAND"
-      labels = {
-        role = local.nodegroup_g4dn_xlarge_label
-      }
-      taints = [
-        {
-          key    = "dedicated"
-          value  = local.nodegroup_g4dn_xlarge_label
-          effect = "NO_SCHEDULE"
-        }
-      ]
-      tags = {
-        "k8s.io/cluster-autoscaler/enabled"                       = "true"
-        "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
-        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_g4dn_xlarge_label}"
-        "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_g4dn_xlarge_label}:NoSchedule"
-      }
-    }
+    #   min_size      = 0
+    #   max_size      = 1
+    #   desired_size  = 0
+    #   capacity_type = "ON_DEMAND"
+    #   labels = {
+    #     role = local.nodegroup_g4dn_xlarge_label
+    #   }
+    #   taints = [
+    #     {
+    #       key    = "dedicated"
+    #       value  = local.nodegroup_g4dn_xlarge_label
+    #       effect = "NO_SCHEDULE"
+    #     }
+    #   ]
+    #   tags = {
+    #     "k8s.io/cluster-autoscaler/enabled"                       = "true"
+    #     "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
+    #     "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_g4dn_xlarge_label}"
+    #     "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_g4dn_xlarge_label}:NoSchedule"
+    #   }
+    # }
   }
   tags = local.tags
 }

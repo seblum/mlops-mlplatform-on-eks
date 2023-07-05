@@ -43,6 +43,33 @@ module "eks" {
 
 
 # CUSTOM TOOLS
+
+module "mlflow" {
+  count                 = var.deploy_mlflow ? 1 : 0
+  source                = "./modules/mlflow"
+  name                  = "mlflow"
+  namespace             = "mlflow"
+  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
+  s3_force_destroy      = local.force_destroy_s3_bucket
+  oidc_provider_arn     = module.eks.oidc_provider_arn
+  
+  # RDS
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  rds_port                    = local.port_mlflow
+  rds_name                    = "mlflow"
+  rds_engine                  = "mysql"
+  rds_engine_version          = "8.0.33"
+  rds_instance_class          = "db.t3.micro"
+  storage_type                = local.storage_type
+  max_allocated_storage       = local.max_allocated_storage
+
+  depends_on = [
+    module.eks
+  ]
+}
+
 module "airflow" {
   count            = var.deploy_airflow ? 1 : 0
   source           = "./modules/airflow"
@@ -57,7 +84,7 @@ module "airflow" {
   rds_port                    = local.port_airflow
   rds_name                    = "airflow"
   rds_engine                  = "postgres"
-  rds_engine_version          = "13.3"
+  rds_engine_version          = "13.11" # end of support may 2024
   rds_instance_class          = "db.t3.micro"
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
@@ -72,37 +99,12 @@ module "airflow" {
   git_token             = local.git_token
   git_repository_url    = local.git_repository_url
   git_branch            = local.git_branch
+  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
 
   depends_on = [
     module.eks
   ]
 }
-
-
-module "mlflow" {
-  count                 = var.deploy_mlflow ? 1 : 0
-  source                = "./modules/mlflow"
-  name                  = "mlflow"
-  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
-  s3_force_destroy      = local.force_destroy_s3_bucket
-
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_mlflow
-  rds_name                    = "mlflow"
-  rds_engine                  = "mysql"
-  rds_engine_version          = "8.0.30"
-  rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
-
-  depends_on = [
-    module.eks
-  ]
-}
-
 
 module "jupyterhub" {
   count            = var.deploy_jupyterhub ? 1 : 0
@@ -129,7 +131,8 @@ module "jupyterhub" {
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
   helm_chart_name       = "jupyterhub"
   helm_chart_version    = "2.0.0"
-
+  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
+  
   depends_on = [
     module.eks
   ]
@@ -140,3 +143,8 @@ module "monitoring" {
   source = "./modules/monitoring"
   name   = "monitoring"
 }
+
+# module "prometheus" {
+#   count  = var.deploy_prometheus ? 1 : 0
+#   source = "./modules/kubernetes/prometheus"
+# }

@@ -12,7 +12,7 @@ resource "helm_release" "jupyterhub" {
   version    = var.helm_chart_version
 
   values = [
-    "${file("${path.module}/../../applications/jupyterhub/values.yaml")}"
+    "${file("${path.module}/helm/values.yaml")}"
   ]
 
   # set {
@@ -20,5 +20,13 @@ resource "helm_release" "jupyterhub" {
   #   value = ["git", "clone", "https://github.com/seblum/Airflow_DAGs.git"]
   #   type = list
   # }
+  set {
+    name = "singleuser.extraEnv[0].name"
+    value = "MLFLOW_TRACKING_URI"
+  }
+  set {
+    name = "singleuser.extraEnv[0].value"
+    value = "http://${var.mlflow_tracking_uri}"
+  }
 
 }

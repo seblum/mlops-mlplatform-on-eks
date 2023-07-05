@@ -16,3 +16,19 @@ variable "name" {
 #   type        = string
 #   description = "Version of the helm chart"
 # }
+
+
+
+
+
+# variable "namespace" {
+#   type        = string
+#   description = "Namespace to launch Prometheus in"
+#   default     = "monitoring"
+# }
+
+# variable "create_namespace" {
+#   type        = bool
+#   description = "Should the namespace be created, if it does not exists?"
+#   default     = true
+# }

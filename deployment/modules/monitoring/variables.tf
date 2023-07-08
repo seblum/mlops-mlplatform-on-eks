@@ -21,14 +21,14 @@ variable "name" {
 
 
 
-# variable "namespace" {
-#   type        = string
-#   description = "Namespace to launch Prometheus in"
-#   default     = "monitoring"
-# }
+variable "namespace" {
+  type        = string
+  description = "Namespace to launch Prometheus & Grafana"
+  default     = "monitoring"
+}
 
-# variable "create_namespace" {
-#   type        = bool
-#   description = "Should the namespace be created, if it does not exists?"
-#   default     = true
-# }
+variable "create_namespace" {
+  type        = bool
+  description = "Should the namespace be created, if it does not exists?"
+  default     = true
+}

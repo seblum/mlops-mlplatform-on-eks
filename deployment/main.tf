@@ -42,6 +42,16 @@ module "eks" {
 }
 
 
+module "user-profiles" {
+  source = "./modules/user-profiles"
+  #user_env           = var.user_env
+  profiles = local.profiles_config
+  # kfp_s3_bucket_name = module.kubeflow_components.s3_bucket_name
+  # tags               = local.tags
+  eks_oidc_provider = module.eks.oidc_provider_arn
+}
+
+
 # CUSTOM TOOLS
 
 module "mlflow" {
@@ -52,7 +62,7 @@ module "mlflow" {
   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
   s3_force_destroy      = local.force_destroy_s3_bucket
   oidc_provider_arn     = module.eks.oidc_provider_arn
-  
+
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -71,11 +81,14 @@ module "mlflow" {
 }
 
 module "airflow" {
-  count            = var.deploy_airflow ? 1 : 0
-  source           = "./modules/airflow"
-  name             = "airflow"
-  cluster_name     = local.cluster_name
-  cluster_endpoint = module.eks.cluster_endpoint
+  count             = var.deploy_airflow ? 1 : 0
+  source            = "./modules/airflow"
+  name              = "airflow"
+  namespace         = "airflow"
+  cluster_name      = local.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  user_profiles     = local.airflow_profiles
 
   # RDS
   vpc_id                      = module.vpc.vpc_id
@@ -94,7 +107,7 @@ module "airflow" {
   # HELM
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
-  helm_chart_version    = "8.6.1"
+  helm_chart_version    = "8.7.1"
   git_username          = local.git_username
   git_token             = local.git_token
   git_repository_url    = local.git_repository_url
@@ -102,7 +115,8 @@ module "airflow" {
   mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
 
   depends_on = [
-    module.eks
+    module.eks,
+    module.user-profiles
   ]
 }
 
@@ -132,9 +146,10 @@ module "jupyterhub" {
   helm_chart_name       = "jupyterhub"
   helm_chart_version    = "2.0.0"
   mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
-  
+
   depends_on = [
-    module.eks
+    module.eks,
+    module.user-profiles
   ]
 }
 
@@ -143,8 +158,3 @@ module "monitoring" {
   source = "./modules/monitoring"
   name   = "monitoring"
 }
-
-# module "prometheus" {
-#   count  = var.deploy_prometheus ? 1 : 0
-#   source = "./modules/kubernetes/prometheus"
-# }

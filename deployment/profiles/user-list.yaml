@@ -1,0 +1,8 @@
+profiles:
+    - user: admin.master
+      airflow_role: Admin
+      email: admin@example.com
+    - user: sebastian.blum
+      airflow_role: Admin
+      email: sebastian@example.com
+

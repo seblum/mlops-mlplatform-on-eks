@@ -1,7 +1,7 @@
-# Profiles
 
 locals {
 
+  # Profiles
   profiles_yaml = yamldecode(file("${path.module}/profiles/user-list.yaml"))["profiles"]
 
   profiles_config = {
@@ -10,7 +10,6 @@ locals {
       email     = profile["email"]
       firstName = split(".", profile["user"])[0]
       lastName  = split(".", profile["user"])[1]
-      #airflow_username = profile["user"]
       airflow_role = lookup(profile, "airflow_role", [])
     }
   }

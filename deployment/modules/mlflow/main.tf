@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+# TODO: set namespace before ressourcs right
 
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
@@ -15,8 +16,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_state_encr
     }
   }
 }
+
 # "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.eks_oidc_provider}"
-#  "arn:aws:iam::855372857567:oidc-provider/oidc.eks.eu-central-1.amazonaws.com/id/875EEDFE09B23389C7CCE0A5CBFD14E8"
 resource "aws_iam_role" "mlflow_s3_role" {
   name = "${var.namespace}-s3-access-role"
 
@@ -49,7 +50,6 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid" : "AllowUsersToAccessFolder2Only",
         "Effect" : "Allow",
         "Action" : [
           "s3:*Object",
@@ -144,7 +144,7 @@ resource "helm_release" "mlflow" {
     value = "test"
   }
   set {
-    name = "ARTIFACT_S3_ROLE_ARN"
+    name  = "ARTIFACT_S3_ROLE_ARN"
     value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}" # "arn:aws:iam::855372857567:role/mlflow-s3-access-mlflow-role"
   }
   set {

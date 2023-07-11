@@ -22,8 +22,8 @@ variable "s3_force_destroy" {
 }
 
 variable "oidc_provider_arn" {
-  type = string
-  description = "arn of the OIDC provider"  
+  type        = string
+  description = "arn of the OIDC provider"
 }
 
 

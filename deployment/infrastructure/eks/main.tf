@@ -6,9 +6,9 @@ locals {
   autoscaler_service_account_name      = "autoscaler-controller-sa"
   autoscaler_service_account_role_name = "${var.cluster_name}-autoscaler-controller"
 
-  nodegroup_t3_small_label             = "t3_small"
-  nodegroup_t3_medium_label            = "t3_medium"
-  nodegroup_g4dn_xlarge_label          = "g4dn_xlarge"
+  nodegroup_t3_small_label    = "t3_small"
+  nodegroup_t3_medium_label   = "t3_medium"
+  nodegroup_g4dn_xlarge_label = "g4dn_xlarge"
   eks_asg_tag_list_nodegroup_t3_small_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
@@ -80,8 +80,8 @@ module "eks" {
     group_t3_small = {
       name = "ng0_t3_small"
 
-      instance_types = ["t3.small"]
-      #instance_types = ["t3.medium"] # for testing airflow now.
+      #instance_types = ["t3.small"]
+      instance_types = ["t3.medium"] # for testing airflow now.
 
       min_size      = 3
       max_size      = 6

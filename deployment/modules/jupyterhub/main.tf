@@ -21,11 +21,11 @@ resource "helm_release" "jupyterhub" {
   #   type = list
   # }
   set {
-    name = "singleuser.extraEnv[0].name"
+    name  = "singleuser.extraEnv[0].name"
     value = "MLFLOW_TRACKING_URI"
   }
   set {
-    name = "singleuser.extraEnv[0].value"
+    name  = "singleuser.extraEnv[0].value"
     value = "http://${var.mlflow_tracking_uri}"
   }
 

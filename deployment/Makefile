@@ -22,6 +22,9 @@ destroy: init \
 init:
 	terraform init
 
+fmt:
+	terraform fmt -recursive .
+
 # TERRAFORM APPLY
 create-vpc:
 	terraform apply	-target="module.vpc" -var-file=$(VARS_FILE) -auto-approve

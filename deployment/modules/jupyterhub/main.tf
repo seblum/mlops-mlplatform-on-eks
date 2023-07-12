@@ -30,7 +30,7 @@ resource "helm_release" "jupyterhub" {
   }
 
   set {
-    name = "hub.config.Authenticator.admin_users"
+    name  = "hub.config.Authenticator.admin_users"
     value = "{var.admin_user_list}"
   }
   # hub:

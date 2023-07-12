@@ -54,7 +54,7 @@ module "mlflow" {
   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
   s3_force_destroy      = local.force_destroy_s3_bucket
   oidc_provider_arn     = module.eks.oidc_provider_arn
-  name_prefix = local.name_prefix
+  name_prefix           = local.name_prefix
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -122,9 +122,9 @@ module "jupyterhub" {
   cluster_name     = local.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
 
-  admin_user_list = local.jupyterhub_admin_user_list
+  admin_user_list   = local.jupyterhub_admin_user_list
   allowed_user_list = local.jupyterhub_allowed_user_list
-  
+
   # # RDS
   # vpc_id                      = module.vpc.vpc_id
   # private_subnets             = module.vpc.private_subnets

@@ -44,11 +44,11 @@ locals {
 
   jupyterhub_admin_user_list = flatten(compact([
     for profile in local.profiles_yaml : profile["jupyter_role"] == "Admin" ? profile["user"] : ""
-    ]))
+  ]))
 
   jupyterhub_allowed_user_list = flatten(compact([
     for profile in local.profiles_yaml : profile["jupyter_role"] == "User" ? profile["user"] : ""
-    ]))
+  ]))
 
 
 }

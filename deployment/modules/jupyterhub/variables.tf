@@ -101,11 +101,11 @@ variable "mlflow_tracking_uri" {
 }
 
 variable "admin_user_list" {
-  type = list(string)
+  type        = list(string)
   description = "List of Admin users added to Jupyterhub"
 }
 
 variable "allowed_user_list" {
-  type = list(string)
+  type        = list(string)
   description = "List of allowed_user_list users added to Jupyterhub"
 }

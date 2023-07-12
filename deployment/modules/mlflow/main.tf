@@ -1,3 +1,7 @@
+locals {
+  mlflow_s3_bucket_name = "${var.name_prefix}-${var.namespace}-${var.mlflow_s3_bucket_name}"
+}
+
 data "aws_caller_identity" "current" {}
 # TODO: set namespace before ressourcs right
 
@@ -56,7 +60,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:GetObjectVersion"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/test/*"
+          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
+          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
         ]
       },
       {
@@ -66,15 +71,16 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:ListBucketVersions"
         ],
         "Resource" : [
+          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
           "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
         ],
-        "Condition" : {
-          "StringLike" : {
-            "s3:prefix" : [
-              "test/*"
-            ]
-          }
-        }
+        # "Condition" : {
+        #   "StringLike" : {
+        #     "s3:prefix" : [
+        #       "test/*"
+        #     ]
+        #   }
+        # }
       }
   ] })
 }

@@ -11,12 +11,12 @@ locals {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {} # 
 
-# resource "kubernetes_namespace" "airflow" {
-#   metadata {
+resource "kubernetes_namespace" "airflow" {
+  metadata {
 
-#     name = var.namespace
-#   }
-# }
+    name = var.namespace
+  }
+}
 
 ####### LOG STORAGE
 

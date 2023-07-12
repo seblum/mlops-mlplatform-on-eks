@@ -99,3 +99,13 @@ variable "mlflow_tracking_uri" {
   type        = string
   description = "The internal address of MLflow, to make it easily accessible from Jupyter."
 }
+
+variable "admin_user_list" {
+  type = list(string)
+  description = "List of Admin users added to Jupyterhub"
+}
+
+variable "allowed_user_list" {
+  type = list(string)
+  description = "List of allowed_user_list users added to Jupyterhub"
+}

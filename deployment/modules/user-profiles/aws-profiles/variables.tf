@@ -1,4 +1,4 @@
 variable "profile" {
-  type = map(any)
+  type        = map(any)
   description = "Profile configuration as object"
 }

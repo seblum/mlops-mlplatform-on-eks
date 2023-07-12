@@ -2,7 +2,9 @@ profiles:
     - user: admin.master
       airflow_role: Admin
       email: admin@example.com
+      jupyter_role: Admin
     - user: sebastian.blum
       airflow_role: Admin
       email: sebastian@example.com
+      jupyter_role: User
 

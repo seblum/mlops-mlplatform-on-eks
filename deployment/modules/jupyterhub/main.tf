@@ -29,4 +29,16 @@ resource "helm_release" "jupyterhub" {
     value = "http://${var.mlflow_tracking_uri}"
   }
 
+  set {
+    name = "hub.config.Authenticator.admin_users"
+    value = "{var.admin_user_list}"
+  }
+  # hub:
+  # config:
+  #     JupyterHub:
+  #       admin_access: false
+  #       authenticator_class: dummy
+  #     Authenticator:
+  #       admin_users:
+
 }

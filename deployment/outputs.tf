@@ -22,3 +22,10 @@ output "airflow-profiles" {
   value = local.airflow_profiles
 }
 
+output "jupyterhub_admin_user_list" {
+  value = local.jupyterhub_admin_user_list
+}
+
+output "jupyterhub_allowed_user_list" {
+  value = local.jupyterhub_allowed_user_list
+}

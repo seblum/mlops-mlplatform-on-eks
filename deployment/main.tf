@@ -1,21 +1,11 @@
 
-locals {
-  cluster_name            = "${var.name_prefix}-eks"
-  vpc_name                = "${var.name_prefix}-vpc"
-  port_airflow            = var.port_airflow
-  port_mlflow             = var.port_mlflow
-  mlflow_s3_bucket_name   = "${var.name_prefix}-mlflow-bucket"
-  force_destroy_s3_bucket = true
-  storage_type            = "gp2"
-  max_allocated_storage   = var.max_allocated_storage
-  airflow_github_ssh      = var.airflow_github_ssh
-  git_username            = var.git_username
-  git_token               = var.git_token
-  git_repository_url      = var.git_repository_url
-  git_branch              = var.git_branch
-}
-
 data "aws_caller_identity" "current" {}
+
+resource "random_string" "random_prefix" {
+  length  = 12
+  upper   = false
+  special = false
+}
 
 
 # INFRASTRUCTURE
@@ -27,14 +17,16 @@ module "vpc" {
 
 
 module "eks" {
-  source                = "./infrastructure/eks"
-  cluster_name          = local.cluster_name
-  eks_cluster_version   = "1.23"
-  vpc_id                = module.vpc.vpc_id
-  aws_region            = var.aws_region
-  private_subnets       = module.vpc.private_subnets
-  security_group_id_one = [module.vpc.worker_group_mgmt_one_id]
-  security_group_id_two = [module.vpc.worker_group_mgmt_two_id]
+  source                      = "./infrastructure/eks"
+  cluster_name                = local.cluster_name
+  eks_cluster_version         = "1.23"
+  vpc_id                      = module.vpc.vpc_id
+  aws_region                  = var.aws_region
+  private_subnets             = module.vpc.private_subnets
+  azs                         = module.vpc.azs
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  security_group_id_one       = [module.vpc.worker_group_mgmt_one_id]
+  security_group_id_two       = [module.vpc.worker_group_mgmt_two_id]
   # depends_on = [
   #   module.vpc
   # ]
@@ -62,7 +54,7 @@ module "mlflow" {
   mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
   s3_force_destroy      = local.force_destroy_s3_bucket
   oidc_provider_arn     = module.eks.oidc_provider_arn
-
+  name_prefix = local.name_prefix
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -81,14 +73,17 @@ module "mlflow" {
 }
 
 module "airflow" {
-  count             = var.deploy_airflow ? 1 : 0
-  source            = "./modules/airflow"
-  name              = "airflow"
-  namespace         = "airflow"
-  cluster_name      = local.cluster_name
-  cluster_endpoint  = module.eks.cluster_endpoint
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  user_profiles     = local.airflow_profiles
+  count                      = var.deploy_airflow ? 1 : 0
+  source                     = "./modules/airflow"
+  name                       = "airflow"
+  namespace                  = "airflow"
+  name_prefix                = local.name_prefix
+  cluster_name               = local.cluster_name
+  cluster_endpoint           = module.eks.cluster_endpoint
+  oidc_provider_arn          = module.eks.oidc_provider_arn
+  user_profiles              = local.airflow_profiles
+  s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
+  s3_data_bucket_name        = local.airflow_s3_data_bucket
 
   # RDS
   vpc_id                      = module.vpc.vpc_id
@@ -127,6 +122,9 @@ module "jupyterhub" {
   cluster_name     = local.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
 
+  admin_user_list = local.jupyterhub_admin_user_list
+  allowed_user_list = local.jupyterhub_allowed_user_list
+  
   # # RDS
   # vpc_id                      = module.vpc.vpc_id
   # private_subnets             = module.vpc.private_subnets

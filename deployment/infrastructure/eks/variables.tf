@@ -23,6 +23,11 @@ variable "private_subnets" {
   description = "List of private subnets"
 }
 
+variable "private_subnets_cidr_blocks" {
+  type        = list(string)
+  description = "List of private subnet cidr blocks"
+}
+
 variable "security_group_id_one" {
   type        = list(string)
   description = "ID of EKS worker security group one"
@@ -31,4 +36,8 @@ variable "security_group_id_one" {
 variable "security_group_id_two" {
   type        = list(string)
   description = "ID of EKS worker security group two"
+}
+
+variable "azs" {
+
 }

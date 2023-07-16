@@ -16,7 +16,7 @@ locals {
   git_token                          = var.git_token
   git_repository_url                 = var.git_repository_url
   git_branch                         = var.git_branch
-  deployment_name                    = "airflow-platform"
+  deployment_name                    = "mlplatform"
   name_prefix                        = random_string.random_prefix.result
 
   # Profiles

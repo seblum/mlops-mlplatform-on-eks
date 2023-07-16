@@ -61,6 +61,12 @@ module "eks" {
   # aws_auth_users            = local.cluster_users # add users in later step
 
   cluster_addons = {
+    coredns = {
+      most_recent = true
+    },
+    kube-proxy = {
+      most_recent = true
+    },
     aws-ebs-csi-driver = {
       service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ebs_csi_service_account_role_name}"
     },
@@ -183,10 +189,12 @@ module "vpc_cni_irsa" {
   }
 }
 
+
 ################################################################################
 #
 # EBS CSI controller
 #
+
 module "ebs_csi_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "5.11.1"
@@ -225,12 +233,24 @@ resource "aws_iam_policy" "ebs_csi_controller_sa" {
   ] })
 }
 
+resource "kubernetes_annotations" "ebs-no-default-storageclass" {
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  force       = "true"
 
+  metadata {
+    name = "gp2"
+  }
+  annotations = {
+    "storageclass.kubernetes.io/is-default-class" = "false"
+  }
+}
 
 ################################################################################
 #
 # EKS Cluster autoscaler
 #
+
 resource "aws_iam_policy" "node_additional" {
   name        = "${local.cluster_name}-additional"
   description = "${local.cluster_name} node additional policy"
@@ -299,13 +319,10 @@ module "eks_autoscaler" {
 }
 
 
-
-
 ################################################################################
 #
 # EFS
 #
-
 
 resource "helm_release" "aws_efs_csi_driver" {
   chart      = "aws-efs-csi-driver"

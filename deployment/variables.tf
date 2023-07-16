@@ -72,3 +72,4 @@ variable "deploy_monitoring" {
   default     = true
 }
 
+variable "domain_name" {}

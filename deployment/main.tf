@@ -33,6 +33,15 @@ module "eks" {
   # if this is in, I get an for_each error. weird
 }
 
+module "networking" {
+  source                  = "./infrastructure/networking"
+  namespace               = "kube-system"
+  cluster_name            = local.cluster_name
+  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  domain_name             = var.domain_name
+}
+
+
 
 module "user-profiles" {
   source = "./modules/user-profiles"
@@ -143,7 +152,7 @@ module "jupyterhub" {
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
   helm_chart_name       = "jupyterhub"
   helm_chart_version    = "2.0.0"
-  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
+  mlflow_tracking_uri   = "test" #var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : ""
 
   depends_on = [
     module.eks,

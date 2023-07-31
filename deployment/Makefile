@@ -4,7 +4,7 @@ VARS_FILE ?= testing.tfvars
 apply: init \
 	apply-all
 
-deploy: init \
+deploy-all: init \
 	create-vpc \
 	create-eks-cluster \
 	deploy-airflow \
@@ -12,7 +12,7 @@ deploy: init \
 	deploy-jupyterhub
 
 
-destroy: init \
+destroy-all: init \
 	destroy-mlflow \
 	destroy-jupyterhub \
 	destroy-airflow \
@@ -51,6 +51,9 @@ destroy-vpc:
 destroy-eks-cluster:
 	terraform destroy -target="module.eks" -var-file=$(VARS_FILE) -auto-approve
 
+destroy-networking:
+	terraform destroy -target="module.networking" -var-file=$(VARS_FILE) -auto-approve
+
 destroy-airflow:
 	terraform destroy -target="module.airflow" -var-file=$(VARS_FILE) -auto-approve
 
@@ -59,6 +62,27 @@ destroy-mlflow:
 
 destroy-jupyterhub:
 	terraform destroy -target="module.jupyterhub" -var-file=$(VARS_FILE) -auto-approve
+
+destroy-monitoring:
+	terraform destroy -target="module.monitoring" -var-file=$(VARS_FILE) -auto-approve
+
+destroy-user-profiles:
+	terraform destroy -target="module.user-profiles" -var-file=$(VARS_FILE) -auto-approve
+
+destroy-modules:
+	terraform destroy -target="module.monitoring" \ 
+					-target="module.jupyterhub" \
+					-target="module.mlflow" \
+					-target="module.airflow" \
+					-target="module.user-profiles" \
+					-var-file=$(VARS_FILE) -auto-approve
+
+destroy-test:
+	terraform destroy \
+					-target="module.jupyterhub" \
+					-target="module.user-profiles" \
+					-target="module.eks" \
+					-var-file=$(VARS_FILE) -auto-approve
 
 # wipe-tf-state:
 # 	terraform state rm $$(terraform state list)

@@ -11,34 +11,59 @@ resource "helm_release" "jupyterhub" {
   chart      = var.helm_chart_name
   version    = var.helm_chart_version
 
-  values = [
-    "${file("${path.module}/helm/values.yaml")}"
-  ]
-
-  # set {
-  #   name  = "singleuser.lifecycleHooks.postStart.exec.command"
-  #   value = ["git", "clone", "https://github.com/seblum/Airflow_DAGs.git"]
-  #   type = list
-  # }
-  set {
-    name  = "singleuser.extraEnv[0].name"
-    value = "MLFLOW_TRACKING_URI"
-  }
-  set {
-    name  = "singleuser.extraEnv[0].value"
-    value = "http://${var.mlflow_tracking_uri}"
-  }
-
-  set {
-    name  = "hub.config.Authenticator.admin_users"
-    value = "{var.admin_user_list}"
-  }
-  # hub:
-  # config:
-  #     JupyterHub:
-  #       admin_access: false
-  #       authenticator_class: dummy
-  #     Authenticator:
-  #       admin_users:
-
+  values = [yamlencode({
+    singleuser = {
+      defaultUrl = "/lab"
+      image = {
+        name = "seblum/jupyterhub-server"
+        tag  = "latest"
+      },
+      lifecycleHooks = {
+        postStart = {
+          exec = {
+            command = ["git", "clone", "${var.git_repository_url}"]
+          }
+        }
+      },
+      extraEnv = {
+        "MLFLOW_TRACKING_URI"   = "http://mlflow-service.mlflow.svc.cluster.local"
+        "AWS_ACCESS_KEY"        = "mlflow_tracking_uri123"
+        "AWS_SECRET_ACCESS_KEY" = "mlflow_tracking_uri456"
+      }
+    },
+    ingress = {
+      enabled : true
+      annotations = {
+        "external-dns.alpha.kubernetes.io/hostname" = "${var.domain_name}"
+        "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
+        "alb.ingress.kubernetes.io/target-type"     = "ip"
+        "kubernetes.io/ingress.class"               = "alb"
+        "alb.ingress.kubernetes.io/group.name"      = "mlplatform"
+      }
+      hosts = ["${var.domain_name}", "www.${var.domain_name}"]
+    },
+    proxy = {
+      service = {
+        type = "ClusterIP"
+      }
+      secretToken = var.proxy_secret_token
+    }
+    cull = {
+      enabled = true
+      users   = true
+    }
+    hub = {
+      baseUrl = "/${var.domain_suffix}"
+      config = {
+        GitHubOAuthenticator = {
+          client_id          = var.git_client_id
+          client_secret      = var.git_client_secret
+          oauth_callback_url = "http://${var.domain_name}/${var.domain_suffix}/hub/oauth_callback"
+        }
+        JupyterHub = {
+          authenticator_class = "github"
+        }
+      }
+    }
+  })]
 }

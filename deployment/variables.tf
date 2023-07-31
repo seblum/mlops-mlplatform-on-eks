@@ -50,6 +50,16 @@ variable "git_branch" {
   description = "Name of the git branch of the Airflow DAG repository"
 }
 
+
+variable "airflow_git_client_id" {}
+variable "airflow_git_client_secret" {}
+variable "airflow_fernet_key" {}
+
+variable "jupyterhub_git_client_id" {}
+variable "jupyterhub_git_client_secret" {}
+variable "jupyterhub_proxy_secret_token" {}
+
+
 # MLFLOW
 variable "deploy_mlflow" {
   type        = bool

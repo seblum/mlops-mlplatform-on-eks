@@ -181,3 +181,20 @@ variable "s3_force_destroy" {
 #     lastName  = "user"
 #   }
 # ] }
+
+variable "git_client_id" {
+
+}
+
+variable "git_client_secret" {
+
+}
+
+variable "domain_name" {
+
+}
+
+variable "domain_suffix" {}
+
+
+variable "fernet_key" {}

@@ -93,7 +93,9 @@ module "airflow" {
   user_profiles              = local.airflow_profiles
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket
-
+  domain_name                = var.domain_name
+  domain_suffix              = "airflow"
+  fernet_key = var.airflow_fernet_key
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -118,6 +120,10 @@ module "airflow" {
   git_branch            = local.git_branch
   mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
 
+
+  git_client_id     = var.airflow_git_client_id
+  git_client_secret = var.airflow_git_client_secret
+
   depends_on = [
     module.eks,
     module.user-profiles
@@ -130,6 +136,8 @@ module "jupyterhub" {
   name             = "jupyterhub"
   cluster_name     = local.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
+  domain_name      = var.domain_name
+  domain_suffix    = "jupyterhub"
 
   admin_user_list   = local.jupyterhub_admin_user_list
   allowed_user_list = local.jupyterhub_allowed_user_list
@@ -147,6 +155,11 @@ module "jupyterhub" {
   # max_allocated_storage       = local.max_allocated_storage
   # # periodic updates
   # # log airflow to s3
+  git_repository_url = local.git_repository_url
+
+  git_client_id     = var.jupyterhub_git_client_id
+  git_client_secret = var.jupyterhub_git_client_secret
+  proxy_secret_token = var.jupyterhub_proxy_secret_token
 
   # HELM
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"

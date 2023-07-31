@@ -1,15 +1,14 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {} # 
+
 locals {
   k8s_airflow_db_secret_name   = "${var.name_prefix}-${var.namespace}-db-auth"
   git_airflow_repo_secret_name = "${var.name_prefix}-${var.namespace}-https-git-secret"
+  git_organization_secret_name = "${var.name_prefix}-${var.namespace}-organization-git-secret"
   s3_data_bucket_secret_name   = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_secret_name}"
   s3_data_bucket_name          = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_name}"
   s3_log_bucket_name           = "${var.name_prefix}-${var.namespace}-log-storage"
 }
-
-
-
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
 
 resource "kubernetes_namespace" "airflow" {
   metadata {
@@ -18,7 +17,11 @@ resource "kubernetes_namespace" "airflow" {
   }
 }
 
-####### LOG STORAGE
+
+################################################################################
+#
+# Log Storage
+#
 
 module "s3-remote-logging" {
   source             = "./remote_logging"
@@ -29,7 +32,10 @@ module "s3-remote-logging" {
 }
 
 
-####### DATA STORAGE
+################################################################################
+#
+# Data Storage
+#
 
 module "s3-data-storage" {
   source                     = "./data_storage"
@@ -40,7 +46,10 @@ module "s3-data-storage" {
 }
 
 
-# HELM
+################################################################################
+#
+# Helm Release
+#
 
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
@@ -63,13 +72,24 @@ resource "kubernetes_secret" "airflow_https_git_secret" {
   }
 }
 
+resource "kubernetes_secret" "airflow_organization_git_secret" {
+  metadata {
+    name      = local.git_organization_secret_name
+    namespace = helm_release.airflow.namespace
+  }
+  data = {
+    "GITHUB_CLIENT_ID"     = var.git_client_id
+    "GITHUB_CLIENT_SECRET" = var.git_client_secret
+  }
+}
+
+
+
 resource "random_password" "rds_password" {
   length  = 16
   special = false
 }
 
-
-# create rds for airflow
 module "rds-airflow" {
   source                      = "../../infrastructure/rds"
   vpc_id                      = var.vpc_id
@@ -98,16 +118,38 @@ resource "helm_release" "airflow" {
 
   values = [yamlencode({
     airflow = {
+      extraEnv = [
+        {
+          name = "GITHUB_CLIENT_ID"
+          valueFrom = {
+            secretKeyRef = {
+              name = local.git_organization_secret_name
+              key  = "GITHUB_CLIENT_ID"
+            }
+          }
+        },
+        {
+          name = "GITHUB_CLIENT_SECRET"
+          valueFrom = {
+            secretKeyRef = {
+              name = local.git_organization_secret_name
+              key  = "GITHUB_CLIENT_SECRET"
+            }
+          }
+        }
+      ],
       config = {
         AIRFLOW__WEBSERVER__EXPOSE_CONFIG = true
-        AIRFLOW__CORE__LOAD_EXAMPLES      = false
+        AIRFLOW__WEBSERVER__BASE_URL      = "http://${var.domain_name}/${var.domain_suffix}"
+
+        AIRFLOW__CORE__LOAD_EXAMPLES = false
         # AIRFLOW__LOGGING__LOGGING_LEVEL          = "DEBUG"
         # AIRFLOW__LOGGING__REMOTE_LOGGING         = true
         # AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER = "s3://${module.s3-data-storage.s3_log_bucket_name}/airflow/logs"
         # AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID     = "aws_logs_storage_access"
         AIRFLOW__CORE__DEFAULT_TIMEZONE = "Europe/Amsterdam"
       },
-      users = var.user_profiles,
+      users = [] #var.user_profiles,
       image = {
         repository = "seblum/airflow"
         tag        = "2.6.3-python3.11-custom-light"
@@ -117,14 +159,14 @@ resource "helm_release" "airflow" {
         gid        = 0
       },
       executor           = "KubernetesExecutor"
-      fernetKey          = "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc="
+      fernetKey          = var.fernet_key
       webserverSecretKey = "THIS IS UNSAFE!"
       connections = [
         {
           id          = "aws_logs_storage_access"
           type        = "aws"
           description = "AWS connection to store logs on S3"
-          extra       = "{\"region_name\": \"eu-central-1\"}"
+          extra       = "{\"region_name\": \"${data.aws_region.current.name}\"}"
         }
       ],
       variables = [
@@ -196,6 +238,41 @@ resource "helm_release" "airflow" {
         storageClass : "efs"
         size : "5Gi"
         accessMode : "ReadWriteMany"
+      }
+    },
+    ingress = {
+      enabled    = true
+      apiVersion = "networking.k8s.io/v1"
+      web = {
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname"  = "${var.domain_name}"
+          "alb.ingress.kubernetes.io/scheme"           = "internet-facing"
+          "alb.ingress.kubernetes.io/target-type"      = "ip"
+          "kubernetes.io/ingress.class"                = "alb"
+          "alb.ingress.kubernetes.io/group.name"       = "mlplatform"
+          "alb.ingress.kubernetes.io/healthcheck-path" = "/${var.domain_suffix}/health"
+        }
+        path = "/${var.domain_suffix}" # (/|$)(.*)
+        host = "${var.domain_name}"
+        precedingPaths = [{
+          path        = "/${var.domain_suffix}*" # this is not working with any other deployments now.
+          serviceName = "airflow-web"
+          servicePort = "web"
+        }]
+        #ingressClassName = ""
+      }
+    },
+    web = {
+      readinessProbe = {
+        enabled             = true
+        initialDelaySeconds = 45
+      },
+      livenessProbe = {
+        enabled             = true
+        initialDelaySeconds = 45
+      },
+      webserverConfig = {
+        stringOverride = file("${path.module}/WebServerConfig.py")
       }
     },
   })]

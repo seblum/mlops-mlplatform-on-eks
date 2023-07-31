@@ -109,3 +109,25 @@ variable "allowed_user_list" {
   type        = list(string)
   description = "List of allowed_user_list users added to Jupyterhub"
 }
+
+variable "git_client_id" {
+
+}
+
+variable "git_client_secret" {
+
+}
+
+variable "domain_name" {
+
+}
+
+variable "domain_suffix" {}
+
+
+variable "git_repository_url" {
+  type        = string
+  description = "Https URL to the Github repository to sync Airflow with"
+}
+
+variable "proxy_secret_token" {}

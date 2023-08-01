@@ -1,7 +1,0 @@
-clusterName: "mlplatform-eks-cluster"
-image:
-  tag: v2.4.2
-serviceAccount:
-  name: "aws-load-balancer-controller-sa"
-  annotations: 
-    eks.amazonaws.com/role-arn: "arn:aws:iam::AWSID:role/aws-load-balancer-controller-role"

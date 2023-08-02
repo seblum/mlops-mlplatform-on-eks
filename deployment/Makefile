@@ -79,7 +79,7 @@ destroy-modules:
 
 destroy-test:
 	terraform destroy \
-					-target="module.jupyterhub" \
+					-target="module.airflow" \
 					-target="module.user-profiles" \
 					-target="module.eks" \
 					-var-file=$(VARS_FILE) -auto-approve

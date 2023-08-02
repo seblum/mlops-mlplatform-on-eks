@@ -1,7 +1,6 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {} # 
 
-
 resource "aws_s3_bucket" "s3_data_storage" {
   bucket        = var.s3_data_bucket_name
   force_destroy = var.s3_force_destroy
@@ -73,10 +72,11 @@ resource "aws_iam_role" "s3_data_bucket_role" {
     ]
   }
   EOF
-  tags = {
-    tag-key = "tag-value"
-  }
+  # tags = {
+  #   tag-key = "tag-value"
+  # }
 }
+
 resource "aws_iam_role_policy_attachment" "s3_data_bucket_role_policy" {
   role       = aws_iam_role.s3_data_bucket_role.name
   policy_arn = aws_iam_policy.s3_data_bucket_policy.arn

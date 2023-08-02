@@ -8,7 +8,7 @@ locals {
 
   nodegroup_t3_small_label    = "t3_small"
   nodegroup_t3_medium_label   = "t3_medium"
-  nodegroup_g4dn_xlarge_label = "g4dn_xlarge"
+  nodegroup_t3_large_label = "t3_large"
   eks_asg_tag_list_nodegroup_t3_small_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
@@ -19,14 +19,13 @@ locals {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
     "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_t3_medium_label
-    "k8s.io/cluster-autoscaler/node-template/taint/dedicated" : "${local.nodegroup_t3_medium_label}:NoSchedule"
   }
 
-  eks_asg_tag_list_nodegroup_g4dn_xlarge_label = {
+  eks_asg_tag_list_nodegroup_t3_large_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
-    "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_g4dn_xlarge_label
-    "k8s.io/cluster-autoscaler/node-template/taint/dedicated" : "${local.nodegroup_g4dn_xlarge_label}:NoSchedule"
+    "k8s.io/cluster-autoscaler/node-template/label/role" : local.nodegroup_t3_large_label
+    "k8s.io/cluster-autoscaler/node-template/taint/dedicated" : "${local.nodegroup_t3_large_label}:NoSchedule"
   }
 
   tags = {
@@ -41,14 +40,12 @@ data "aws_caller_identity" "current" {}
 #
 # EKS
 #
-
-# TODO: node group in each availability zone
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.5.1"
 
   cluster_name              = local.cluster_name
-  cluster_version           = "1.24" # passed on via var
+  cluster_version           = var.eks_cluster_version
   cluster_enabled_log_types = ["api", "controllerManager", "scheduler"]
 
   vpc_id     = var.vpc_id
@@ -96,12 +93,11 @@ module "eks" {
     group_t3_small = {
       name = "ng0_t3_small"
 
-      #instance_types = ["t3.small"]
-      instance_types = ["t3.medium"] # for testing airflow now.
+      instance_types = ["t3.small"]
 
-      min_size      = 2
-      max_size      = 6
-      desired_size  = 3
+      min_size      = 0
+      max_size      = 5
+      desired_size  = 0
       capacity_type = "ON_DEMAND"
       labels = {
         role = local.nodegroup_t3_small_label
@@ -117,62 +113,50 @@ module "eks" {
 
       instance_types = ["t3.medium"]
 
-      min_size      = 0
-      max_size      = 5
-      desired_size  = 0
+      min_size      = 4
+      max_size      = 6
+      desired_size  = 4
       capacity_type = "ON_DEMAND"
       labels = {
         role = local.nodegroup_t3_medium_label
       }
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled"                       = "true"
+        "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
+        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_medium_label}"
+      }
+    }
+    group_t3_large = {
+      name = "ng2_t3_large"
+
+      instance_types = ["t3.large"]
+
+      min_size      = 0
+      max_size      = 3
+      desired_size  = 0
+      capacity_type = "ON_DEMAND"
+      labels = {
+        role = local.nodegroup_t3_large_label
+      }
       taints = [
         {
           key    = "dedicated"
-          value  = local.nodegroup_t3_medium_label
+          value  = local.nodegroup_t3_large_label
           effect = "NO_SCHEDULE"
         }
       ]
       tags = {
         "k8s.io/cluster-autoscaler/enabled"                       = "true"
         "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
-        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_medium_label}"
-        "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_t3_medium_label}:NoSchedule"
+        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_large_label}"
+        "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_t3_large_label}:NoSchedule"
       }
     }
-    # group_g4dn_xlarge = {
-    #   name = "ng2_g4dn_xlarge"
-
-    #   instance_types = ["g4dn.xlarge"]
-
-    #   min_size      = 0
-    #   max_size      = 1
-    #   desired_size  = 0
-    #   capacity_type = "ON_DEMAND"
-    #   labels = {
-    #     role = local.nodegroup_g4dn_xlarge_label
-    #   }
-    #   taints = [
-    #     {
-    #       key    = "dedicated"
-    #       value  = local.nodegroup_g4dn_xlarge_label
-    #       effect = "NO_SCHEDULE"
-    #     }
-    #   ]
-    #   tags = {
-    #     "k8s.io/cluster-autoscaler/enabled"                       = "true"
-    #     "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
-    #     "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_g4dn_xlarge_label}"
-    #     "k8s.io/cluster-autoscaler/node-template/taint/dedicated" = "${local.nodegroup_g4dn_xlarge_label}:NoSchedule"
-    #   }
-    # }
   }
   tags = local.tags
 }
 
-
-################################
-#  ROLES FOR SERVICE ACCOUNTS  #
-################################
-
+#  Role for Service Account
 module "vpc_cni_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
@@ -194,7 +178,6 @@ module "vpc_cni_irsa" {
 #
 # EBS CSI controller
 #
-
 module "ebs_csi_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "5.11.1"
@@ -246,118 +229,34 @@ resource "kubernetes_annotations" "ebs-no-default-storageclass" {
   }
 }
 
-################################################################################
-#
-# EKS Cluster autoscaler
-#
-
-resource "aws_iam_policy" "node_additional" {
-  name        = "${local.cluster_name}-additional"
-  description = "${local.cluster_name} node additional policy"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "ec2:Describe*",
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-    ]
-  })
-}
-
-
-resource "aws_iam_role_policy_attachment" "additional" {
-  for_each = module.eks.eks_managed_node_groups
-
-  policy_arn = aws_iam_policy.node_additional.arn
-  role       = each.value.iam_role_name
-}
-
-
-# Tags for the ASG to support cluster-autoscaler scale up from 0 for nodegroup2
-resource "aws_autoscaling_group_tag" "nodegroup_t3_small" {
-  for_each               = local.eks_asg_tag_list_nodegroup_t3_small_label
-  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 2)
-  tag {
-    key                 = each.key
-    value               = each.value
-    propagate_at_launch = true
-  }
-}
-
-resource "aws_autoscaling_group_tag" "nodegroup_t3_medium" {
-  for_each               = local.eks_asg_tag_list_nodegroup_t3_medium_label
-  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 1)
-  tag {
-    key                 = each.key
-    value               = each.value
-    propagate_at_launch = true
-  }
-}
-
-resource "aws_autoscaling_group_tag" "nodegroup_g4dn_xlarge" {
-  for_each               = local.eks_asg_tag_list_nodegroup_g4dn_xlarge_label
-  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 0)
-  tag {
-    key                 = each.key
-    value               = each.value
-    propagate_at_launch = true
-  }
-}
-
-module "eks_autoscaler" {
-  source                          = "./autoscaler"
-  cluster_name                    = local.cluster_name
-  cluster_namespace               = local.cluster_namespace
-  aws_region                      = var.aws_region
-  cluster_oidc_issuer_url         = module.eks.cluster_oidc_issuer_url
-  autoscaler_service_account_name = local.autoscaler_service_account_name
-}
-
 
 ################################################################################
 #
 # EFS
 #
-
 resource "helm_release" "aws_efs_csi_driver" {
   chart      = "aws-efs-csi-driver"
   name       = "aws-efs-csi-driver"
   namespace  = "kube-system"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver/"
-
-  # set {
-  #   name  = "image.repository"
-  #   value = "602401143452.dkr.ecr.eu-central-1.amazonaws.com/eks/aws-efs-csi-driver"
-  # }
-
   set {
     name  = "controller.serviceAccount.create"
     value = true
   }
-
   set {
     name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.attach_efs_csi_role.iam_role_arn
   }
-
   set {
     name  = "controller.serviceAccount.name"
     value = "efs-csi-controller-sa"
   }
 }
 
-
 module "attach_efs_csi_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
   role_name             = "efs-csi"
   attach_efs_csi_policy = true
-
   oidc_providers = {
     ex = {
       provider_arn               = module.eks.oidc_provider_arn
@@ -365,7 +264,6 @@ module "attach_efs_csi_role" {
     }
   }
 }
-
 
 resource "aws_security_group" "allow_nfs" {
   name        = "allow nfs for efs"
@@ -379,7 +277,6 @@ resource "aws_security_group" "allow_nfs" {
     protocol    = "tcp"
     cidr_blocks = var.private_subnets_cidr_blocks
   }
-
   egress {
     from_port        = 0
     to_port          = 0
@@ -387,9 +284,7 @@ resource "aws_security_group" "allow_nfs" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
-
 }
-
 
 ### MODULE EFS IS NOT WORKING AT THE MOMENT; NEED TO SET EVERYYTHING MANUALLY
 
@@ -439,11 +334,9 @@ resource "aws_security_group" "allow_nfs" {
 #   #tags = var.tags
 # }
 
-
 resource "aws_efs_file_system" "stw_node_efs" {
   creation_token = "efs-for-stw-node"
 }
-
 
 resource "aws_efs_mount_target" "stw_node_efs_mt_0" {
   file_system_id  = aws_efs_file_system.stw_node_efs.id
@@ -456,7 +349,6 @@ resource "aws_efs_mount_target" "stw_node_efs_mt_1" {
   subnet_id       = var.private_subnets[1]
   security_groups = [aws_security_group.allow_nfs.id]
 }
-
 
 resource "aws_efs_mount_target" "stw_node_efs_mt_2" {
   file_system_id  = aws_efs_file_system.stw_node_efs.id
@@ -482,4 +374,74 @@ resource "kubernetes_storage_class_v1" "efs" {
   mount_options = [
     "iam"
   ]
+}
+
+
+################################################################################
+#
+# EKS Cluster autoscaler
+#
+resource "aws_iam_policy" "node_additional" {
+  name        = "${local.cluster_name}-additional"
+  description = "${local.cluster_name} node additional policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "additional" {
+  for_each = module.eks.eks_managed_node_groups
+
+  policy_arn = aws_iam_policy.node_additional.arn
+  role       = each.value.iam_role_name
+}
+
+# Tags for the ASG to support cluster-autoscaler scale up from 0 for nodegroup2
+resource "aws_autoscaling_group_tag" "nodegroup_t3_small" {
+  for_each               = local.eks_asg_tag_list_nodegroup_t3_small_label
+  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 2)
+  tag {
+    key                 = each.key
+    value               = each.value
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_autoscaling_group_tag" "nodegroup_t3_medium" {
+  for_each               = local.eks_asg_tag_list_nodegroup_t3_medium_label
+  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 1)
+  tag {
+    key                 = each.key
+    value               = each.value
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_autoscaling_group_tag" "nodegroup_t3_large" {
+  for_each               = local.eks_asg_tag_list_nodegroup_t3_large_label
+  autoscaling_group_name = element(module.eks.eks_managed_node_groups_autoscaling_group_names, 0)
+  tag {
+    key                 = each.key
+    value               = each.value
+    propagate_at_launch = true
+  }
+}
+
+module "eks_autoscaler" {
+  source                          = "./autoscaler"
+  cluster_name                    = local.cluster_name
+  cluster_namespace               = local.cluster_namespace
+  aws_region                      = var.aws_region
+  cluster_oidc_issuer_url         = module.eks.cluster_oidc_issuer_url
+  autoscaler_service_account_name = local.autoscaler_service_account_name
 }

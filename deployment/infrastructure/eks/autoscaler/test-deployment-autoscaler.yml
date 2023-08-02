@@ -80,9 +80,9 @@ spec:
             requests:
               cpu: 1
       nodeSelector:
-        role: g4dn_xlarge
+        role: t3_large
       tolerations:
         - key: "dedicated"
           operator: "Equal"
-          value: g4dn_xlarge
+          value: t3_large
           effect: "NoSchedule"

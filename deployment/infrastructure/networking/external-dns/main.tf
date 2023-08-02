@@ -6,7 +6,6 @@ locals {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {} # 
 
-
 module "external_dns_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "5.11.1"
@@ -30,7 +29,7 @@ resource "aws_iam_policy" "external_dns_controller_sa" {
           "route53:ChangeResourceRecordSets"
         ],
         "Resource" : [
-          "arn:aws:route53:::hostedzone/*" # hostedzoneid
+          "arn:aws:route53:::hostedzone/*" # Limit to hostedzoneID
         ]
       },
       {
@@ -47,12 +46,9 @@ resource "aws_iam_policy" "external_dns_controller_sa" {
   })
 }
 
-
-#external-dns helm
-
 resource "helm_release" "external_dns" {
   name             = var.name
-  namespace        = "kube-system"
+  namespace        = var.namespace
   chart            = var.helm_chart_name
   create_namespace = false
 
@@ -78,6 +74,5 @@ resource "helm_release" "external_dns" {
     provider   = "aws"
     txtOwnerId = "${var.name}"
   })]
-  #  "${file("${path.module}/helm/values.yaml")}"
 }
 

@@ -2,10 +2,9 @@ locals {
   aws_load_balancer_controller_service_account_role_name = "aws-load-balancer-controller-role"
   aws_load_balancer_controller_service_account_name      = "aws-load-balancer-controller-sa"
 }
-# create policy and role for route53 iam 
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {} # 
-
 
 module "aws_load_balancer_controller_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
@@ -23,7 +22,6 @@ resource "aws_iam_policy" "aws_load_balancer_controller_controller_sa" {
 
   policy = file("${path.module}/AWSLoadBalancerControllerPolicy.json")
 }
-
 
 resource "helm_release" "aws-load-balancer-controller" {
   name             = var.helm_chart_name

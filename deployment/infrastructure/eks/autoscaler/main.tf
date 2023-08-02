@@ -1,5 +1,4 @@
 
-
 resource "helm_release" "cluster-autoscaler" {
   name             = "cluster-autoscaler"
   namespace        = var.cluster_namespace
@@ -84,7 +83,6 @@ data "aws_iam_policy_document" "cluster_autoscaler" {
       variable = "autoscaling:ResourceTag/k8s.io/cluster-autoscaler/${var.cluster_name}"
       values   = ["owned"]
     }
-
     condition {
       test     = "StringEquals"
       variable = "autoscaling:ResourceTag/k8s.io/cluster-autoscaler/enabled"

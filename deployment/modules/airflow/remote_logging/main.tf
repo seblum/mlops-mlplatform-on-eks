@@ -1,14 +1,10 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {} # 
 
-
-####### LOG STORAGE
-
 resource "aws_s3_bucket" "s3_log_storage" {
   bucket        = var.s3_log_bucket_name
   force_destroy = var.s3_force_destroy
 }
-
 
 resource "aws_iam_role" "s3_log_bucket_role" {
   name                 = "${var.namespace}-s3-log-bucket-access-role"
@@ -66,7 +62,6 @@ resource "aws_iam_policy" "s3_log_bucket_policy" {
       }
   ] })
 }
-
 
 resource "aws_iam_role_policy_attachment" "s3_log_bucket_role_policy" {
   role       = aws_iam_role.s3_log_bucket_role.name

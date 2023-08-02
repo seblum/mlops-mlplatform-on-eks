@@ -1,6 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
-
 locals {
   k8s_airflow_db_secret_name   = "${var.name_prefix}-${var.namespace}-db-auth"
   git_airflow_repo_secret_name = "${var.name_prefix}-${var.namespace}-https-git-secret"
@@ -10,6 +7,9 @@ locals {
   s3_log_bucket_name           = "${var.name_prefix}-${var.namespace}-log-storage"
 }
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {} # 
+
 resource "kubernetes_namespace" "airflow" {
   metadata {
 
@@ -17,12 +17,10 @@ resource "kubernetes_namespace" "airflow" {
   }
 }
 
-
 ################################################################################
 #
 # Log Storage
 #
-
 module "s3-remote-logging" {
   source             = "./remote_logging"
   s3_log_bucket_name = local.s3_log_bucket_name
@@ -31,12 +29,10 @@ module "s3-remote-logging" {
   oidc_provider_arn  = var.oidc_provider_arn
 }
 
-
 ################################################################################
 #
 # Data Storage
 #
-
 module "s3-data-storage" {
   source                     = "./data_storage"
   s3_data_bucket_name        = local.s3_data_bucket_name
@@ -45,12 +41,10 @@ module "s3-data-storage" {
   s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
 }
 
-
 ################################################################################
 #
-# Helm Release
+# Helm Release Airflow
 #
-
 resource "kubernetes_secret" "airflow_db_credentials" {
   metadata {
     name      = local.k8s_airflow_db_secret_name
@@ -83,8 +77,7 @@ resource "kubernetes_secret" "airflow_organization_git_secret" {
   }
 }
 
-
-
+# RDS
 resource "random_password" "rds_password" {
   length  = 16
   special = false
@@ -105,7 +98,7 @@ module "rds-airflow" {
   max_allocated_storage       = var.max_allocated_storage
 }
 
-
+# HELM
 resource "helm_release" "airflow" {
   name             = var.name
   namespace        = var.namespace
@@ -149,7 +142,7 @@ resource "helm_release" "airflow" {
         # AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID     = "aws_logs_storage_access"
         AIRFLOW__CORE__DEFAULT_TIMEZONE = "Europe/Amsterdam"
       },
-      users = [] #var.user_profiles,
+      users = []
       image = {
         repository = "seblum/airflow"
         tag        = "2.6.3-python3.11-custom-light"
@@ -252,14 +245,13 @@ resource "helm_release" "airflow" {
           "alb.ingress.kubernetes.io/group.name"       = "mlplatform"
           "alb.ingress.kubernetes.io/healthcheck-path" = "/${var.domain_suffix}/health"
         }
-        path = "/${var.domain_suffix}" # (/|$)(.*)
+        path = "/${var.domain_suffix}"
         host = "${var.domain_name}"
         precedingPaths = [{
-          path        = "/${var.domain_suffix}*" # this is not working with any other deployments now.
+          path        = "/${var.domain_suffix}*"
           serviceName = "airflow-web"
           servicePort = "web"
         }]
-        #ingressClassName = ""
       }
     },
     web = {

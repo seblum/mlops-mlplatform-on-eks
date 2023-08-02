@@ -1,7 +1,3 @@
-# create a database
-
-# configure the Amazon EBS CSI Driver with a IAM Role for Service Accounts for least privileged containers.
-
 resource "helm_release" "jupyterhub" {
   name             = var.name
   namespace        = var.name
@@ -26,9 +22,7 @@ resource "helm_release" "jupyterhub" {
         }
       },
       extraEnv = {
-        "MLFLOW_TRACKING_URI"   = "http://mlflow-service.mlflow.svc.cluster.local"
-        "AWS_ACCESS_KEY"        = "mlflow_tracking_uri123"
-        "AWS_SECRET_ACCESS_KEY" = "mlflow_tracking_uri456"
+        "MLFLOW_TRACKING_URI" = "http://mlflow-service.mlflow.svc.cluster.local"
       }
     },
     ingress = {

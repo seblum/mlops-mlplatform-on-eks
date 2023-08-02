@@ -19,7 +19,7 @@ module "vpc" {
 module "eks" {
   source                      = "./infrastructure/eks"
   cluster_name                = local.cluster_name
-  eks_cluster_version         = "1.23"
+  eks_cluster_version         = "1.24"
   vpc_id                      = module.vpc.vpc_id
   aws_region                  = var.aws_region
   private_subnets             = module.vpc.private_subnets
@@ -95,7 +95,7 @@ module "airflow" {
   s3_data_bucket_name        = local.airflow_s3_data_bucket
   domain_name                = var.domain_name
   domain_suffix              = "airflow"
-  fernet_key = var.airflow_fernet_key
+  fernet_key                 = var.airflow_fernet_key
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -157,8 +157,8 @@ module "jupyterhub" {
   # # log airflow to s3
   git_repository_url = local.git_repository_url
 
-  git_client_id     = var.jupyterhub_git_client_id
-  git_client_secret = var.jupyterhub_git_client_secret
+  git_client_id      = var.jupyterhub_git_client_id
+  git_client_secret  = var.jupyterhub_git_client_secret
   proxy_secret_token = var.jupyterhub_proxy_secret_token
 
   # HELM

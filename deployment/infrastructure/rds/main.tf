@@ -29,7 +29,7 @@ resource "aws_db_instance" "rds_instance" {
 resource "aws_security_group" "rds_sg" {
   name   = "${local.rds_name}-${local.rds_engine}-sg"
   vpc_id = var.vpc_id
-  
+
   ingress {
     description = "Enable postgres access"
     from_port   = local.rds_port

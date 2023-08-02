@@ -6,9 +6,9 @@ locals {
   autoscaler_service_account_name      = "autoscaler-controller-sa"
   autoscaler_service_account_role_name = "${var.cluster_name}-autoscaler-controller"
 
-  nodegroup_t3_small_label    = "t3_small"
-  nodegroup_t3_medium_label   = "t3_medium"
-  nodegroup_t3_large_label = "t3_large"
+  nodegroup_t3_small_label  = "t3_small"
+  nodegroup_t3_medium_label = "t3_medium"
+  nodegroup_t3_large_label  = "t3_large"
   eks_asg_tag_list_nodegroup_t3_small_label = {
     "k8s.io/cluster-autoscaler/enabled" : true
     "k8s.io/cluster-autoscaler/${local.cluster_name}" : "owned"
@@ -121,9 +121,9 @@ module "eks" {
         role = local.nodegroup_t3_medium_label
       }
       tags = {
-        "k8s.io/cluster-autoscaler/enabled"                       = "true"
-        "k8s.io/cluster-autoscaler/${local.cluster_name}"         = "owned"
-        "k8s.io/cluster-autoscaler/node-template/label/role"      = "${local.nodegroup_t3_medium_label}"
+        "k8s.io/cluster-autoscaler/enabled"                  = "true"
+        "k8s.io/cluster-autoscaler/${local.cluster_name}"    = "owned"
+        "k8s.io/cluster-autoscaler/node-template/label/role" = "${local.nodegroup_t3_medium_label}"
       }
     }
     group_t3_large = {
@@ -254,7 +254,7 @@ resource "helm_release" "aws_efs_csi_driver" {
 }
 
 module "attach_efs_csi_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   role_name             = "efs-csi"
   attach_efs_csi_policy = true
   oidc_providers = {

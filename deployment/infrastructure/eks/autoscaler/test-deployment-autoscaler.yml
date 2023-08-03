@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: t3-medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: t3-medium
+  template:
+    metadata:
+      labels:
+        app: t3-medium
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: t3-medium
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+              memory: "2Gi"
+      nodeSelector:
+        role: t3_medium_large
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: t3_medium_large
+          effect: "NoSchedule"
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: t3-large
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: t3-large
+#   template:
+#     metadata:
+#       labels:
+#         app: t3-large
+#     spec:
+#       terminationGracePeriodSeconds: 0
+#       containers:
+#         - name: t3-large
+#           image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+#           resources:
+#             requests:
+#               cpu: 1
+#               memory: "4Gi"
+#       nodeSelector:
+#         role: t3_medium_large
+#       tolerations:
+#         - key: "dedicated"
+#           operator: "Equal"
+#           value: t3_medium_large
+#           effect: "NoSchedule"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: g4dn-xlarge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: g4dn-xlarge
+  template:
+    metadata:
+      labels:
+        app: g4dn-xlarge
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: g4dn-xlarge
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+      nodeSelector:
+        role: t3_large
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: t3_large
+          effect: "NoSchedule"

@@ -1,8 +1,4 @@
-
-
 locals {
-  # private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  # public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
   cluster_name = var.cluster_name
 }
 
@@ -10,7 +6,7 @@ data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "5.0.0"
 
   name = var.vpc_name
 
@@ -34,16 +30,6 @@ module "vpc" {
     "kubernetes.io/role/internal-elb"             = 1
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 resource "aws_security_group" "worker_group_mgmt_one" {
   name_prefix = "worker_group_mgmt_one"

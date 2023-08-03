@@ -17,7 +17,7 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
-      serviceAccount: default
+      serviceAccount: mlflow-user
       containers:
         - name: mlflow
           securityContext: {}
@@ -30,6 +30,12 @@ spec:
               value: mysql://$(RDS_USERNAME):$(RDS_PASSWORD)@$(RDS_HOST):$(RDS_PORT)/$(DB_NAME)
             - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
               value: s3://$(ARTIFACT_S3_BUCKET)/$(ARTIFACT_S3_KEY_PREFIX)
+          command:
+            - /bin/bash
+            - -c
+            - |
+              mlflow db upgrade "mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME}";
+              mlflow server --host=${MLFLOW_HOST} --port=${MLFLOW_PORT} --backend-store-uri=mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME} --artifacts-destination=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --default-artifact-root=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --serve-artifacts 
           envFrom:
             - secretRef:
                 name: mlflow-secret
@@ -54,25 +60,3 @@ spec:
             limits:
               memory: "2048Mi"
               cpu: "1000m"
-      initContainers:
-        - name: mlflow-database-creation
-          image: {{ .Values.deployment.image }}
-          imagePullPolicy: Always
-          command:
-            [
-              "sh",
-              "-c",
-              'mariadb --host=${RDS_HOST} --port=${RDS_PORT} --user=${RDS_USERNAME} --password=${RDS_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}"',
-            ]
-          envFrom:
-            - secretRef:
-                name: mlflow-secret
-            - configMapRef:
-                name: mlflow-config
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "100m"
-            limits:
-              memory: "128Mi"
-              cpu: "200m"

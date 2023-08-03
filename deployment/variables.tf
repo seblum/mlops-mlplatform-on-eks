@@ -11,14 +11,11 @@ variable "AWS_SECRET_KEY" {
 variable "aws_region" {
   default     = "eu-central-1"
   description = "AWS region"
+  type        = string
 }
 
 variable "airflow_github_ssh" {
   default = ""
-}
-
-variable "name_prefix" {
-  default = "airflow-seblum"
 }
 
 variable "max_allocated_storage" {
@@ -27,20 +24,12 @@ variable "max_allocated_storage" {
   default     = 500
 }
 
-variable "port_mlflow" {
-  default = 5432
-}
-
-variable "port_airflow" {
-  default = 5000
-}
-
 variable "git_username" {
-type = string
+  type = string
 }
 
 variable "git_token" {
-type = string
+  type = string
 }
 
 
@@ -61,6 +50,16 @@ variable "git_branch" {
   description = "Name of the git branch of the Airflow DAG repository"
 }
 
+
+variable "airflow_git_client_id" {}
+variable "airflow_git_client_secret" {}
+variable "airflow_fernet_key" {}
+
+variable "jupyterhub_git_client_id" {}
+variable "jupyterhub_git_client_secret" {}
+variable "jupyterhub_proxy_secret_token" {}
+
+
 # MLFLOW
 variable "deploy_mlflow" {
   type        = bool
@@ -73,3 +72,14 @@ variable "deploy_jupyterhub" {
   description = "Should Jupyterhub be deployed?"
   default     = true
 }
+
+
+# MONITORING
+
+variable "deploy_monitoring" {
+  type        = bool
+  description = "Should Monitoring be deployed?"
+  default     = true
+}
+
+variable "domain_name" {}

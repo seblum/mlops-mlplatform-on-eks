@@ -17,3 +17,7 @@ output "worker_group_mgmt_two_id" {
 output "private_subnets_cidr_blocks" {
   value = module.vpc.private_subnets_cidr_blocks
 }
+
+output "azs" {
+  value = module.vpc.azs
+}

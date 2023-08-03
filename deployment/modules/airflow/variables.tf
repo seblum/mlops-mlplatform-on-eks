@@ -1,6 +1,15 @@
 
-variable "name" {}
+variable "name" {
+  type = string
+}
 
+variable "namespace" {
+  type = string
+}
+
+variable "name_prefix" {
+  type = string
+}
 variable "create_namespace" {
   type        = bool
   description = "Should the namespace be created, if it does not exists?"
@@ -17,6 +26,35 @@ variable "cluster_endpoint" {
   description = "Endpoint of the EKS Cluster"
 }
 
+variable "oidc_provider_arn" {
+  type        = string
+  description = "arn of the OIDC provider"
+}
+
+variable "user_profiles" {
+  type        = list(any)
+  description = "list of user profiles"
+  default = [
+    {
+      "username" = "user"
+      "password" = "user123"
+      "role" = [
+        "User",
+        "Viewer"
+      ]
+      "email"     = "user@example.com"
+      "firstName" = "user"
+      "lastName"  = "user"
+  }]
+}
+
+variable "s3_data_bucket_secret_name" {
+
+}
+
+variable "s3_data_bucket_name" {
+
+}
 
 # RDS
 
@@ -114,3 +152,49 @@ variable "git_branch" {
   type        = string
   description = "Branch of the Github repository"
 }
+
+variable "mlflow_tracking_uri" {
+  type        = string
+  description = "The internal address of MLflow, to make it easily accessible from Jupyter."
+}
+
+variable "s3_force_destroy" {
+  type        = bool
+  description = "Set to true to disable protection against s3 bucket being destroyed. Use only for dev!"
+  default     = false
+}
+
+
+
+
+
+# Test
+
+
+# variable "plugins" { default = [
+#   {
+#     username  = "user",
+#     password  = "user123",
+#     role      = "User",
+#     email     = "user@example.com",
+#     firstName = "user",
+#     lastName  = "user"
+#   }
+# ] }
+
+variable "git_client_id" {
+
+}
+
+variable "git_client_secret" {
+
+}
+
+variable "domain_name" {
+
+}
+
+variable "domain_suffix" {}
+
+
+variable "fernet_key" {}

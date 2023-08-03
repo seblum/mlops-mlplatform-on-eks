@@ -10,8 +10,6 @@ resource "aws_db_subnet_group" "default" {
   subnet_ids = var.private_subnets
 }
 
-
-
 resource "aws_db_instance" "rds_instance" {
   allocated_storage      = var.max_allocated_storage
   storage_type           = var.storage_type
@@ -19,7 +17,7 @@ resource "aws_db_instance" "rds_instance" {
   engine_version         = local.rds_engine_version
   instance_class         = var.rds_instance_class
   db_name                = "${local.rds_name}_db"
-  username               = "${local.rds_name}_admin" # push to main
+  username               = "${local.rds_name}_admin"
   password               = var.rds_password
   identifier             = "${local.rds_name}-${local.rds_engine}"
   port                   = local.rds_port
@@ -27,7 +25,6 @@ resource "aws_db_instance" "rds_instance" {
   db_subnet_group_name   = aws_db_subnet_group.default.name
   skip_final_snapshot    = true
 }
-
 
 resource "aws_security_group" "rds_sg" {
   name   = "${local.rds_name}-${local.rds_engine}-sg"
@@ -40,7 +37,6 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "tcp"
     cidr_blocks = var.private_subnets_cidr_blocks
   }
-
   egress {
     from_port   = 0
     to_port     = 0

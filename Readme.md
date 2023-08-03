@@ -8,7 +8,6 @@ As a demonstration of the platform's capabilities, an exemplary deep learning us
 
 Additionally, this project is an integral part of the larger ML engineering [bookdown project](https://github.com/seblum/mlops-engineering-book), which aims to provide comprehensive insights and guidance on MLOps engineering practices.
 
-
 ## Repository Structure
 
 The project repository is organized as follows:
@@ -162,14 +161,6 @@ Contributions to **MLOps Airflow on EKS** are highly appreciated! Whether you co
 
 ### EFS Module Integration:
 - [ ] Consider using EFS module for easier setup and management of Elastic File System.
-
-## Helpful Links
-
-* [EKS Workshop Scaling](https://archive.eksworkshop.com/beginner/080_scaling/deploy_ca/)
-* [Zero to JupyterHub](https://github.com/jupyterhub/zero-to-jupyterhub-k8s)
-* [JupyterHub Helm Chart](https://hub.jupyter.org/helm-chart/)
-* [Medium Article by Nils Braun](https://nils-braun.medium.com/deploying-a-free-multi-user-browser-only-ide-in-just-a-few-minutes-d891f803224b)
-* [JupyterHub Installation Guide](https://z2jh.jupyter.org/en/latest/jupyterhub/installation.html)
 
 ## License
 

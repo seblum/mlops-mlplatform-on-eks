@@ -147,6 +147,7 @@ Contributions to **MLOps Airflow on EKS** are highly appreciated! Whether you co
 ### JupyterHub Improvements:
 - [ ] Allow JupyterHub to support multiple images for diverse user needs.
 - [ ] Explore Helm list input for JupyterHub to enable dynamic management of Airflow DAG repositories.
+- [ ] Health check for JupyterHub ALB is currently failing
 
 ### AWS Service Quota:
 - [ ] Check AWS service quota for GPU instances to ensure sufficient resources.

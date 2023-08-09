@@ -74,13 +74,13 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
           "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
         ],
-        # "Condition" : {
-        #   "StringLike" : {
-        #     "s3:prefix" : [
-        #       "test/*"
-        #     ]
-        #   }
-        # }
+        "Condition" : {
+          "StringLike" : {
+            "s3:prefix" : [
+              "test/*"
+            ]
+          }
+        }
       }
   ] })
 }

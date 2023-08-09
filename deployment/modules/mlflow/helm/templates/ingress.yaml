@@ -3,9 +3,28 @@ kind: Ingress
 metadata:
   name: mlflow-ingress
   namespace: mlflow
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: mlplatform.seblum.me
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: mlplatform
+    kubernetes.io/ingress.class: alb
+    # alb.ingress.kubernetes.io/healthcheck-path: /ping
+    # nginx.ingress.kubernetes.io/auth-signin: http://$host/oauth2/start?rd=http://$host$escaped_request_uri
+    # nginx.ingress.kubernetes.io/auth-url: http://mlflow.mlflow.svc.cluster.local:4180/oauth2/start"
 spec:
   rules:
-    - host:  mlflow
+    - host: www.mlplatform.seblum.me
+      http:
+        paths:
+          - path: /mlflow
+            pathType: Prefix
+            backend:
+              service:
+                name: mlflow-service
+                port:
+                  number: 80
+    - host: mlplatform.seblum.me
       http:
         paths:
           - path: /mlflow

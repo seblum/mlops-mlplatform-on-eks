@@ -126,37 +126,38 @@ resource "helm_release" "mlflow" {
   ]
 
   set {
-    name  = "RDS_USERNAME"
+    name  = "rds.USERNAME"
     value = module.rds-mlflow.rds_username
   }
   set {
-    name  = "RDS_PASSWORD"
+    name  = "rds.PASSWORD"
     value = module.rds-mlflow.rds_password
   }
   set {
-    name  = "RDS_HOST"
+    name  = "rds.HOST"
     value = module.rds-mlflow.rds_host
   }
   set {
-    name  = "RDS_PORT"
+    name  = "rds.PORT"
     value = var.rds_port
   }
   set {
-    name  = "ARTIFACT_S3_BUCKET"
+    name  = "artifacts.S3_BUCKET"
     value = var.mlflow_s3_bucket_name
   }
   set {
-    name  = "ARTIFACT_S3_KEY_PREFIX"
+    name  = "artifacts.S3_KEY_PREFIX"
     value = "test"
   }
   set {
-    name  = "ARTIFACT_S3_ROLE_ARN"
-    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}" # "arn:aws:iam::855372857567:role/mlflow-s3-access-mlflow-role"
+    name  = "artifacts.S3_ROLE_ARN"
+    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}"
   }
   set {
     name  = "DB_NAME"
     value = module.rds-mlflow.rds_dbname
   }
 }
+
 
 

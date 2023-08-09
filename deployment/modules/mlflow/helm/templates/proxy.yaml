@@ -1,0 +1,57 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mlflow-proxy
+#   namespace: mlflow
+#   labels:
+#     app: mlflow-proxy
+#   annotations:
+#       kubernetes.io/ingress.class: "nginx"
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: mlflow-proxy
+#   template:
+#     metadata:
+#       labels:
+#         app: mlflow-proxy
+#     spec:
+#       containers:
+#         - name: mlflow-proxy
+#           image: quay.io/oauth2-proxy/oauth2-proxy:latest
+#           imagePullPolicy: Always
+#           args:
+#             - --provider=github
+#             - --email-domain=*
+#             - --upstream=file:///dev/null
+#             # - --upstream=http://mlflow-service.mlflow.svc.cluster.local:5000
+#             - --http-address=http://0.0.0.0:4180
+#             - --whitelist-domain=*.seblum.me:*
+#             - --cookie-domain=*.seblum.me:*
+#             - --github-org=mlplatform-seblum-me
+#             - --reverse-proxy=true
+#             # do not forget to change this
+#             # - --github-team=""
+#             - --client-id=2a46b515404d2e9f36ed
+#             - --client-secret=02c4eb7320ae8b7f7f999e372510c78fa44e9854
+#             - --redirect-url=http://mlplatform.seblum.me/mlflow/oauth2/callback
+#             - --cookie-secret=mMgMRONRJl5iDjOn1vLAgsNIU3evXLPMDvAZ7RFCdCs=
+#           ports:
+#             - containerPort: 4180
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mlflow
+#   namespace: mlflow
+#   annotations:
+#       kubernetes.io/ingress.class: "nginx"
+# spec:
+#   selector:
+#     app: mlflow-proxy
+#   type: ClusterIP
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 4180

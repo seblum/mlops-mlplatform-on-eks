@@ -1,12 +1,18 @@
 
-RDS_USERNAME:
-RDS_PASSWORD:
-RDS_HOST:
-RDS_PORT:
-ARTIFACT_S3_BUCKET:
-ARTIFACT_S3_KEY_PREFIX:
-ARTIFACT_S3_ROLE_ARN: 
+rds:
+  USERNAME:
+  PASSWORD:
+  HOST:
+  PORT:
+artifacts:
+  S3_BUCKET:
+  S3_KEY_PREFIX:
+  S3_ROLE_ARN: 
 DB_NAME:
 
 deployment:
   image: seblum/mlflow:v2.4.1
+
+# ingress:
+#   prefix: "/mlflow"
+# https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy

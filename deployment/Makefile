@@ -79,6 +79,7 @@ destroy-modules:
 
 destroy-test:
 	terraform destroy \
+					-target="module.mlflow" \
 					-target="module.airflow" \
 					-target="module.user-profiles" \
 					-target="module.eks" \

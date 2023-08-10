@@ -33,8 +33,8 @@
 #             - --reverse-proxy=true
 #             # do not forget to change this
 #             # - --github-team=""
-#             - --client-id=2a46b515404d2e9f36ed
-#             - --client-secret=02c4eb7320ae8b7f7f999e372510c78fa44e9854
+#             - --client-id=id
+#             - --client-secret=secret
 #             - --redirect-url=http://mlplatform.seblum.me/mlflow/oauth2/callback
 #             - --cookie-secret=mMgMRONRJl5iDjOn1vLAgsNIU3evXLPMDvAZ7RFCdCs=
 #           ports:

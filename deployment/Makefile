@@ -79,7 +79,7 @@ destroy-modules:
 
 destroy-test:
 	terraform destroy \
-					-target="module.jupyterhub" \
+					-target="module.airflow" \
 					-target="module.mlflow" \
 					-target="module.user-profiles" \
 					-target="module.eks" \

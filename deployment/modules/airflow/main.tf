@@ -38,7 +38,7 @@ module "s3-data-storage" {
   source                     = "./data_storage"
   s3_data_bucket_name        = local.s3_data_bucket_name
   namespace                  = var.namespace
-  s3_force_destroy           = var.s3_force_destroy
+  s3_force_destroy           = true
   s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
 }
 

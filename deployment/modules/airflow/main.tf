@@ -1,10 +1,11 @@
 locals {
-  k8s_airflow_db_secret_name   = "${var.name_prefix}-${var.namespace}-db-auth"
-  git_airflow_repo_secret_name = "${var.name_prefix}-${var.namespace}-https-git-secret"
-  git_organization_secret_name = "${var.name_prefix}-${var.namespace}-organization-git-secret"
-  s3_data_bucket_secret_name   = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_secret_name}"
-  s3_data_bucket_name          = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_name}"
-  s3_log_bucket_name           = "${var.name_prefix}-${var.namespace}-log-storage"
+  prefix = "${var.name_prefix}-${var.namespace}"
+  k8s_airflow_db_secret_name   = "${local.prefix}-db-auth"
+  git_airflow_repo_secret_name = "${local.prefix}-https-git-secret"
+  git_organization_secret_name = "${local.prefix}-organization-git-secret"
+  s3_data_bucket_secret_name   = "${var.namespace}-${var.s3_data_bucket_secret_name}"
+  s3_data_bucket_name          = "${local.prefix}-${var.s3_data_bucket_name}"
+  s3_log_bucket_name           = "${local.prefix}-log-storage"
 }
 
 data "aws_caller_identity" "current" {}
@@ -216,7 +217,7 @@ resource "helm_release" "airflow" {
         repo                  = var.git_repository_url
         branch                = var.git_branch
         revision              = "HEAD"
-        repoSubPath           = "workflows"
+        # repoSubPath           = "workflows"
         httpSecret            = local.git_airflow_repo_secret_name
         httpSecretUsernameKey = "username"
         httpSecretPasswordKey = "password"

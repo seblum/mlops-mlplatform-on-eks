@@ -83,3 +83,9 @@ variable "deploy_monitoring" {
 }
 
 variable "domain_name" {}
+
+variable "deploy_seldon_core" {
+  type        = bool
+  description = "Should Seldon Core be deployed?"
+  default     = true
+}

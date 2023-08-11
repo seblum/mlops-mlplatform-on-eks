@@ -1,0 +1,18 @@
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  name: skin-cancer-deployment
+spec:
+  name: skin-cancer-predict
+  predictors:
+  - graph:
+      children: []
+      implementation: MLFLOW_SERVER
+      modelUri: s3://seldon-models/v1.18.0-dev/sklearn/iris # mlflow artifact folder s3://
+      name: classifier
+      parameters: # default call is numpy.ndarray
+        - name: method
+          type: STRING
+          value: predict
+    name: default
+    replicas: 1

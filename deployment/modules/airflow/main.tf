@@ -1,5 +1,5 @@
 locals {
-  prefix = "${var.name_prefix}-${var.namespace}"
+  prefix                       = "${var.name_prefix}-${var.namespace}"
   k8s_airflow_db_secret_name   = "${local.prefix}-db-auth"
   git_airflow_repo_secret_name = "${local.prefix}-https-git-secret"
   git_organization_secret_name = "${local.prefix}-organization-git-secret"
@@ -213,10 +213,10 @@ resource "helm_release" "airflow" {
     dags = {
       path = "/opt/airflow/dags"
       gitSync = {
-        enabled               = true
-        repo                  = var.git_repository_url
-        branch                = var.git_branch
-        revision              = "HEAD"
+        enabled  = true
+        repo     = var.git_repository_url
+        branch   = var.git_branch
+        revision = "HEAD"
         # repoSubPath           = "workflows"
         httpSecret            = local.git_airflow_repo_secret_name
         httpSecretUsernameKey = "username"

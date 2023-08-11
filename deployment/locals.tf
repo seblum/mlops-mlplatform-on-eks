@@ -3,7 +3,7 @@
 locals {
   cluster_name                       = "${local.deployment_name}-eks-cluster"
   vpc_name                           = "${local.deployment_name}-vpc"
-  mlflow_s3_bucket_name              = "${local.name_prefix}-artifact-bucket"
+  mlflow_s3_bucket_name              = "artifact-bucket"
   airflow_s3_data_bucket             = "data-storage"
   airflow_s3_data_bucket_credentials = "s3-data-bucket-access-credentials"
   port_airflow                       = 5000

@@ -1,4 +1,6 @@
-
+locals {
+  seldon_aws_s3_credentials_secret_name = "aws-s3-credentials"
+}
 # resource "kubernetes_namespace" "seldon-system" {
 #   metadata {
 
@@ -6,16 +8,17 @@
 #   }
 # }
 
-# resource "kubernetes_secret" "seldon_secret_aws_bucket" {
-#   metadata {
-#     name      = s3-bucket
-#     namespace = helm_release.airflow.namespace
-#   }
-#   stringData = {
-   
-#   }
-# }
-
+resource "kubernetes_secret" "seldon_aws_s3_credentials" {
+  metadata {
+    name      = local.seldon_aws_s3_credentials_secret_name
+    namespace = helm_release.seldon-core-operator.namespace
+  }
+  data = {
+    "RCLONE_CONFIG_S3_TYPE"="s3"
+    "RCLONE_CONFIG_S3_PROVIDER"= "AWS"
+ 
+  }
+}
 
 resource "helm_release" "seldon-core-operator" {
   name             = var.name
@@ -28,7 +31,7 @@ resource "helm_release" "seldon-core-operator" {
 
   values = [yamlencode({
     predictiveUnit = {
-      defaultEnvSecretRefName = "s3-bucket"
+      defaultEnvSecretRefName = local.seldon_aws_s3_credentials_secret_name
     }
   })]
 }

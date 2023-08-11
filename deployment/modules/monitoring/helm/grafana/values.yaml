@@ -9,7 +9,24 @@ datasources:
       isDefault: true
 service:
   enabled: true
-  type: LoadBalancer
+  type: ClusterIP
+ingress:
+  enabled: true
+  annotations: {
+    external-dns.alpha.kubernetes.io/hostname : "mlplatform.seblum.me",
+    alb.ingress.kubernetes.io/scheme : "internet-facing",
+    alb.ingress.kubernetes.io/target-type : "ip",
+    kubernetes.io/ingress.class : "alb",
+    alb.ingress.kubernetes.io/group.name : "mlplatform",
+    alb.ingress.kubernetes.io/healthcheck-path : "/api/health"
+  }
+  labels: {}
+  path: /grafana
+  pathType: Prefix
+  hosts:
+    - mlplatform.seblum.me
+    - www.mlplatform.seblum.me
+
 # admin:
 #   ## Name of the secret. Can be templated.
 #   existingSecret: ""
@@ -40,3 +57,23 @@ dashboards:
     k8s-cluster:
       gnetId: 6417
       datasource: Prometheus
+grafana.ini:
+  server:
+    domain: mlplatform.seblum.me
+    root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+    serve_from_sub_path: true
+  # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+  # auth.github:
+  #    enabled: false
+  #    allow_sign_up: false
+  #    scopes: user:email,read:org
+  #    auth_url: https://github.com/login/oauth/authorize
+  #    token_url: https://github.com/login/oauth/access_token
+  #    api_url: https://api.github.com/user
+  #    team_ids:
+  #    allowed_organizations:
+  #    client_id:
+  #    client_secret:
+
+
+    # root_url: "mlplatform.seblum.me/grafana"

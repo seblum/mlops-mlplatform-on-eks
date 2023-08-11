@@ -7,7 +7,7 @@ data "aws_caller_identity" "current" {}
 
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
-  bucket = var.mlflow_s3_bucket_name
+  bucket = local.mlflow_s3_bucket_name
   # tags          = var.tags
   force_destroy = var.s3_force_destroy
 }
@@ -57,7 +57,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
         "Effect" : "Allow",
         "Action" : [
           "s3:*Object",
-          "s3:GetObjectVersion"
+          "s3:GetObjectVersion",
+          "s3:*"
         ],
         "Resource" : [
           "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",

@@ -198,3 +198,8 @@ variable "domain_suffix" {}
 
 
 variable "fernet_key" {}
+
+
+variable "s3_data_bucket_user_name" {
+
+}

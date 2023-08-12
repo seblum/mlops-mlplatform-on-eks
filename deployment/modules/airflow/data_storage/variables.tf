@@ -14,3 +14,7 @@ variable "s3_data_bucket_name" {
 variable "s3_data_bucket_secret_name" {
 
 }
+
+variable "s3_data_bucket_user_name" {
+
+}

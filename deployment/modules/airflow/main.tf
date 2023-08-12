@@ -40,6 +40,7 @@ module "s3-data-storage" {
   namespace                  = var.namespace
   s3_force_destroy           = true
   s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
+  s3_data_bucket_user_name   = var.s3_data_bucket_user_name
 }
 
 ################################################################################

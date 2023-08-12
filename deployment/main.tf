@@ -76,6 +76,9 @@ module "mlflow" {
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
 
+  # TODO: add data access common rule
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+
   depends_on = [
     module.eks
   ]
@@ -110,6 +113,8 @@ module "airflow" {
   # periodic updates
   # log airflow to s3
 
+  # TODO: add data access common rule
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
   # HELM
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
@@ -161,11 +166,11 @@ module "jupyterhub" {
 }
 
 module "monitoring" {
-  count  = var.deploy_monitoring ? 1 : 0
-  source = "./modules/monitoring"
-  name   = "monitoring"
-  git_client_id      = var.grafana_git_client_id
-  git_client_secret  = var.grafana_git_client_secret
+  count             = var.deploy_monitoring ? 1 : 0
+  source            = "./modules/monitoring"
+  name              = "monitoring"
+  git_client_id     = var.grafana_git_client_id
+  git_client_secret = var.grafana_git_client_secret
 
 }
 

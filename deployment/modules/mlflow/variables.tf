@@ -88,3 +88,11 @@ variable "max_allocated_storage" {
   description = "The upper limit of scalable storage (Gb)"
   default     = 500
 }
+
+variable "airflow_s3_role_name" {
+  default = "airflow-s3-data-bucket-role"
+}
+
+variable "s3_data_bucket_user_name" {
+
+}

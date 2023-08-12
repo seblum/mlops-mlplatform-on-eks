@@ -91,9 +91,9 @@ variable "deploy_seldon_core" {
 }
 
 variable "grafana_git_client_id" {
-  
+
 }
 
 variable "grafana_git_client_secret" {
-  
+
 }

@@ -164,6 +164,9 @@ module "monitoring" {
   count  = var.deploy_monitoring ? 1 : 0
   source = "./modules/monitoring"
   name   = "monitoring"
+  git_client_id      = var.grafana_git_client_id
+  git_client_secret  = var.grafana_git_client_secret
+
 }
 
 

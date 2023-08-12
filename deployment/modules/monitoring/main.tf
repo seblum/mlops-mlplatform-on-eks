@@ -1,3 +1,6 @@
+
+##### PROMETHEUS
+#
 resource "helm_release" "prometheus" {
   chart            = "prometheus"
   name             = "prometheus"
@@ -24,6 +27,20 @@ resource "helm_release" "prometheus" {
   ]
 }
 
+resource "helm_release" "prometheus-operator-crds" {
+  chart            = "prometheus-operator-crds"
+  name             = "prometheus-operator-crds"
+  namespace        = var.namespace
+  create_namespace = var.create_namespace
+
+  repository = "https://prometheus-community.github.io/helm-charts"
+  version    = "5.1.0"
+}
+
+
+
+##### GRAFANA
+#
 resource "helm_release" "grafana" {
   chart            = "grafana"
   name             = "grafana"
@@ -51,13 +68,26 @@ resource "helm_release" "grafana" {
       }
       service = {
         enabled = true
-        type    = "LoadBalancer"
+        type    = "ClusterIP"
       }
-      # admin:
-      #   ## Name of the secret. Can be templated.
-      #   existingSecret: ""
-      #   userKey: admin-user
-      #   passwordKey: admin-password
+      ingress = {
+        enabled = true
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname"  = "mlplatform.seblum.me",
+          "alb.ingress.kubernetes.io/scheme"           = "internet-facing",
+          "alb.ingress.kubernetes.io/target-type"      = "ip",
+          "kubernetes.io/ingress.class"                = "alb",
+          "alb.ingress.kubernetes.io/group.name"       = "mlplatform",
+          "alb.ingress.kubernetes.io/healthcheck-path" = "/api/health"
+        }
+        labels   = {}
+        path     = "/grafana"
+        pathType = "Prefix"
+        hosts = [
+          "mlplatform.seblum.me",
+          "www.mlplatform.seblum.me"
+        ]
+      },
       dashboardProviders = {
         yaml = {
           apiVersion = 1
@@ -93,6 +123,26 @@ resource "helm_release" "grafana" {
           }
         }
       }
+      "grafana.ini" = {
+        server = {
+          domain : "mlplatform.seblum.me"
+          root_url : "%(protocol)s://%(domain)s/grafana/"
+          serve_from_sub_path : true
+          # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+        },
+        "auth.github" = {
+          enabled       = true
+          allow_sign_up = true
+          scopes        = "user:email,read:org"
+          auth_url      = "https://github.com/login/oauth/authorize"
+          token_url     = "https://github.com/login/oauth/access_token"
+          api_url       = "https://api.github.com/user"
+          # team_ids: grafana-user-team
+          # allowed_organizations:
+          client_id     = var.git_client_id
+          client_secret = var.git_client_secret
+        }
+      }
   })]
-  # "${file("${path.module}/helm/grafana/values.yaml")}"
 }
+

@@ -89,3 +89,11 @@ variable "deploy_seldon_core" {
   description = "Should Seldon Core be deployed?"
   default     = true
 }
+
+variable "grafana_git_client_id" {
+  
+}
+
+variable "grafana_git_client_secret" {
+  
+}

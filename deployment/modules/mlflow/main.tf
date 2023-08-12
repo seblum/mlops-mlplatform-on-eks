@@ -61,8 +61,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:*"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
         ]
       },
       {
@@ -72,8 +72,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:ListBucketVersions"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
         ],
         "Condition" : {
           "StringLike" : {
@@ -88,6 +88,12 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
 
 resource "aws_iam_role_policy_attachment" "mlflow_s3_policy" {
   role       = aws_iam_role.mlflow_s3_role.name
+  policy_arn = aws_iam_policy.mlflow_s3_policy.arn
+}
+
+# TODO: needs to be airflow user
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_name" {
+  user       = var.s3_data_bucket_user_name
   policy_arn = aws_iam_policy.mlflow_s3_policy.arn
 }
 
@@ -144,7 +150,7 @@ resource "helm_release" "mlflow" {
   }
   set {
     name  = "artifacts.S3_BUCKET"
-    value = var.mlflow_s3_bucket_name
+    value = local.mlflow_s3_bucket_name
   }
   set {
     name  = "artifacts.S3_KEY_PREFIX"

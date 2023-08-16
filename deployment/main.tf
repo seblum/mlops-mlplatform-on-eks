@@ -189,3 +189,14 @@ module "seldon-core" {
     module.eks
   ]
 }
+
+
+
+
+
+module "dashboard" {
+  count  = var.deploy_dashboard ? 1 : 0
+  source = "./modules/dashboard"
+  name   = "dashboard"
+  namespace = "dashboard"
+}

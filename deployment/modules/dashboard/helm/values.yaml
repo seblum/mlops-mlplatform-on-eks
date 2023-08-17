@@ -1,0 +1,8 @@
+
+
+deployment:
+  image: seblum/vuejs-ml-dashboard:latest
+
+# ingress:
+#   prefix: "/mlflow"
+# https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy

@@ -21,25 +21,11 @@ spec:
                 name: dashboard-service
                 port:
                   number: 80
-          - path: /
-            pathType: Exact
-            backend:
-              service:
-                name: dashboard-service
-                port:
-                  number: 80
     - host: www.mlplatform.seblum.me
       http:
         paths:
           - path: /main
             pathType: Prefix
-            backend:
-              service:
-                name: dashboard-service
-                port:
-                  number: 80
-          - path: /
-            pathType: Exact
             backend:
               service:
                 name: dashboard-service

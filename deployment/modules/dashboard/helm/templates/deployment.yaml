@@ -17,23 +17,22 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
-      # serviceAccount: dashboard-user
       containers:
         - name: dashboard
           image: {{ .Values.deployment.image }}
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 80
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /health/liveness
+              port: 80
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /health/readiness
+              port: 80
           resources:
             requests:
               memory: "64Mi"

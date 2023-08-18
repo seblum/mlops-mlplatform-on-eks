@@ -1,18 +1,100 @@
 apiVersion: machinelearning.seldon.io/v1alpha2
 kind: SeldonDeployment
 metadata:
-  name: skin-cancer-deployment
+  name: skin-cancer-predict
+  namespace: seldon-system
 spec:
   name: skin-cancer-predict
   predictors:
-  - graph:
+  - componentSpecs:
+    - spec:
+        # We are setting high failureThreshold as installing conda dependencies
+        # can take long time and we want to avoid k8s killing the container prematurely
+        containers:
+        - name: classifier
+          livenessProbe:
+            initialDelaySeconds: 80
+            failureThreshold: 200
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            initialDelaySeconds: 80
+            failureThreshold: 200
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP
+    graph:
       children: []
       implementation: MLFLOW_SERVER
-      modelUri: s3://seldon-models/v1.18.0-dev/sklearn/iris # mlflow artifact folder s3://
+      modelUri: s3://1cilc0i138g7-mlflow-artifact-bucket/test/1/fb76e5eb365444648bda0dde72fd22ba/artifacts/model
       name: classifier
-      parameters: # default call is numpy.ndarray
-        - name: method
-          type: STRING
-          value: predict
+    name: default
+    replicas: 1
+# ---
+# apiVersion: machinelearning.seldon.io/v1alpha2
+# kind: SeldonDeployment
+# metadata:
+#   name: skin-cancer-deployment
+#   namespace: seldon-system
+# spec:
+#   # protocol: v2  # Activate the v2 protocol
+#   name: skin-cancer-predict
+#   predictors:
+#   - graph:
+#       implementation: MLFLOW_SERVER
+#       modelUri: s3://6735dno0s0fz-mlflow-artifact-bucket/test/1/c6b83abcf26449c892988dbe8c1a4b7b/artifacts/model/ # s3://seldon-models/v1.18.0-dev/sklearn/iris # mlflow artifact folder s3://
+#       name: classifier
+#       # parameters: # default call is numpy.ndarray
+#       #   - name: method
+#       #     type: STRING
+#       #     value: predict
+#     name: default
+#     replicas: 1
+#     annotations:
+#       sidecar.istio.io/inject: "false"
+#     componentSpecs:
+#       - spec:
+#           # We are setting high failureThreshold as installing conda dependencies
+#           # can take long time and we want to avoid k8s killing the container prematurely
+#           containers:
+#           - name: classifier
+#             livenessProbe:
+#               initialDelaySeconds: 80
+#               failureThreshold: 200
+#               periodSeconds: 5
+#               successThreshold: 1
+#               httpGet:
+#                 path: /health/ping
+#                 port: http
+#                 scheme: HTTP
+#             readinessProbe:
+#               initialDelaySeconds: 80
+#               failureThreshold: 200
+#               periodSeconds: 5
+#               successThreshold: 1
+#               httpGet:
+#                 path: /health/ping
+#                 port: http
+#                 scheme: HTTP
+---
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: iris-model
+  namespace: seldon-system
+spec:
+  name: iris
+  predictors:
+  - graph:
+      implementation: SKLEARN_SERVER
+      modelUri: gs://seldon-models/v1.14.0-dev/sklearn/iris
+      name: classifier
     name: default
     replicas: 1

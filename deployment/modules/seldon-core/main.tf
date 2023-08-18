@@ -14,9 +14,11 @@ resource "kubernetes_secret" "seldon_aws_s3_credentials" {
     namespace = helm_release.seldon-core-operator.namespace
   }
   data = {
-    "RCLONE_CONFIG_S3_TYPE"="s3"
-    "RCLONE_CONFIG_S3_PROVIDER"= "AWS"
- 
+    "RCLONE_CONFIG_S3_TYPE"              = "s3"
+    "RCLONE_CONFIG_S3_PROVIDER"          = "AWS"
+    "RCLONE_CONFIG_S3_ENV_AUTH"          = "false"
+    "RCLONE_CONFIG_S3_ACCESS_KEY_ID"     = ""
+    "RCLONE_CONFIG_S3_SECRET_ACCESS_KEY" = ""
   }
 }
 

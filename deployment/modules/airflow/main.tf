@@ -1,10 +1,11 @@
 locals {
-  k8s_airflow_db_secret_name   = "${var.name_prefix}-${var.namespace}-db-auth"
-  git_airflow_repo_secret_name = "${var.name_prefix}-${var.namespace}-https-git-secret"
-  git_organization_secret_name = "${var.name_prefix}-${var.namespace}-organization-git-secret"
-  s3_data_bucket_secret_name   = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_secret_name}"
-  s3_data_bucket_name          = "${var.name_prefix}-${var.namespace}-${var.s3_data_bucket_name}"
-  s3_log_bucket_name           = "${var.name_prefix}-${var.namespace}-log-storage"
+  prefix                       = "${var.name_prefix}-${var.namespace}"
+  k8s_airflow_db_secret_name   = "${local.prefix}-db-auth"
+  git_airflow_repo_secret_name = "${local.prefix}-https-git-secret"
+  git_organization_secret_name = "${local.prefix}-organization-git-secret"
+  s3_data_bucket_secret_name   = "${var.namespace}-${var.s3_data_bucket_secret_name}"
+  s3_data_bucket_name          = "${local.prefix}-${var.s3_data_bucket_name}"
+  s3_log_bucket_name           = "${local.prefix}-log-storage"
 }
 
 data "aws_caller_identity" "current" {}
@@ -37,8 +38,9 @@ module "s3-data-storage" {
   source                     = "./data_storage"
   s3_data_bucket_name        = local.s3_data_bucket_name
   namespace                  = var.namespace
-  s3_force_destroy           = var.s3_force_destroy
+  s3_force_destroy           = true
   s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
+  s3_data_bucket_user_name   = var.s3_data_bucket_user_name
 }
 
 ################################################################################
@@ -132,7 +134,7 @@ resource "helm_release" "airflow" {
         }
       ],
       config = {
-        AIRFLOW__WEBSERVER__EXPOSE_CONFIG = true
+        AIRFLOW__WEBSERVER__EXPOSE_CONFIG = false
         AIRFLOW__WEBSERVER__BASE_URL      = "http://${var.domain_name}/${var.domain_suffix}"
 
         AIRFLOW__CORE__LOAD_EXAMPLES = false
@@ -212,11 +214,11 @@ resource "helm_release" "airflow" {
     dags = {
       path = "/opt/airflow/dags"
       gitSync = {
-        enabled               = true
-        repo                  = var.git_repository_url
-        branch                = var.git_branch
-        revision              = "HEAD"
-        repoSubPath           = "workflows"
+        enabled  = true
+        repo     = var.git_repository_url
+        branch   = var.git_branch
+        revision = "HEAD"
+        # repoSubPath           = "workflows"
         httpSecret            = local.git_airflow_repo_secret_name
         httpSecretUsernameKey = "username"
         httpSecretPasswordKey = "password"

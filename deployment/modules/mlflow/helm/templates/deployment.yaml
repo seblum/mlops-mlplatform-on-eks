@@ -35,7 +35,7 @@ spec:
             - -c
             - |
               mlflow db upgrade "mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME}";
-              mlflow server --host=${MLFLOW_HOST} --port=${MLFLOW_PORT} --backend-store-uri=mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME} --artifacts-destination=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --default-artifact-root=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --serve-artifacts 
+              mlflow server --host=${MLFLOW_HOST} --port=${MLFLOW_PORT} --backend-store-uri=mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME} --artifacts-destination=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --default-artifact-root=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --serve-artifacts --static-prefix=/mlflow
           envFrom:
             - secretRef:
                 name: mlflow-secret
@@ -47,11 +47,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /mlflow
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /mlflow
               port: http
           resources:
             requests:

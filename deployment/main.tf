@@ -76,6 +76,9 @@ module "mlflow" {
   storage_type                = local.storage_type
   max_allocated_storage       = local.max_allocated_storage
 
+  # TODO: add data access common rule
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+
   depends_on = [
     module.eks
   ]
@@ -110,6 +113,8 @@ module "airflow" {
   # periodic updates
   # log airflow to s3
 
+  # TODO: add data access common rule
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
   # HELM
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
@@ -142,19 +147,6 @@ module "jupyterhub" {
   admin_user_list   = local.jupyterhub_admin_user_list
   allowed_user_list = local.jupyterhub_allowed_user_list
 
-  # # RDS
-  # vpc_id                      = module.vpc.vpc_id
-  # private_subnets             = module.vpc.private_subnets
-  # private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  # rds_port                    = local.port_airflow
-  # rds_name                    = "jupyterhub"
-  # rds_engine                  = "postgres"
-  # rds_engine_version          = "13.3"
-  # rds_instance_class          = "db.t3.micro"
-  # storage_type                = local.storage_type
-  # max_allocated_storage       = local.max_allocated_storage
-  # # periodic updates
-  # # log airflow to s3
   git_repository_url = local.git_repository_url
 
   git_client_id      = var.jupyterhub_git_client_id
@@ -174,7 +166,42 @@ module "jupyterhub" {
 }
 
 module "monitoring" {
-  count  = var.deploy_monitoring ? 1 : 0
-  source = "./modules/monitoring"
-  name   = "monitoring"
+  count             = var.deploy_monitoring ? 1 : 0
+  source            = "./modules/monitoring"
+  name              = "monitoring"
+  git_client_id     = var.grafana_git_client_id
+  git_client_secret = var.grafana_git_client_secret
+
+}
+
+
+module "seldon-core" {
+  count            = var.deploy_seldon_core ? 1 : 0
+  source           = "./modules/seldon-core"
+  name             = "seldon-core"
+  cluster_name     = local.cluster_name
+  cluster_endpoint = module.eks.cluster_endpoint
+  domain_name      = var.domain_name
+  domain_suffix    = "seldon"
+  namespace        = "seldon-system"
+
+  # HELM
+  helm_chart_repository = "https://storage.googleapis.com/seldon-charts"
+  helm_chart_name       = "seldon-core-operator"
+  helm_chart_version    = "1.16.0"
+
+  depends_on = [
+    module.eks
+  ]
+}
+
+
+
+
+
+module "dashboard" {
+  count  = var.deploy_dashboard ? 1 : 0
+  source = "./modules/dashboard"
+  name   = "dashboard"
+  namespace = "dashboard"
 }

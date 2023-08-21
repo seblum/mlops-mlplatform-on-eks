@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mlflow-ingress
-  namespace: mlflow
+  name: dashboard-ingress
+  namespace: dashboard
   annotations:
     external-dns.alpha.kubernetes.io/hostname: mlplatform.seblum.me
     kubernetes.io/ingress.class: alb
@@ -14,20 +14,20 @@ spec:
     - host: mlplatform.seblum.me
       http:
         paths:
-          - path: /mlflow
+          - path: /main
             pathType: Prefix
             backend:
               service:
-                name: mlflow-service
+                name: dashboard-service
                 port:
                   number: 80
     - host: www.mlplatform.seblum.me
       http:
         paths:
-          - path: /mlflow
+          - path: /main
             pathType: Prefix
             backend:
               service:
-                name: mlflow-service
+                name: dashboard-service
                 port:
                   number: 80

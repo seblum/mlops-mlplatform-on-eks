@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "s3_data_storage" {
 }
 
 resource "aws_iam_user" "s3_data_bucket_user" {
-  name = "${var.namespace}-s3-data-bucket-user"
+  name = var.s3_data_bucket_user_name
   path = "/"
 }
 

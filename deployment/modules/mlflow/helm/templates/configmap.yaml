@@ -4,6 +4,6 @@ metadata:
   name: mlflow-config
   namespace: mlflow
 data:
-  ARTIFACT_S3_BUCKET: {{ .Values.ARTIFACT_S3_BUCKET }}
-  ARTIFACT_S3_KEY_PREFIX: {{ .Values.ARTIFACT_S3_KEY_PREFIX }}
+  ARTIFACT_S3_BUCKET: {{ .Values.artifacts.S3_BUCKET }}
+  ARTIFACT_S3_KEY_PREFIX: {{ .Values.artifacts.S3_KEY_PREFIX }}
   DB_NAME: {{ .Values.DB_NAME }}

@@ -7,7 +7,7 @@ data "aws_caller_identity" "current" {}
 
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
-  bucket = var.mlflow_s3_bucket_name
+  bucket = local.mlflow_s3_bucket_name
   # tags          = var.tags
   force_destroy = var.s3_force_destroy
 }
@@ -57,11 +57,12 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
         "Effect" : "Allow",
         "Action" : [
           "s3:*Object",
-          "s3:GetObjectVersion"
+          "s3:GetObjectVersion",
+          "s3:*"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
         ]
       },
       {
@@ -71,22 +72,28 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:ListBucketVersions"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${var.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
+          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
         ],
-        # "Condition" : {
-        #   "StringLike" : {
-        #     "s3:prefix" : [
-        #       "test/*"
-        #     ]
-        #   }
-        # }
+        "Condition" : {
+          "StringLike" : {
+            "s3:prefix" : [
+              "test/*"
+            ]
+          }
+        }
       }
   ] })
 }
 
 resource "aws_iam_role_policy_attachment" "mlflow_s3_policy" {
   role       = aws_iam_role.mlflow_s3_role.name
+  policy_arn = aws_iam_policy.mlflow_s3_policy.arn
+}
+
+# TODO: needs to be airflow user
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_name" {
+  user       = var.s3_data_bucket_user_name
   policy_arn = aws_iam_policy.mlflow_s3_policy.arn
 }
 
@@ -126,37 +133,38 @@ resource "helm_release" "mlflow" {
   ]
 
   set {
-    name  = "RDS_USERNAME"
+    name  = "rds.USERNAME"
     value = module.rds-mlflow.rds_username
   }
   set {
-    name  = "RDS_PASSWORD"
+    name  = "rds.PASSWORD"
     value = module.rds-mlflow.rds_password
   }
   set {
-    name  = "RDS_HOST"
+    name  = "rds.HOST"
     value = module.rds-mlflow.rds_host
   }
   set {
-    name  = "RDS_PORT"
+    name  = "rds.PORT"
     value = var.rds_port
   }
   set {
-    name  = "ARTIFACT_S3_BUCKET"
-    value = var.mlflow_s3_bucket_name
+    name  = "artifacts.S3_BUCKET"
+    value = local.mlflow_s3_bucket_name
   }
   set {
-    name  = "ARTIFACT_S3_KEY_PREFIX"
+    name  = "artifacts.S3_KEY_PREFIX"
     value = "test"
   }
   set {
-    name  = "ARTIFACT_S3_ROLE_ARN"
-    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}" # "arn:aws:iam::855372857567:role/mlflow-s3-access-mlflow-role"
+    name  = "artifacts.S3_ROLE_ARN"
+    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}"
   }
   set {
     name  = "DB_NAME"
     value = module.rds-mlflow.rds_dbname
   }
 }
+
 
 

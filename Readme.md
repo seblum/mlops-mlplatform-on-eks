@@ -1,6 +1,6 @@
 # MLOps Airflow on EKS
 
-This project aims to develop an ML platform on Kubernetes that facilitates the MLOps framework. The entire infrastructure is provisioned on AWS using Terraform. Load balancing and DNS management are handled using AWS ALB and Route 53, respectively.
+This project aims to develop a machine learning (ML) platform on Kubernetes that facilitates the MLOps framework. The entire infrastructure is provisioned on AWS using Terraform. Load balancing and DNS management are handled using AWS ALB and Route 53, respectively.
 
 The ML platform incorporates Airflow, MLFlow, and JupyterHub, which are deployed using the Helm provider. Specifically, the Airflow community Helm chart, the JupyterHub official Helm chart, and a custom Helm chart for MLFlow are utilized. To ensure security, each component is protected by GitHub OAuth authentication.
 
@@ -47,7 +47,7 @@ project
 
 ## Features
 
-The project *MLOps Airflow on EKS* provides a comprehensive ML platform on AWS EKS, utilizing powerful tools and technologies to streamline ML workflows and facilitate collaboration among data scientists and ML practitioners. The platform's automation and deployment features make it easy to set up and manage, while the exemplary deep learning use case serves as a valuable resource for users to kickstart their own ML projects. The main features of the "MLOps Airflow on EKS" project can be described as follows:
+The project *MLOps Airflow on EKS* provides a comprehensive machine learning platform on AWS EKS, utilizing powerful tools and technologies to streamline machine learning workflows and facilitate collaboration among data scientists and ML practitioners. The platform's automation and deployment features make it easy to set up and manage, while the exemplary deep learning use case serves as a valuable resource for users to kickstart their own ML projects. The main features of the "MLOps Airflow on EKS" project can be described as follows:
 
 1. **ML Platform on Kubernetes (EKS)**: The project aims to set up a complete Machine Learning (ML) platform on Kubernetes using Amazon EKS (Elastic Kubernetes Service). This allows users to leverage the power of Kubernetes for orchestrating containerized ML workloads.
 2. **MLOps Framework**: The platform is designed to support MLOps practices, enabling end-to-end automation, monitoring, and collaboration for ML workflows. MLOps helps streamline the development, deployment, and management of ML models, enhancing productivity and reliability.
@@ -147,6 +147,7 @@ Contributions to **MLOps Airflow on EKS** are highly appreciated! Whether you co
 ### JupyterHub Improvements:
 - [ ] Allow JupyterHub to support multiple images for diverse user needs.
 - [ ] Explore Helm list input for JupyterHub to enable dynamic management of Airflow DAG repositories.
+- [ ] Health check for JupyterHub ALB is currently failing
 
 ### AWS Service Quota:
 - [ ] Check AWS service quota for GPU instances to ensure sufficient resources.

@@ -32,3 +32,11 @@ variable "create_namespace" {
   description = "Should the namespace be created, if it does not exists?"
   default     = true
 }
+
+variable "git_client_id" {
+
+}
+
+variable "git_client_secret" {
+
+}

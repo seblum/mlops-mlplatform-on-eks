@@ -52,20 +52,6 @@ resource "helm_release" "grafana" {
 
   values = [
     yamlencode({
-      datasources = {
-        yaml = {
-          apiVersion = 1
-          datasources = [
-            {
-              name      = "Prometheus"
-              type      = "prometheus"
-              url       = "http://prometheus-server.monitoring.svc.cluster.local"
-              access    = "proxy"
-              isDefault = true
-            }
-          ]
-        }
-      }
       service = {
         enabled = true
         type    = "ClusterIP"
@@ -88,8 +74,22 @@ resource "helm_release" "grafana" {
           "www.mlplatform.seblum.me"
         ]
       },
+      datasources = {
+        "datasources.yaml" = {
+          apiVersion = 1
+          datasources = [
+            {
+              name      = "Prometheus"
+              type      = "prometheus"
+              url       = "http://prometheus-server.monitoring.svc.cluster.local"
+              access    = "proxy"
+              isDefault = true
+            }
+          ]
+        }
+      },
       dashboardProviders = {
-        yaml = {
+        "dashboardproviders.yaml" = {
           apiVersion = 1
           providers = [
             {
@@ -124,6 +124,9 @@ resource "helm_release" "grafana" {
         }
       }
       "grafana.ini" = {
+        security = {
+          allow_embedding = true # enables iframe loading
+        },
         server = {
           domain : "mlplatform.seblum.me"
           root_url : "%(protocol)s://%(domain)s/grafana/"

@@ -13,7 +13,7 @@ variable "create_namespace" {
   default     = true
 }
 
-variable "mlflow_s3_bucket_name" {
+variable "s3_bucket_name" {
   type        = string
   description = "Name of the S3 Bucket for the MLFlow artifacts"
 }

@@ -102,3 +102,7 @@ variable "grafana_git_client_secret" {
 variable "deploy_dashboard" {
   default = false
 }
+
+variable "deploy_yatai" {
+  default = false
+}

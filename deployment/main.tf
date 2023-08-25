@@ -56,14 +56,14 @@ module "user-profiles" {
 # CUSTOM TOOLS
 
 module "mlflow" {
-  count                 = var.deploy_mlflow ? 1 : 0
-  source                = "./modules/mlflow"
-  name                  = "mlflow"
-  namespace             = "mlflow"
-  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
-  s3_force_destroy      = local.force_destroy_s3_bucket
-  oidc_provider_arn     = module.eks.oidc_provider_arn
-  name_prefix           = local.name_prefix
+  count             = var.deploy_mlflow ? 1 : 0
+  source            = "./modules/mlflow"
+  name              = "mlflow"
+  namespace         = "mlflow"
+  s3_bucket_name    = local.mlflow_s3_bucket_name
+  s3_force_destroy  = local.force_destroy_s3_bucket
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  name_prefix       = local.name_prefix
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -198,10 +198,43 @@ module "seldon-core" {
 
 
 
+module "yatai" {
+  count        = var.deploy_yatai ? 1 : 0
+  cluster_name = local.cluster_name
+
+  source             = "./modules/yatai"
+  name               = "yatai"
+  namespace          = "yatai-system"
+  helm_chart_version = "1.1.10"
+
+  s3_bucket_name          = local.mlflow_s3_bucket_name
+  s3_force_destroy        = local.force_destroy_s3_bucket
+  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  name_prefix             = local.name_prefix
+  # RDS
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
+  rds_port                    = 5432
+  rds_name                    = "yatai"
+  rds_engine                  = "postgres"
+  rds_engine_version          = "13.11" # end of support may 2024
+  rds_instance_class          = "db.t3.micro"
+  rds_storage_type            = local.storage_type
+  rds_max_allocated_storage   = local.max_allocated_storage
+
+
+  depends_on = [
+    module.eks
+  ]
+}
+
+
+
 
 module "dashboard" {
-  count  = var.deploy_dashboard ? 1 : 0
-  source = "./modules/dashboard"
-  name   = "dashboard"
+  count     = var.deploy_dashboard ? 1 : 0
+  source    = "./modules/dashboard"
+  name      = "dashboard"
   namespace = "dashboard"
 }

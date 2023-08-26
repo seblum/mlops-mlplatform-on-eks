@@ -31,22 +31,22 @@ variable "oidc_provider_arn" {
   description = "arn of the OIDC provider"
 }
 
-variable "user_profiles" {
-  type        = list(any)
-  description = "list of user profiles"
-  default = [
-    {
-      "username" = "user"
-      "password" = "user123"
-      "role" = [
-        "User",
-        "Viewer"
-      ]
-      "email"     = "user@example.com"
-      "firstName" = "user"
-      "lastName"  = "user"
-  }]
-}
+# variable "user_profiles" {
+#   type        = list(any)
+#   description = "list of user profiles"
+#   default = [
+#     {
+#       "username" = "user"
+#       "password" = "user123"
+#       "role" = [
+#         "User",
+#         "Viewer"
+#       ]
+#       "email"     = "user@example.com"
+#       "firstName" = "user"
+#       "lastName"  = "user"
+#   }]
+# }
 
 variable "s3_data_bucket_secret_name" {
 

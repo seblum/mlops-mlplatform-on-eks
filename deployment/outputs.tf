@@ -1,7 +1,7 @@
-output "airflow_profiles" {
-  description = "Airflow profiles"
-  value       = local.airflow_profiles
-}
+# output "airflow_profiles" {
+#   description = "Airflow profiles"
+#   value       = local.airflow_profiles
+# }
 
 output "aws_region" {
   description = "AWS region"
@@ -18,15 +18,15 @@ output "eks_managed_node_groups_autoscaling_group_names" {
   value       = module.eks.eks_managed_node_groups_autoscaling_group_names
 }
 
-output "jupyterhub_admin_user_list" {
-  description = "List of admin users in JupyterHub"
-  value       = local.jupyterhub_admin_user_list
-}
+# output "jupyterhub_admin_user_list" {
+#   description = "List of admin users in JupyterHub"
+#   value       = local.jupyterhub_admin_user_list
+# }
 
-output "jupyterhub_allowed_user_list" {
-  description = "List of allowed users in JupyterHub"
-  value       = local.jupyterhub_allowed_user_list
-}
+# output "jupyterhub_allowed_user_list" {
+#   description = "List of allowed users in JupyterHub"
+#   value       = local.jupyterhub_allowed_user_list
+# }
 
 # output "rds_host" {
 #   description = "Kubernetes Cluster Name"

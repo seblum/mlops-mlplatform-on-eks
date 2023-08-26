@@ -1,5 +1,3 @@
-
-
 locals {
   cluster_name                       = "${local.deployment_name}-eks-cluster"
   vpc_name                           = "${local.deployment_name}-vpc"
@@ -30,23 +28,28 @@ locals {
     }
   }
 
-  airflow_profiles = [
-    for profile in local.profiles_yaml : {
-      username  = profile["user"]
-      password  = module.user-profiles.user_profile[profile["user"]]["user_password"]
-      email     = profile["email"]
-      role      = lookup(profile, "airflow_role", [])
-      firstName = split(".", profile["user"])[0]
-      lastName  = split(".", profile["user"])[1]
-  }]
+  # airflow_profiles = [
+  #   for profile in local.profiles_yaml : {
+  #     username  = profile["user"]
+  #     password  = module.user-profiles.user_profile[profile["user"]]["user_password"]
+  #     email     = profile["email"]
+  #     role      = lookup(profile, "airflow_role", [])
+  #     firstName = split(".", profile["user"])[0]
+  #     lastName  = split(".", profile["user"])[1]
+  # }]
 
-  jupyterhub_admin_user_list = flatten(compact([
-    for profile in local.profiles_yaml : profile["jupyter_role"] == "Admin" ? profile["user"] : ""
-  ]))
+  # jupyterhub_admin_user_list = flatten(compact([
+  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "Admin" ? profile["user"] : ""
+  # ]))
 
-  jupyterhub_allowed_user_list = flatten(compact([
-    for profile in local.profiles_yaml : profile["jupyter_role"] == "User" ? profile["user"] : ""
-  ]))
+  # jupyterhub_allowed_user_list = flatten(compact([
+  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "User" ? profile["user"] : ""
+  # ]))
 
+}
 
+resource "random_string" "random_prefix" {
+  length  = 12
+  upper   = false
+  special = false
 }

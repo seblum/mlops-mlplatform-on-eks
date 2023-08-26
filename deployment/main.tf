@@ -1,12 +1,4 @@
-
 data "aws_caller_identity" "current" {}
-
-resource "random_string" "random_prefix" {
-  length  = 12
-  upper   = false
-  special = false
-}
-
 
 # INFRASTRUCTURE
 module "vpc" {
@@ -93,7 +85,7 @@ module "airflow" {
   cluster_name               = local.cluster_name
   cluster_endpoint           = module.eks.cluster_endpoint
   oidc_provider_arn          = module.eks.oidc_provider_arn
-  user_profiles              = local.airflow_profiles
+  # user_profiles              = local.airflow_profiles
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket
   domain_name                = var.domain_name
@@ -130,8 +122,7 @@ module "airflow" {
   git_client_secret = var.airflow_git_client_secret
 
   depends_on = [
-    module.eks,
-    module.user-profiles
+    module.eks
   ]
 }
 
@@ -160,8 +151,7 @@ module "jupyterhub" {
   mlflow_tracking_uri   = "test" #var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : ""
 
   depends_on = [
-    module.eks,
-    module.user-profiles
+    module.eks
   ]
 }
 

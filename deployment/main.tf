@@ -194,7 +194,7 @@ module "yatai" {
 
   source             = "./modules/yatai"
   name               = "yatai"
-  namespace          = "yatai-system"
+  namespace          = "yatai"
   helm_chart_version = "1.1.10"
 
   s3_bucket_name          = local.mlflow_s3_bucket_name

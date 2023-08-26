@@ -4,30 +4,34 @@ locals {
   yatai_service_account_name                    = "yatai-sa"
   yatai_image_builder_service_account_role_name = "yatai-image-builder-role"
   yatai_image_builder_service_account_name      = "yatai-image-builder-sa"
-  namespace_yatai                               = var.namespace
-  namespace_yatai_image_builder                 = "yatai-image-builder"
-  namespace_yatai_deployment                    = "yatai-deployment"
+  namespace_yatai                               = "${var.namespace}-system"
+  namespace_yatai_image_builder                 = "${var.namespace}-image-builder"
+  namespace_yatai_deployment                    = "${var.namespace}-deployment"
 }
 
 data "aws_caller_identity" "current" {}
 
+resource "kubernetes_namespace" "yatai" {
+  metadata {
+    name = "${var.namespace}"
+  }
+}
+
 resource "kubernetes_namespace" "yatai-system" {
   metadata {
-
     name = local.namespace_yatai
   }
 }
 
-resource "kubernetes_namespace" "yatai" {
+resource "kubernetes_namespace" "yatai-image-builder" {
   metadata {
 
-    name = "yatai"
+    name = local.namespace_yatai_image_builder
   }
 }
 
 resource "kubernetes_namespace" "yatai-deployment" {
   metadata {
-
     name = local.namespace_yatai_deployment
   }
 }
@@ -229,13 +233,6 @@ resource "helm_release" "metrics_server" {
 
 ######### YATAI IMAGE BUILDER #########
 
-resource "kubernetes_namespace" "yatai-image-builder" {
-  metadata {
-
-    name = local.namespace_yatai_image_builder
-  }
-}
-
 # Prepare Container Registry
 
 
@@ -435,7 +432,7 @@ resource "helm_release" "yatai-deployment" {
         # domainSuffix = "mlplatform.seblum.me"
       }
     }
-    bentoDeploymentNamespaces = ["yatai"]
+    bentoDeploymentNamespaces = ["${var.namespace}"]
   })]
   depends_on = [helm_release.metrics_server]
 }

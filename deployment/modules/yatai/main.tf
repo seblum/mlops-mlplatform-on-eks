@@ -36,9 +36,10 @@ resource "kubernetes_namespace" "yatai-deployment" {
   }
 }
 
+################################################################################
+#
 # S3
-
-# create s3 bucket for artifacts
+#
 resource "aws_s3_bucket" "yatai" {
   bucket = local.s3_bucket_name
   # tags          = var.tags
@@ -55,7 +56,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_state_encr
 }
 
 
-# Postgres
+################################################################################
+#
+# RDS
+#
 resource "random_password" "rds_password" {
   #count  = var.generate_db_password ? 1 : 0
   length  = 16
@@ -136,10 +140,10 @@ resource "aws_iam_policy" "yatai_iam_sa" {
 
 
 
-######### YATAI #########
-
-# Yatai Helm Chart
-
+################################################################################
+#
+# YATAI
+#
 resource "helm_release" "yatai" {
   name             = var.name
   namespace        = local.namespace_yatai
@@ -195,10 +199,12 @@ resource "helm_release" "yatai" {
 
 
 
-######### CERT MANAGER AND METRICS SERVER #########
+################################################################################
+#
+# CERT MANAGER AND METRICS SERVER
+#
 
 # needed for yatai-image-builder and yatai-deployment
-
 # TODO: install certifications manager
 # kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
 resource "helm_release" "certifications-manager" {
@@ -215,10 +221,9 @@ resource "helm_release" "certifications-manager" {
   })]
 }
 
-
 resource "helm_release" "metrics_server" {
   name = "metrics-server"
-  # namespace        = var.namespace
+  # namespace        = "metrics-server"
   create_namespace = true
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
@@ -230,13 +235,12 @@ resource "helm_release" "metrics_server" {
 
 
 
-
-######### YATAI IMAGE BUILDER #########
+################################################################################
+#
+# YATAI IMAGE BUILDER
+#
 
 # Prepare Container Registry
-
-
-
 module "ecr" {
   source = "terraform-aws-modules/ecr/aws"
 
@@ -394,8 +398,10 @@ resource "helm_release" "yatai-image-builder" {
 
 
 
-######### YATAI DEPLOYMENT #########
-
+################################################################################
+#
+# YATAI DEPLOYMENT 
+#
 resource "helm_release" "yatai-deployment-crds" {
   name      = "yatai-deployment-crds"
   namespace = local.namespace_yatai_deployment

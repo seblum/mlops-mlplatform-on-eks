@@ -28,7 +28,7 @@ resource "kubernetes_namespace" "yatai" {
 resource "kubernetes_namespace" "yatai-deployment" {
   metadata {
 
-    name = local.namespace_deployment
+    name = local.namespace_yatai_deployment
   }
 }
 

@@ -1,43 +1,53 @@
 variable "aws_region" {
-  type        = string
   description = "AWS region"
-}
-
-variable "cluster_name" {
   type        = string
-  description = "Name of the EKS Cluster"
-}
-
-variable "eks_cluster_version" {
-  type        = string
-  description = "Version number of the EKS Cluster"
-}
-
-variable "vpc_id" {
-  type        = string
-  description = "VPC of the EKS cluster"
-}
-
-variable "private_subnets" {
-  type        = list(string)
-  description = "List of private subnets"
-}
-
-variable "private_subnets_cidr_blocks" {
-  type        = list(string)
-  description = "List of private subnet cidr blocks"
-}
-
-variable "security_group_id_one" {
-  type        = list(string)
-  description = "ID of EKS worker security group one"
-}
-
-variable "security_group_id_two" {
-  type        = list(string)
-  description = "ID of EKS worker security group two"
+  default     = ""
 }
 
 variable "azs" {
+  description = "Availability zones"
+  type        = list(string)
+  default     = [""]
+}
 
+variable "cluster_name" {
+  description = "Name of the EKS Cluster"
+  type        = string
+  default     = ""
+}
+
+variable "eks_cluster_version" {
+  description = "Version number of the EKS Cluster"
+  type        = string
+  default     = ""
+}
+
+variable "vpc_id" {
+  description = "VPC of the EKS cluster"
+  type        = string
+  default     = ""
+}
+
+variable "private_subnets" {
+  description = "List of private subnets"
+  type        = list(string)
+  default     = [""]
+}
+
+variable "private_subnets_cidr_blocks" {
+  description = "List of private subnet CIDR blocks"
+  type        = list(string)
+  default     = [""]
+}
+
+variable "security_group_id_one" {
+  description = "ID of EKS worker security group one"
+  type        = list(string)
+  default     = [""]
+}
+
+variable "security_group_id_two" {
+  description = "ID of EKS worker security group two"
+  type        = list(string)
+  default     = [""]
 }

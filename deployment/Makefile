@@ -66,6 +66,9 @@ destroy-jupyterhub:
 destroy-monitoring:
 	terraform destroy -target="module.monitoring" -var-file=$(VARS_FILE) -auto-approve
 
+destroy-yatai:
+	terraform destroy -target="module.yatai" -var-file=$(VARS_FILE) -auto-approve
+
 destroy-user-profiles:
 	terraform destroy -target="module.user-profiles" -var-file=$(VARS_FILE) -auto-approve
 
@@ -79,9 +82,7 @@ destroy-modules:
 
 destroy-test:
 	terraform destroy \
-					-target="module.mlflow" \
-					-target="module.airflow" \
-					-target="module.seldon-core" \
+					-target="module.yatai" \
 					-target="module.user-profiles" \
 					-target="module.eks" \
 					-var-file=$(VARS_FILE) -auto-approve

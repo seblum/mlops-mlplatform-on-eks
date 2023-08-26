@@ -1,4 +1,5 @@
 output "machine_user_profile" {
+  description = "Machine user profile information"
   value = {
     profile_name  = var.profile.name
     user_name     = aws_iam_user.this.name

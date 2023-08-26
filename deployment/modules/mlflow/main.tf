@@ -117,8 +117,8 @@ module "rds-mlflow" {
   rds_engine                  = var.rds_engine
   rds_engine_version          = var.rds_engine_version
   rds_instance_class          = var.rds_instance_class
-  storage_type                = var.storage_type
-  max_allocated_storage       = var.max_allocated_storage
+  storage_type                = var.rds_storage_type
+  max_allocated_storage       = var.rds_max_allocated_storage
 }
 
 

@@ -104,12 +104,12 @@ variable "rds_instance_class" {
   description = "Database instance type"
 }
 
-variable "storage_type" {
+variable "rds_storage_type" {
   type        = string
   description = "Instance storage type: standard, gp2, gp3, or io1"
 }
 
-variable "max_allocated_storage" {
+variable "rds_max_allocated_storage" {
   type        = number
   description = "The upper limit of scalable storage (Gb)"
   default     = 500

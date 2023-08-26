@@ -1,108 +1,143 @@
 variable "AWS_ACCESS_KEY" {
-  default     = ""
   description = "AWS access key id"
+  type        = string
+  default     = ""
 }
 
 variable "AWS_SECRET_KEY" {
-  default     = ""
   description = "AWS secret access key"
+  type        = string
+  default     = ""
 }
 
-variable "aws_region" {
-  default     = "eu-central-1"
+variable "AWS_REGION" {
   description = "AWS region"
   type        = string
+  default     = "eu-central-1"
+}
+
+variable "airflow_fernet_key" {
+  description = "Fernet key for Airflow encryption"
+  type        = string
+  default     = ""
 }
 
 variable "airflow_github_ssh" {
-  default = ""
+  description = "SSH key for Airflow GitHub repository"
+  type        = string
+  default     = ""
 }
 
-variable "max_allocated_storage" {
-  type        = number
-  description = "The upper limit of scalable storage (Gb)"
-  default     = 500
+variable "airflow_git_client_id" {
+  description = "Client ID for Airflow Git integration"
+  type        = string
+  default     = ""
 }
 
-variable "git_username" {
-  type = string
+variable "airflow_git_client_secret" {
+  description = "Client secret for Airflow Git integration"
+  type        = string
+  default     = ""
 }
 
-variable "git_token" {
-  type = string
-}
-
-
-# AIRFLOW
 variable "deploy_airflow" {
-  type        = bool
   description = "Should Airflow be deployed?"
-  default     = true
-}
-
-variable "git_repository_url" {
-  type        = string
-  description = "Https git url to the Airflow DAG repository"
-}
-
-variable "git_branch" {
-  type        = string
-  description = "Name of the git branch of the Airflow DAG repository"
-}
-
-
-variable "airflow_git_client_id" {}
-variable "airflow_git_client_secret" {}
-variable "airflow_fernet_key" {}
-
-variable "jupyterhub_git_client_id" {}
-variable "jupyterhub_git_client_secret" {}
-variable "jupyterhub_proxy_secret_token" {}
-
-
-# MLFLOW
-variable "deploy_mlflow" {
   type        = bool
-  description = "Should MLflow be deployed?"
-  default     = true
+  default     = false
 }
-# JUPYTERHUB
-variable "deploy_jupyterhub" {
-  type        = bool
-  description = "Should Jupyterhub be deployed?"
-  default     = true
-}
-
-
-# MONITORING
-
-variable "deploy_monitoring" {
-  type        = bool
-  description = "Should Monitoring be deployed?"
-  default     = true
-}
-
-variable "domain_name" {}
-
-variable "deploy_seldon_core" {
-  type        = bool
-  description = "Should Seldon Core be deployed?"
-  default     = true
-}
-
-variable "grafana_git_client_id" {
-
-}
-
-variable "grafana_git_client_secret" {
-
-}
-
 
 variable "deploy_dashboard" {
-  default = false
+  description = "Should the dashboard be deployed?"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_jupyterhub" {
+  description = "Should JupyterHub be deployed?"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_mlflow" {
+  description = "Should MLflow be deployed?"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_monitoring" {
+  description = "Should monitoring be deployed?"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_seldon_core" {
+  description = "Should Seldon Core be deployed?"
+  type        = bool
+  default     = false
 }
 
 variable "deploy_yatai" {
-  default = false
+  description = "Should Yatai be deployed?"
+  type        = bool
+  default     = false
+}
+
+variable "domain_name" {
+  description = "Domain name for deployment"
+  type        = string
+  default     = ""
+}
+
+variable "git_sync_branch" {
+  description = "Name of the git branch of the Airflow DAG repository"
+  type        = string
+  default     = ""
+}
+
+variable "git_sync_repository_url" {
+  description = "Https git url to the Airflow DAG repository"
+  type        = string
+  default     = ""
+}
+
+variable "git_token" {
+  description = "Token for Git authentication"
+  type        = string
+  default     = ""
+}
+
+variable "git_username" {
+  description = "Username for Git authentication"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_git_client_id" {
+  description = "Client ID for Grafana Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_git_client_secret" {
+  description = "Client secret for Grafana Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "jupyterhub_git_client_id" {
+  description = "Client ID for JupyterHub Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "jupyterhub_git_client_secret" {
+  description = "Client secret for JupyterHub Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "jupyterhub_proxy_secret_token" {
+  description = "Secret token for JupyterHub proxy"
+  type        = string
+  default     = ""
 }

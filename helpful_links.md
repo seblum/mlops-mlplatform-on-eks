@@ -29,5 +29,9 @@ kubectl get namespace airflow -o json > admins.json
 kubectl replace --raw "/api/v1/namespaces/airflow/finalize" -f ./admins.json
 
 
+kubectl get namespace yatai-system -o json > admins.json
+kubectl replace --raw "/api/v1/namespaces/yatai-system/finalize" -f ./admins.json
+
+
 delete loadbalancer
 delete nat-gateaway

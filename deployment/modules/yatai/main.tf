@@ -13,7 +13,7 @@ data "aws_caller_identity" "current" {}
 
 resource "kubernetes_namespace" "yatai" {
   metadata {
-    name = "${var.namespace}"
+    name = var.namespace
   }
 }
 
@@ -36,6 +36,33 @@ resource "kubernetes_namespace" "yatai-deployment" {
   }
 }
 
+
+################################################################################
+#
+# RDS
+#
+resource "random_password" "rds_password" {
+  #count  = var.generate_db_password ? 1 : 0
+  length  = 16
+  special = false
+}
+
+module "rds-yatai" {
+  source                      = "../../infrastructure/rds"
+  vpc_id                      = var.vpc_id
+  private_subnets             = var.private_subnets
+  private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
+  rds_port                    = var.rds_port
+  rds_name                    = var.rds_name
+  rds_password                = coalesce(var.rds_password, random_password.rds_password.result)
+  rds_engine                  = var.rds_engine
+  rds_engine_version          = var.rds_engine_version
+  rds_instance_class          = var.rds_instance_class
+  storage_type                = var.rds_storage_type
+  max_allocated_storage       = var.rds_max_allocated_storage
+}
+
+
 ################################################################################
 #
 # S3
@@ -55,33 +82,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_state_encr
   }
 }
 
-
-################################################################################
-#
-# RDS
-#
-resource "random_password" "rds_password" {
-  #count  = var.generate_db_password ? 1 : 0
-  length  = 16
-  special = false
-}
-
-# create rds for s3
-module "rds-yatai" {
-  source                      = "../../infrastructure/rds"
-  vpc_id                      = var.vpc_id
-  private_subnets             = var.private_subnets
-  private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
-  rds_port                    = var.rds_port
-  rds_name                    = var.rds_name
-  rds_password                = coalesce(var.rds_password, random_password.rds_password.result)
-  rds_engine                  = var.rds_engine
-  rds_engine_version          = var.rds_engine_version
-  rds_instance_class          = var.rds_instance_class
-  storage_type                = var.rds_storage_type
-  max_allocated_storage       = var.rds_max_allocated_storage
-}
-
 # resource "kubernetes_secret" "yatai_s3_secret" {
 #   metadata {
 #     name      = "yatai_s3_secret"
@@ -93,18 +93,17 @@ module "rds-yatai" {
 #   }
 # }
 
+# module "yatai_role" {
+#   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+#   version                       = "5.11.1"
+#   create_role                   = true
+#   role_name                     = local.yatai_service_account_role_name
+#   provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")
+#   role_policy_arns              = [aws_iam_policy.yatai_iam_sa.arn]
+#   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.namespace_yatai}:${local.yatai_service_account_name}"]
+# }
 
-module "yatai_role" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "5.11.1"
-  create_role                   = true
-  role_name                     = local.yatai_service_account_role_name
-  provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = [aws_iam_policy.yatai_iam_sa.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.namespace_yatai}:${local.yatai_service_account_name}"]
-}
-
-resource "aws_iam_policy" "yatai_iam_sa" {
+resource "aws_iam_policy" "yatai_data_bucket_policy" {
   name        = local.yatai_service_account_name
   description = "Yatai policy for accessing S3"
 
@@ -138,6 +137,49 @@ resource "aws_iam_policy" "yatai_iam_sa" {
 }
 
 
+resource "aws_iam_role" "yatai_data_bucket_role" {
+  name                 = "${var.namespace}-data-bucket-role"
+  max_session_duration = 28800
+
+  assume_role_policy = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.yatai_data_bucket_user.name}"
+            },
+            "Action": "sts:AssumeRole"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "s3.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+  }
+  EOF
+  # tags = {
+  #   tag-key = "tag-value"
+  # }
+}
+
+resource "aws_iam_user" "yatai_data_bucket_user" {
+  name = "yatai-data-bucket-user"
+  path = "/"
+}
+
+resource "aws_iam_access_key" "yatai_data_bucket_credentials" {
+  user = aws_iam_user.yatai_data_bucket_user.name
+}
+
+resource "aws_iam_role_policy_attachment" "yatai_data_bucket_role_policy" {
+  role       = aws_iam_role.yatai_data_bucket_role.name
+  policy_arn = aws_iam_policy.yatai_data_bucket_policy.arn
+}
 
 
 ################################################################################
@@ -165,13 +207,15 @@ resource "helm_release" "yatai" {
       endpoint   = aws_s3_bucket.yatai.bucket_domain_name
       region     = aws_s3_bucket.yatai.region
       bucketName = aws_s3_bucket.yatai.bucket
+      accessKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.id}"
+      secretKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.secret}"
     },
     serviceAccount = {
       create = true,
-      name   = "yatai-sa"
-      annotations = {
-        "eks.amazonaws.com/role-arn" = "${module.yatai_role.iam_role_arn}"
-      }
+      name   = "yatai"
+      # annotations = {
+      #   "eks.amazonaws.com/role-arn" = "${module.yatai_role.iam_role_arn}"
+      # }
     },
     ingress = {
       # className = "alb"
@@ -349,7 +393,7 @@ resource "aws_iam_policy" "yatai_image_builder_iam_sa" {
 resource "kubernetes_service_account" "this" {
   metadata {
     name      = "yatai-image-builder-pod"
-    namespace = local.namespace_yatai_image_builder
+    namespace = local.namespace_yatai
     labels    = { "yatai.ai/yatai-image-builder-pod" = true }
     annotations = {
       "eks.amazonaws.com/role-arn" = "ROLE_ARN"
@@ -390,7 +434,18 @@ resource "helm_release" "yatai-image-builder" {
       password            = "",
       secure              = true,
       bentoRepositoryName = "yatai-bentos"
-    }
+      useAWSECRWithIAMRole = true
+      awsECRRegion = "eu-central-1"
+    },
+    # yataiSystem = {
+    #   namespace = "yatai-system"
+    #   serviceAccountName = "yatai"
+    # },
+    # yatai = {
+    #   endpoint = "http://yatai.yatai-system.svc.cluster.local"
+    #   apiToken = "apfgfrfWZ8EpvmyR"
+    #   clusterName = "default"
+    # }
   })]
   depends_on = [helm_release.metrics_server]
 }
@@ -427,15 +482,16 @@ resource "helm_release" "yatai-deployment" {
     layers = {
       network = {
         ingressClass = "alb",
-        # ingressAnnotations = {
-        #   "external-dns.alpha.kubernetes.io/hostname" = "mlplatform.seblum.me"
-        #   "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-        #   "alb.ingress.kubernetes.io/target-type"     = "ip"
-        #   #"kubernetes.io/ingress.class"               = "alb"
-        #   "alb.ingress.kubernetes.io/group.name"      = "mlplatform"
-        # },
-        # ingressPath = "/serve"
-        # domainSuffix = "mlplatform.seblum.me"
+        ingressAnnotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = "mlplatform.seblum.me"
+          "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
+          "alb.ingress.kubernetes.io/target-type"     = "ip"
+          #"kubernetes.io/ingress.class"               = "alb"
+          "alb.ingress.kubernetes.io/group.name"      = "mlplatform"
+        },
+        # ingressPath = "/serve",
+        ingressPathType = "Prefix",
+        domainSuffix = "mlplatform.seblum.me"
       }
     }
     bentoDeploymentNamespaces = ["${var.namespace}"]

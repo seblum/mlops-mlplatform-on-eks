@@ -77,14 +77,14 @@ module "mlflow" {
 }
 
 module "airflow" {
-  count                      = var.deploy_airflow ? 1 : 0
-  source                     = "./modules/airflow"
-  name                       = "airflow"
-  namespace                  = "airflow"
-  name_prefix                = local.name_prefix
-  cluster_name               = local.cluster_name
-  cluster_endpoint           = module.eks.cluster_endpoint
-  oidc_provider_arn          = module.eks.oidc_provider_arn
+  count             = var.deploy_airflow ? 1 : 0
+  source            = "./modules/airflow"
+  name              = "airflow"
+  namespace         = "airflow"
+  name_prefix       = local.name_prefix
+  cluster_name      = local.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  oidc_provider_arn = module.eks.oidc_provider_arn
   # user_profiles              = local.airflow_profiles
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket

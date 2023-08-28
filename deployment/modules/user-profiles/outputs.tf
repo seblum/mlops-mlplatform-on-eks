@@ -1,5 +1,4 @@
-
 output "user_profile" {
-  value = local.machine_user_profiles
+  description = "User profiles for the machine"
+  value       = local.machine_user_profiles
 }
-

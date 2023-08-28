@@ -1,13 +1,17 @@
-
-
-variable "name" {}
-
-variable "namespace" {}
-
-
-variable "create_namespace" {
-  type        = bool
-  description = "Should the namespace be created, if it does not exists?"
-  default     = true
+variable "name" {
+  description = "Name"
+  type        = string
+  default     = ""
 }
 
+variable "namespace" {
+  description = "Namespace"
+  type        = string
+  default     = ""
+}
+
+variable "create_namespace" {
+  description = "Should the namespace be created if it does not exist?"
+  type        = bool
+  default     = true
+}

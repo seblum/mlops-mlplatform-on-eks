@@ -1,5 +1,5 @@
 provider "aws" {
-  region     = var.aws_region
+  region     = local.aws_region
   access_key = var.AWS_ACCESS_KEY
   secret_key = var.AWS_SECRET_KEY
 
@@ -32,7 +32,19 @@ provider "helm" {
 }
 
 
+terraform {
+  # required_version = ">= 1.0.0"
 
+  backend "s3" {
+    bucket = "mlplatform-terraform-state"
+    # rename in next run
+    key    = "terraform.tfstate"
+    region = "eu-central-1"
+    #dynamodb_table = "aws-locks"
+    encrypt = true
+  }
+
+}
 # terraform {
 #   required_providers {
 #     aws = {

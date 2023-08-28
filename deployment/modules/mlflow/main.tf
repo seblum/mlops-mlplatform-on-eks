@@ -1,5 +1,5 @@
 locals {
-  mlflow_s3_bucket_name = "${var.name_prefix}-${var.namespace}-${var.mlflow_s3_bucket_name}"
+  s3_bucket_name = "${var.name_prefix}-${var.namespace}-${var.s3_bucket_name}"
 }
 
 data "aws_caller_identity" "current" {}
@@ -7,7 +7,7 @@ data "aws_caller_identity" "current" {}
 
 # create s3 bucket for artifacts
 resource "aws_s3_bucket" "mlflow" {
-  bucket = local.mlflow_s3_bucket_name
+  bucket = local.s3_bucket_name
   # tags          = var.tags
   force_destroy = var.s3_force_destroy
 }
@@ -61,8 +61,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:*"
         ],
         "Resource" : [
-          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.s3_bucket_name}/*",
+          "arn:aws:s3:::${local.s3_bucket_name}"
         ]
       },
       {
@@ -72,8 +72,8 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
           "s3:ListBucketVersions"
         ],
         "Resource" : [
-          "arn:aws:s3:::${local.mlflow_s3_bucket_name}/*",
-          "arn:aws:s3:::${local.mlflow_s3_bucket_name}"
+          "arn:aws:s3:::${local.s3_bucket_name}/*",
+          "arn:aws:s3:::${local.s3_bucket_name}"
         ],
         "Condition" : {
           "StringLike" : {
@@ -117,8 +117,8 @@ module "rds-mlflow" {
   rds_engine                  = var.rds_engine
   rds_engine_version          = var.rds_engine_version
   rds_instance_class          = var.rds_instance_class
-  storage_type                = var.storage_type
-  max_allocated_storage       = var.max_allocated_storage
+  storage_type                = var.rds_storage_type
+  max_allocated_storage       = var.rds_max_allocated_storage
 }
 
 
@@ -150,7 +150,7 @@ resource "helm_release" "mlflow" {
   }
   set {
     name  = "artifacts.S3_BUCKET"
-    value = local.mlflow_s3_bucket_name
+    value = local.s3_bucket_name
   }
   set {
     name  = "artifacts.S3_KEY_PREFIX"

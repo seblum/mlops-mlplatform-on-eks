@@ -1,5 +1,19 @@
-variable "name" {
-  type = string
+variable "create_namespace" {
+  type        = bool
+  description = "Should the namespace be created if it does not exist?"
+  default     = true
+}
+
+variable "git_client_id" {
+  description = "Client ID for Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "git_client_secret" {
+  description = "Client secret for Git integration"
+  type        = string
+  default     = ""
 }
 
 # variable "helm_chart_repository" {
@@ -17,26 +31,14 @@ variable "name" {
 #   description = "Version of the helm chart"
 # }
 
-
-
-
+variable "name" {
+  description = "Name"
+  type        = string
+  default     = ""
+}
 
 variable "namespace" {
-  type        = string
   description = "Namespace to launch Prometheus & Grafana"
+  type        = string
   default     = "monitoring"
-}
-
-variable "create_namespace" {
-  type        = bool
-  description = "Should the namespace be created, if it does not exists?"
-  default     = true
-}
-
-variable "git_client_id" {
-
-}
-
-variable "git_client_secret" {
-
 }

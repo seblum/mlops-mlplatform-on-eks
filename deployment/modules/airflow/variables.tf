@@ -31,22 +31,22 @@ variable "oidc_provider_arn" {
   description = "arn of the OIDC provider"
 }
 
-variable "user_profiles" {
-  type        = list(any)
-  description = "list of user profiles"
-  default = [
-    {
-      "username" = "user"
-      "password" = "user123"
-      "role" = [
-        "User",
-        "Viewer"
-      ]
-      "email"     = "user@example.com"
-      "firstName" = "user"
-      "lastName"  = "user"
-  }]
-}
+# variable "user_profiles" {
+#   type        = list(any)
+#   description = "list of user profiles"
+#   default = [
+#     {
+#       "username" = "user"
+#       "password" = "user123"
+#       "role" = [
+#         "User",
+#         "Viewer"
+#       ]
+#       "email"     = "user@example.com"
+#       "firstName" = "user"
+#       "lastName"  = "user"
+#   }]
+# }
 
 variable "s3_data_bucket_secret_name" {
 
@@ -104,12 +104,12 @@ variable "rds_instance_class" {
   description = "Database instance type"
 }
 
-variable "storage_type" {
+variable "rds_storage_type" {
   type        = string
   description = "Instance storage type: standard, gp2, gp3, or io1"
 }
 
-variable "max_allocated_storage" {
+variable "rds_max_allocated_storage" {
   type        = number
   description = "The upper limit of scalable storage (Gb)"
   default     = 500

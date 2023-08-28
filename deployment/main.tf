@@ -1,12 +1,4 @@
-
 data "aws_caller_identity" "current" {}
-
-resource "random_string" "random_prefix" {
-  length  = 12
-  upper   = false
-  special = false
-}
-
 
 # INFRASTRUCTURE
 module "vpc" {
@@ -21,7 +13,7 @@ module "eks" {
   cluster_name                = local.cluster_name
   eks_cluster_version         = "1.24"
   vpc_id                      = module.vpc.vpc_id
-  aws_region                  = var.aws_region
+  aws_region                  = local.aws_region
   private_subnets             = module.vpc.private_subnets
   azs                         = module.vpc.azs
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
@@ -56,25 +48,25 @@ module "user-profiles" {
 # CUSTOM TOOLS
 
 module "mlflow" {
-  count                 = var.deploy_mlflow ? 1 : 0
-  source                = "./modules/mlflow"
-  name                  = "mlflow"
-  namespace             = "mlflow"
-  mlflow_s3_bucket_name = local.mlflow_s3_bucket_name
-  s3_force_destroy      = local.force_destroy_s3_bucket
-  oidc_provider_arn     = module.eks.oidc_provider_arn
-  name_prefix           = local.name_prefix
+  count             = var.deploy_mlflow ? 1 : 0
+  source            = "./modules/mlflow"
+  name              = "mlflow"
+  namespace         = "mlflow"
+  s3_bucket_name    = local.mlflow_s3_bucket_name
+  s3_force_destroy  = local.force_destroy_s3_bucket
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  name_prefix       = local.name_prefix
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_mlflow
+  rds_port                    = 5432
   rds_name                    = "mlflow"
   rds_engine                  = "mysql"
   rds_engine_version          = "8.0.33"
   rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
+  rds_storage_type            = local.rds_storage_type
+  rds_max_allocated_storage   = local.rds_max_allocated_storage
 
   # TODO: add data access common rule
   s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
@@ -85,15 +77,15 @@ module "mlflow" {
 }
 
 module "airflow" {
-  count                      = var.deploy_airflow ? 1 : 0
-  source                     = "./modules/airflow"
-  name                       = "airflow"
-  namespace                  = "airflow"
-  name_prefix                = local.name_prefix
-  cluster_name               = local.cluster_name
-  cluster_endpoint           = module.eks.cluster_endpoint
-  oidc_provider_arn          = module.eks.oidc_provider_arn
-  user_profiles              = local.airflow_profiles
+  count             = var.deploy_airflow ? 1 : 0
+  source            = "./modules/airflow"
+  name              = "airflow"
+  namespace         = "airflow"
+  name_prefix       = local.name_prefix
+  cluster_name      = local.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  # user_profiles              = local.airflow_profiles
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket
   domain_name                = var.domain_name
@@ -103,13 +95,13 @@ module "airflow" {
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = local.port_airflow
+  rds_port                    = 5000
   rds_name                    = "airflow"
   rds_engine                  = "postgres"
   rds_engine_version          = "13.11" # end of support may 2024
   rds_instance_class          = "db.t3.micro"
-  storage_type                = local.storage_type
-  max_allocated_storage       = local.max_allocated_storage
+  rds_storage_type            = local.rds_storage_type
+  rds_max_allocated_storage   = local.rds_max_allocated_storage
   # periodic updates
   # log airflow to s3
 
@@ -121,8 +113,8 @@ module "airflow" {
   helm_chart_version    = "8.7.1"
   git_username          = local.git_username
   git_token             = local.git_token
-  git_repository_url    = local.git_repository_url
-  git_branch            = local.git_branch
+  git_repository_url    = local.git_sync_repository_url
+  git_branch            = local.git_sync_branch
   mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
 
 
@@ -130,8 +122,7 @@ module "airflow" {
   git_client_secret = var.airflow_git_client_secret
 
   depends_on = [
-    module.eks,
-    module.user-profiles
+    module.eks
   ]
 }
 
@@ -144,10 +135,10 @@ module "jupyterhub" {
   domain_name      = var.domain_name
   domain_suffix    = "jupyterhub"
 
-  admin_user_list   = local.jupyterhub_admin_user_list
-  allowed_user_list = local.jupyterhub_allowed_user_list
+  # admin_user_list   = local.jupyterhub_admin_user_list
+  # allowed_user_list = local.jupyterhub_allowed_user_list
 
-  git_repository_url = local.git_repository_url
+  git_repository_url = local.git_sync_repository_url
 
   git_client_id      = var.jupyterhub_git_client_id
   git_client_secret  = var.jupyterhub_git_client_secret
@@ -160,8 +151,7 @@ module "jupyterhub" {
   mlflow_tracking_uri   = "test" #var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : ""
 
   depends_on = [
-    module.eks,
-    module.user-profiles
+    module.eks
   ]
 }
 
@@ -175,20 +165,11 @@ module "monitoring" {
 }
 
 
-module "seldon-core" {
-  count            = var.deploy_seldon_core ? 1 : 0
-  source           = "./modules/seldon-core"
-  name             = "seldon-core"
-  cluster_name     = local.cluster_name
-  cluster_endpoint = module.eks.cluster_endpoint
-  domain_name      = var.domain_name
-  domain_suffix    = "seldon"
-  namespace        = "seldon-system"
 
-  # HELM
-  helm_chart_repository = "https://storage.googleapis.com/seldon-charts"
-  helm_chart_name       = "seldon-core-operator"
-  helm_chart_version    = "1.16.0"
+module "sagemaker" {
+  count        = var.deploy_sagemaker ? 1 : 0
+
+  source             = "./modules/sagemaker"
 
   depends_on = [
     module.eks
@@ -196,12 +177,9 @@ module "seldon-core" {
 }
 
 
-
-
-
 module "dashboard" {
-  count  = var.deploy_dashboard ? 1 : 0
-  source = "./modules/dashboard"
-  name   = "dashboard"
+  count     = var.deploy_dashboard ? 1 : 0
+  source    = "./modules/dashboard"
+  name      = "dashboard"
   namespace = "dashboard"
 }

@@ -1,9 +1,11 @@
 variable "cluster_name" {
-  type        = string
   description = "Name of the EKS Cluster"
+  type        = string
+  default     = ""
 }
 
 variable "vpc_name" {
-  type        = string
   description = "Name of the VPC"
+  type        = string
+  default     = ""
 }

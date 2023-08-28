@@ -55,6 +55,13 @@ module "eks" {
   cluster_endpoint_public_access  = true
   manage_aws_auth_configmap       = true
 
+  aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/Jonas_gerth"
+      username = "Jonas_gerth"
+      groups   = ["system:masters"]
+    }
+  ]
   # aws_auth_users            = local.cluster_users # add users in later step
 
   cluster_addons = {

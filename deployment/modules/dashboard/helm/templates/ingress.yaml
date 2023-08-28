@@ -4,27 +4,27 @@ metadata:
   name: dashboard-ingress
   namespace: dashboard
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: mlplatform.seblum.me
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.host }}
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/group.name: mlplatform
 spec:
   rules:
-    - host: mlplatform.seblum.me
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
-          - path: /main
+          - path: {{ .Values.ingress.path }}
             pathType: Prefix
             backend:
               service:
                 name: dashboard-service
                 port:
                   number: 80
-    - host: www.mlplatform.seblum.me
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
-          - path: /main
+          - path: {{ .Values.ingress.path }}
             pathType: Prefix
             backend:
               service:

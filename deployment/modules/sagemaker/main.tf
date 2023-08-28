@@ -1,5 +1,5 @@
 locals {
-  
+
 }
 # Prepare Container Registry
 module "ecr" {

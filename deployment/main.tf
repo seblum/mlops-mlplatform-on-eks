@@ -167,9 +167,9 @@ module "monitoring" {
 
 
 module "sagemaker" {
-  count        = var.deploy_sagemaker ? 1 : 0
+  count = var.deploy_sagemaker ? 1 : 0
 
-  source             = "./modules/sagemaker"
+  source = "./modules/sagemaker"
 
   depends_on = [
     module.eks

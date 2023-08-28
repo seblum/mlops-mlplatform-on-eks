@@ -8,6 +8,19 @@ resource "helm_release" "dashboard" {
   values = [
     "${file("${path.module}/helm/values.yaml")}"
   ]
+  set {
+    name  = "deployment.image"
+    value = "seblum/vuejs-ml-dashboard:latest"
+  }
+  set {
+    name  = "ingress.host"
+    value = "mlplatform.seblum.me"
+  }
+  set {
+    name  = "ingress.path"
+    value = "/main"
+  }
+
 }
 
 

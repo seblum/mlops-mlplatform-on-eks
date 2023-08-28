@@ -41,6 +41,9 @@ deploy-mlflow:
 deploy-jupyterhub:
 	terraform apply -target="module.jupyterhub" -var-file=$(VARS_FILE) -auto-approve
 
+deploy-yatai:
+	terraform apply -target="module.yatai" -var-file=$(VARS_FILE) -auto-approve
+
 apply-all:
 	terraform apply -var-file=$(VARS_FILE) -auto-approve
 

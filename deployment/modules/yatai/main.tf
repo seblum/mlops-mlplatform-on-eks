@@ -93,15 +93,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_state_encr
 #   }
 # }
 
-# module "yatai_role" {
-#   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-#   version                       = "5.11.1"
-#   create_role                   = true
-#   role_name                     = local.yatai_service_account_role_name
-#   provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")
-#   role_policy_arns              = [aws_iam_policy.yatai_iam_sa.arn]
-#   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.namespace_yatai}:${local.yatai_service_account_name}"]
-# }
+module "yatai_role" {
+  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version                       = "5.11.1"
+  create_role                   = true
+  role_name                     = local.yatai_service_account_role_name
+  provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")
+  role_policy_arns              = [aws_iam_policy.yatai_data_bucket_policy.arn]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.namespace_yatai}:${local.yatai_service_account_name}"]
+}
 
 resource "aws_iam_policy" "yatai_data_bucket_policy" {
   name        = local.yatai_service_account_name
@@ -112,60 +112,59 @@ resource "aws_iam_policy" "yatai_data_bucket_policy" {
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Action" : [
-          "s3:*Object",
-          "s3:GetObjectVersion",
-          "s3:*"
-        ],
-        "Resource" : [
-          "arn:aws:s3:::${local.s3_bucket_name}/*",
-          "arn:aws:s3:::${local.s3_bucket_name}"
-        ]
+        "Action" : "s3:ListAllMyBuckets",
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : ["s3:ListBucket", "s3:GetBucketLocation"],
+        "Resource" : "arn:aws:s3:::${local.s3_bucket_name}"
       },
       {
         "Effect" : "Allow",
         "Action" : [
-          "s3:ListBucket",
-          "s3:ListBucketVersions"
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:DeleteObject"
         ],
-        "Resource" : [
-          "arn:aws:s3:::${local.s3_bucket_name}/*",
-          "arn:aws:s3:::${local.s3_bucket_name}"
-        ],
+        "Resource" : "arn:aws:s3:::${local.s3_bucket_name}/*"
       }
-  ] })
-}
-
-
-resource "aws_iam_role" "yatai_data_bucket_role" {
-  name                 = "${var.namespace}-data-bucket-role"
-  max_session_duration = 28800
-
-  assume_role_policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-              "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.yatai_data_bucket_user.name}"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": "s3.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
     ]
-  }
-  EOF
-  # tags = {
-  #   tag-key = "tag-value"
-  # }
+  })
 }
+
+
+# resource "aws_iam_role" "yatai_data_bucket_role" {
+#   name                 = "${var.namespace}-data-bucket-role"
+#   max_session_duration = 28800
+
+#   assume_role_policy = <<EOF
+#   {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Principal": {
+#               "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.yatai_data_bucket_user.name}"
+#             },
+#             "Action": "sts:AssumeRole"
+#         },
+#         {
+#             "Effect": "Allow",
+#             "Principal": {
+#               "Service": "s3.amazonaws.com"
+#             },
+#             "Action": "sts:AssumeRole"
+#         }
+#     ]
+#   }
+#   EOF
+#   # tags = {
+#   #   tag-key = "tag-value"
+#   # }
+# }
 
 resource "aws_iam_user" "yatai_data_bucket_user" {
   name = "yatai-data-bucket-user"
@@ -176,10 +175,10 @@ resource "aws_iam_access_key" "yatai_data_bucket_credentials" {
   user = aws_iam_user.yatai_data_bucket_user.name
 }
 
-resource "aws_iam_role_policy_attachment" "yatai_data_bucket_role_policy" {
-  role       = aws_iam_role.yatai_data_bucket_role.name
-  policy_arn = aws_iam_policy.yatai_data_bucket_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "yatai_data_bucket_role_policy" {
+#   role       = aws_iam_role.yatai_data_bucket_role.name
+#   policy_arn = aws_iam_policy.yatai_data_bucket_policy.arn
+# }
 
 
 ################################################################################
@@ -204,18 +203,18 @@ resource "helm_release" "yatai" {
       password = module.rds-yatai.rds_password
     },
     s3 = {
-      endpoint   = aws_s3_bucket.yatai.bucket_domain_name
+      endpoint   = "s3.amazonaws.com"
       region     = aws_s3_bucket.yatai.region
       bucketName = aws_s3_bucket.yatai.bucket
-      accessKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.id}"
-      secretKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.secret}"
+      # accessKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.id}"
+      # secretKey  = "${aws_iam_access_key.yatai_data_bucket_credentials.secret}"
     },
     serviceAccount = {
       create = true,
       name   = "yatai"
-      # annotations = {
-      #   "eks.amazonaws.com/role-arn" = "${module.yatai_role.iam_role_arn}"
-      # }
+      annotations = {
+        "eks.amazonaws.com/role-arn" = "${module.yatai_role.iam_role_arn}"
+      }
     },
     ingress = {
       # className = "alb"
@@ -223,11 +222,11 @@ resource "helm_release" "yatai" {
       hosts = [
         {
           host  = "mlplatform.seblum.me"
-          paths = ["/bentoml", "/yatai"]
+          # paths = ["/bentoml", "/yatai"]
         },
         {
           host  = "www.mlplatform.seblum.me"
-          paths = ["/bentoml", "/yatai"]
+          # paths = ["/bentoml", "/yatai"]
         }
       ],
       annotations = {
@@ -430,12 +429,12 @@ resource "helm_release" "yatai-image-builder" {
     dockerRegistry = {
       server = module.ecr.repository_url
       # inClusterServer     = "",
-      username            = "",
-      password            = "",
-      secure              = true,
-      bentoRepositoryName = "yatai-bentos"
+      username             = "",
+      password             = "",
+      secure               = true,
+      bentoRepositoryName  = "yatai-bentos"
       useAWSECRWithIAMRole = true
-      awsECRRegion = "eu-central-1"
+      awsECRRegion         = "eu-central-1"
     },
     # yataiSystem = {
     #   namespace = "yatai-system"
@@ -482,16 +481,16 @@ resource "helm_release" "yatai-deployment" {
     layers = {
       network = {
         ingressClass = "alb",
-        ingressAnnotations = {
-          "external-dns.alpha.kubernetes.io/hostname" = "mlplatform.seblum.me"
-          "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-          "alb.ingress.kubernetes.io/target-type"     = "ip"
-          #"kubernetes.io/ingress.class"               = "alb"
-          "alb.ingress.kubernetes.io/group.name"      = "mlplatform"
-        },
-        # ingressPath = "/serve",
-        ingressPathType = "Prefix",
-        domainSuffix = "mlplatform.seblum.me"
+        # ingressAnnotations = {
+        #   "external-dns.alpha.kubernetes.io/hostname" = "mlplatform.seblum.me"
+        #   "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
+        #   "alb.ingress.kubernetes.io/target-type"     = "ip"
+        #   #"kubernetes.io/ingress.class"               = "alb"
+        #   "alb.ingress.kubernetes.io/group.name"      = "mlplatform"
+        # },
+        # # ingressPath = "/serve",
+        # ingressPathType = "Prefix",
+        # domainSuffix = "mlplatform.seblum.me"
       }
     }
     bentoDeploymentNamespaces = ["${var.namespace}"]

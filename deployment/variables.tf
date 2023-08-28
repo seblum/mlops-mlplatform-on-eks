@@ -70,14 +70,8 @@ variable "deploy_monitoring" {
   default     = false
 }
 
-variable "deploy_seldon_core" {
+variable "deploy_sagemaker" {
   description = "Should Seldon Core be deployed?"
-  type        = bool
-  default     = false
-}
-
-variable "deploy_yatai" {
-  description = "Should Yatai be deployed?"
   type        = bool
   default     = false
 }

@@ -165,61 +165,16 @@ module "monitoring" {
 }
 
 
-module "seldon-core" {
-  count            = var.deploy_seldon_core ? 1 : 0
-  source           = "./modules/seldon-core"
-  name             = "seldon-core"
-  cluster_name     = local.cluster_name
-  cluster_endpoint = module.eks.cluster_endpoint
-  domain_name      = var.domain_name
-  domain_suffix    = "seldon"
-  namespace        = "seldon-system"
 
-  # HELM
-  helm_chart_repository = "https://storage.googleapis.com/seldon-charts"
-  helm_chart_name       = "seldon-core-operator"
-  helm_chart_version    = "1.16.0"
+module "sagemaker" {
+  count        = var.deploy_sagemaker ? 1 : 0
+
+  source             = "./modules/sagemaker"
 
   depends_on = [
     module.eks
   ]
 }
-
-
-
-
-module "yatai" {
-  count        = var.deploy_yatai ? 1 : 0
-  cluster_name = local.cluster_name
-
-  source             = "./modules/yatai"
-  name               = "yatai"
-  namespace          = "yatai"
-  helm_chart_version = "1.1.10"
-
-  s3_bucket_name          = local.mlflow_s3_bucket_name
-  s3_force_destroy        = local.force_destroy_s3_bucket
-  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
-  name_prefix             = local.name_prefix
-  # RDS
-  vpc_id                      = module.vpc.vpc_id
-  private_subnets             = module.vpc.private_subnets
-  private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  rds_port                    = 5432
-  rds_name                    = "yatai"
-  rds_engine                  = "postgres"
-  rds_engine_version          = "13.11" # end of support may 2024
-  rds_instance_class          = "db.t3.micro"
-  rds_storage_type            = local.rds_storage_type
-  rds_max_allocated_storage   = local.rds_max_allocated_storage
-
-
-  depends_on = [
-    module.eks
-  ]
-}
-
-
 
 
 module "dashboard" {

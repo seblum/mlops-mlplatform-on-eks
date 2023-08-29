@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {} # 
 
 
 # INFRASTRUCTURE
@@ -87,6 +88,7 @@ module "airflow" {
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
 
+  sagemaker_access_role_arn  = local.sagemaker_access_role_arn
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket
   domain_name                = var.domain_name

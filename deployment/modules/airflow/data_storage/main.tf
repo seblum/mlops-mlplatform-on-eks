@@ -1,5 +1,4 @@
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
 
 resource "aws_s3_bucket" "s3_data_storage" {
   bucket        = var.s3_data_bucket_name
@@ -88,7 +87,6 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
     namespace = var.namespace
   }
   data = {
-    "AWS_REGION"            = "${data.aws_region.current.name}"
     "AWS_BUCKET"            = "${aws_s3_bucket.s3_data_storage.bucket}"
     "AWS_ACCESS_KEY_ID"     = "${aws_iam_access_key.s3_data_bucket_credentials.id}"
     "AWS_SECRET_ACCESS_KEY" = "${aws_iam_access_key.s3_data_bucket_credentials.secret}"

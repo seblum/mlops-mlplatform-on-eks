@@ -6,7 +6,7 @@ locals {
   s3_data_bucket_secret_name   = "${var.namespace}-${var.s3_data_bucket_secret_name}"
   s3_data_bucket_name          = "${local.prefix}-${var.s3_data_bucket_name}"
   s3_log_bucket_name           = "${local.prefix}-log-storage"
-  airflow_variable_list_full   = concat(var.airflow_variable_list, local.airflow_variable_list_addition)
+  
   airflow_variable_list_addition = [{
     key   = "s3_access_name"
     value = "${local.s3_data_bucket_secret_name}"
@@ -15,6 +15,8 @@ locals {
       key   = "s3_access_name_2"
       value = "${local.s3_data_bucket_secret_name}"
   }]
+  airflow_variable_list_full   = concat(var.airflow_variable_list, local.airflow_variable_list_addition)
+
 }
 
 data "aws_caller_identity" "current" {}
@@ -85,6 +87,30 @@ resource "kubernetes_secret" "airflow_organization_git_secret" {
   data = {
     "GITHUB_CLIENT_ID"     = var.git_client_id
     "GITHUB_CLIENT_SECRET" = var.git_client_secret
+  }
+}
+
+
+# secret with account information 
+resource "kubernetes_secret" "aws-account-information" {
+  metadata {
+    name      = "aws-account-information"
+    namespace = var.namespace
+  }
+  data = {
+    "AWS_REGION" = "${data.aws_region.current.name}"
+    "AWS_ID"     = "${data.aws_caller_identity.current.account_id}"
+  }
+}
+
+# secret for sagemaker 
+resource "kubernetes_secret" "sagemaker-access" {
+  metadata {
+    name      = "sagemaker-access"
+    namespace = var.namespace
+  }
+  data = {
+    "SAGEMAKER_ACCESS_ROLE_ARN" = "${var.sagemaker_access_role_arn}"
   }
 }
 

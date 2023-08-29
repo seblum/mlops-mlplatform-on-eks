@@ -167,6 +167,12 @@ variable "rds_storage_type" {
   type        = string
 }
 
+variable "sagemaker_access_role_arn" {
+  description = "Sagemaker access role ARN which is stored as secret"
+  type        = string
+  default     = "none-given"
+}
+
 variable "s3_data_bucket_name" {
   description = "Name of the S3 data bucket"
   type        = string

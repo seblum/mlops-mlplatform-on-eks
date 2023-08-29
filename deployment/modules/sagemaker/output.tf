@@ -7,3 +7,8 @@ output "sagemaker_access_role_arn" {
   description = "Access role arn that enables Sagemaker access"
   value       = aws_iam_role.sagemaker_access_role.arn
 }
+
+output "repository_model_tag" {
+  description = "Model repository tag for image on ECR and Dockerhub"
+  value       = var.repository_model_tag
+}

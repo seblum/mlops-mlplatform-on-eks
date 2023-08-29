@@ -1,5 +1,6 @@
 data "aws_caller_identity" "current" {}
 
+
 # INFRASTRUCTURE
 module "vpc" {
   source       = "./infrastructure/vpc"
@@ -27,6 +28,7 @@ module "eks" {
   # if this is in, I get an for_each error. weird
 }
 
+
 module "networking" {
   source                  = "./infrastructure/networking"
   namespace               = "kube-system"
@@ -36,11 +38,9 @@ module "networking" {
 }
 
 
-
 module "user-profiles" {
-  source   = "./modules/user-profiles"
-  profiles = local.profiles_config
-
+  source            = "./modules/user-profiles"
+  profiles          = local.profiles_config
   eks_oidc_provider = module.eks.oidc_provider_arn
 }
 
@@ -76,6 +76,7 @@ module "mlflow" {
   ]
 }
 
+
 module "airflow" {
   count             = var.deploy_airflow ? 1 : 0
   source            = "./modules/airflow"
@@ -85,12 +86,14 @@ module "airflow" {
   cluster_name      = local.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
-  # user_profiles              = local.airflow_profiles
+
   s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name        = local.airflow_s3_data_bucket
   domain_name                = var.domain_name
   domain_suffix              = "airflow"
   fernet_key                 = var.airflow_fernet_key
+  airflow_variable_list      = local.airflow_variable_list
+
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -111,20 +114,19 @@ module "airflow" {
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
   helm_chart_version    = "8.7.1"
-  git_username          = local.git_username
-  git_token             = local.git_token
-  git_repository_url    = local.git_sync_repository_url
-  git_branch            = local.git_sync_branch
-  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : ""
 
-
-  git_client_id     = var.airflow_git_client_id
-  git_client_secret = var.airflow_git_client_secret
+  git_username       = local.git_username
+  git_token          = local.git_token
+  git_repository_url = local.git_sync_repository_url
+  git_branch         = local.git_sync_branch
+  git_client_id      = var.airflow_git_client_id
+  git_client_secret  = var.airflow_git_client_secret
 
   depends_on = [
     module.eks
   ]
 }
+
 
 module "jupyterhub" {
   count            = var.deploy_jupyterhub ? 1 : 0
@@ -135,11 +137,7 @@ module "jupyterhub" {
   domain_name      = var.domain_name
   domain_suffix    = "jupyterhub"
 
-  # admin_user_list   = local.jupyterhub_admin_user_list
-  # allowed_user_list = local.jupyterhub_allowed_user_list
-
   git_repository_url = local.git_sync_repository_url
-
   git_client_id      = var.jupyterhub_git_client_id
   git_client_secret  = var.jupyterhub_git_client_secret
   proxy_secret_token = var.jupyterhub_proxy_secret_token
@@ -155,25 +153,22 @@ module "jupyterhub" {
   ]
 }
 
+
 module "monitoring" {
   count             = var.deploy_monitoring ? 1 : 0
   source            = "./modules/monitoring"
   name              = "monitoring"
   git_client_id     = var.grafana_git_client_id
   git_client_secret = var.grafana_git_client_secret
-
 }
 
 
-
 module "sagemaker" {
-  count = var.deploy_sagemaker ? 1 : 0
-
+  count  = var.deploy_sagemaker ? 1 : 0
   source = "./modules/sagemaker"
 
-  depends_on = [
-    module.eks
-  ]
+  dockerhub_repository_name = "seblum/mlflow-sagemaker-deployment"
+  repository_model_tag      = "v2.3.2"
 }
 
 

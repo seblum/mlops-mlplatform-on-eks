@@ -17,3 +17,7 @@ output "developers_user_access_auth_list" {
 #   description = "List of managed node groups' autoscaling group names in the EKS cluster"
 #   value       = module.eks.eks_managed_node_groups_autoscaling_group_names
 # }
+
+output "airflow_variable_list" {
+  value = local.airflow_variable_list
+}

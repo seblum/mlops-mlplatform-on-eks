@@ -6,6 +6,15 @@ locals {
   s3_data_bucket_secret_name   = "${var.namespace}-${var.s3_data_bucket_secret_name}"
   s3_data_bucket_name          = "${local.prefix}-${var.s3_data_bucket_name}"
   s3_log_bucket_name           = "${local.prefix}-log-storage"
+  airflow_variable_list_full   = concat(var.airflow_variable_list, local.airflow_variable_list_addition)
+  airflow_variable_list_addition = [{
+    key   = "s3_access_name"
+    value = "${local.s3_data_bucket_secret_name}"
+    },
+    {
+      key   = "s3_access_name_2"
+      value = "${local.s3_data_bucket_secret_name}"
+  }]
 }
 
 data "aws_caller_identity" "current" {}
@@ -164,16 +173,17 @@ resource "helm_release" "airflow" {
           extra       = "{\"region_name\": \"${data.aws_region.current.name}\"}"
         }
       ],
-      variables = [
-        {
-          key   = "MLFLOW_TRACKING_URI"
-          value = "http://mlflow-service.mlflow.svc.cluster.local"
-        },
-        {
-          key   = "s3_access_name"
-          value = "${local.s3_data_bucket_secret_name}"
-        }
-      ]
+      variables = local.airflow_variable_list_full
+      # [
+      #   {
+      #     key   = "s3_access_name"
+      #     value = "${local.s3_data_bucket_secret_name}"
+      #   },
+      #   {
+      #     key   = "MLFLOW_TRACKING_URI"
+      #     value = "http://mlflow-service.mlflow.svc.cluster.local"
+      #   }
+      # ]
     },
     serviceAccount = {
       create = true

@@ -2,7 +2,6 @@ variable "namespace" {
   description = "Namespace"
   type        = string
   default     = ""
-
 }
 
 variable "oidc_provider_arn" {

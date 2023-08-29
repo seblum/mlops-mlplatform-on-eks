@@ -1,205 +1,194 @@
-
-variable "name" {
-  type = string
-}
-
-variable "namespace" {
-  type = string
-}
-
-variable "name_prefix" {
-  type = string
-}
-variable "create_namespace" {
-  type        = bool
-  description = "Should the namespace be created, if it does not exists?"
-  default     = true
-}
-
-variable "cluster_name" {
-  type        = string
-  description = "Name of the EKS Cluster"
+variable "airflow_variable_list" {
+  description = "List of Airflow variables to be set"
+  type        = list(any)
+  default = [{
+    "key"   = "MLFLOW_TRACKING_URI"
+    "value" = "http://mlflow-service.mlflow.svc.cluster.local"
+  }]
 }
 
 variable "cluster_endpoint" {
-  type        = string
   description = "Endpoint of the EKS Cluster"
-}
-
-variable "oidc_provider_arn" {
   type        = string
-  description = "arn of the OIDC provider"
 }
 
-# variable "user_profiles" {
-#   type        = list(any)
-#   description = "list of user profiles"
-#   default = [
-#     {
-#       "username" = "user"
-#       "password" = "user123"
-#       "role" = [
-#         "User",
-#         "Viewer"
-#       ]
-#       "email"     = "user@example.com"
-#       "firstName" = "user"
-#       "lastName"  = "user"
-#   }]
-# }
-
-variable "s3_data_bucket_secret_name" {
-
-}
-
-variable "s3_data_bucket_name" {
-
-}
-
-# RDS
-
-variable "vpc_id" {
+variable "cluster_name" {
+  description = "Name of the EKS Cluster"
   type        = string
-  description = "VPC of the EKS cluster"
 }
 
-variable "private_subnets" {
-  type        = list(string)
-  description = "List of private subnets"
-}
-
-variable "private_subnets_cidr_blocks" {
-  type        = list(string)
-  description = "List of private subnet cidr blocks"
-}
-
-variable "rds_port" {
-  type        = number
-  description = "Port of the rds database"
-}
-
-variable "rds_name" {
-  type        = string
-  description = "Database name"
-}
-
-variable "rds_password" {
-  type        = string
-  description = "Database admin account password"
-  default     = null
-}
-
-variable "rds_engine" {
-  type        = string
-  description = "The type of the database engine (postgres, mysql)"
-}
-
-variable "rds_engine_version" {
-  type        = string
-  description = "The engine version of the database"
-}
-
-variable "rds_instance_class" {
-  type        = string
-  description = "Database instance type"
-}
-
-variable "rds_storage_type" {
-  type        = string
-  description = "Instance storage type: standard, gp2, gp3, or io1"
-}
-
-variable "rds_max_allocated_storage" {
-  type        = number
-  description = "The upper limit of scalable storage (Gb)"
-  default     = 500
-}
-
-
-# HELM
-
-variable "helm_chart_repository" {
-  type        = string
-  description = "Repository URL or path to the location of the helm repo"
-}
-
-variable "helm_chart_name" {
-  type        = string
-  description = "Name of the helm chart"
-}
-
-variable "helm_chart_version" {
-  type        = string
-  description = "Version of the helm chart"
-}
-
-variable "git_username" {
-  type        = string
-  description = "Username to access Github"
-}
-
-variable "git_token" {
-  type        = string
-  description = "Github token"
-}
-
-variable "git_repository_url" {
-  type        = string
-  description = "Https URL to the Github repository to sync Airflow with"
-}
-
-variable "git_branch" {
-  type        = string
-  description = "Branch of the Github repository"
-}
-
-variable "mlflow_tracking_uri" {
-  type        = string
-  description = "The internal address of MLflow, to make it easily accessible from Jupyter."
-}
-
-variable "s3_force_destroy" {
+variable "create_namespace" {
+  description = "Should the namespace be created, if it does not exist?"
   type        = bool
-  description = "Set to true to disable protection against s3 bucket being destroyed. Use only for dev!"
-  default     = false
-}
-
-
-
-
-
-# Test
-
-
-# variable "plugins" { default = [
-#   {
-#     username  = "user",
-#     password  = "user123",
-#     role      = "User",
-#     email     = "user@example.com",
-#     firstName = "user",
-#     lastName  = "user"
-#   }
-# ] }
-
-variable "git_client_id" {
-
-}
-
-variable "git_client_secret" {
-
+  default     = true
 }
 
 variable "domain_name" {
-
+  description = "Domain name"
+  type        = string
+  default     = ""
 }
 
-variable "domain_suffix" {}
+variable "domain_suffix" {
+  description = "Domain suffix"
+  type        = string
+  default     = ""
+}
 
+variable "fernet_key" {
+  type        = string
+  description = "Fernet key"
+}
 
-variable "fernet_key" {}
+variable "git_branch" {
+  description = "Branch of the Github repository"
+  type        = string
+}
 
+variable "git_client_id" {
+  description = "Client ID for Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "git_client_secret" {
+  description = "Client secret for Git integration"
+  type        = string
+  default     = ""
+}
+
+variable "git_repository_url" {
+  description = "Https URL to the Github repository to sync Airflow with"
+  type        = string
+  default     = ""
+}
+
+variable "git_token" {
+  description = "GitHub token"
+  type        = string
+}
+
+variable "git_username" {
+  description = "Username for Git authentication"
+  type        = string
+  default     = ""
+}
+
+variable "helm_chart_name" {
+  description = "Name of the helm chart"
+  type        = string
+  default     = ""
+}
+
+variable "helm_chart_repository" {
+  description = "Repository URL or path to the location of the helm repo"
+  type        = string
+  default     = ""
+}
+
+variable "helm_chart_version" {
+  description = "Version of the helm chart"
+  type        = string
+  default     = ""
+}
+
+variable "name" {
+  description = "Name"
+  type        = string
+  default     = ""
+}
+
+variable "name_prefix" {
+  description = "Name prefix"
+  type        = string
+  default     = ""
+}
+
+variable "namespace" {
+  description = "Namespace to launch Prometheus & Grafana"
+  type        = string
+  default     = "monitoring"
+}
+
+variable "oidc_provider_arn" {
+  description = "ARN of the OIDC provider"
+  type        = string
+}
+
+variable "private_subnets" {
+  description = "List of private subnets"
+  type        = list(string)
+}
+
+variable "private_subnets_cidr_blocks" {
+  description = "List of private subnet CIDR blocks"
+  type        = list(string)
+}
+
+variable "rds_engine" {
+  description = "The type of the database engine (postgres, mysql)"
+  type        = string
+}
+
+variable "rds_engine_version" {
+  description = "The engine version of the database"
+  type        = string
+}
+
+variable "rds_instance_class" {
+  description = "Database instance type"
+  type        = string
+}
+
+variable "rds_max_allocated_storage" {
+  description = "The upper limit of scalable storage (Gb)"
+  type        = number
+  default     = 500
+}
+
+variable "rds_name" {
+  description = "Database name"
+  type        = string
+}
+
+variable "rds_password" {
+  description = "Database admin account password"
+  type        = string
+  default     = null
+}
+
+variable "rds_port" {
+  description = "Port of the RDS database"
+  type        = number
+}
+
+variable "rds_storage_type" {
+  description = "Instance storage type: standard, gp2, gp3, or io1"
+  type        = string
+}
+
+variable "s3_data_bucket_name" {
+  description = "Name of the S3 data bucket"
+  type        = string
+}
+
+variable "s3_data_bucket_secret_name" {
+  description = "Name of the secret for the S3 data bucket"
+  type        = string
+}
+
+variable "s3_force_destroy" {
+  description = "Set to true to disable protection against S3 bucket being destroyed. Use only for dev!"
+  type        = bool
+  default     = false
+}
 
 variable "s3_data_bucket_user_name" {
+  description = "User name for S3 data bucket"
+  type        = string
+}
 
+variable "vpc_id" {
+  description = "VPC of the EKS cluster"
+  type        = string
 }

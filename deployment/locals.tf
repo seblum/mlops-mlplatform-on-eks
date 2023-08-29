@@ -15,6 +15,7 @@ locals {
   deployment_name                    = "mlplatform"
   name_prefix                        = random_string.random_prefix.result
   aws_region                         = var.AWS_REGION
+
   # Profiles
   profiles_yaml = yamldecode(file("${path.module}/profiles/user-list.yaml"))["profiles"]
 
@@ -33,6 +34,26 @@ locals {
       userarn  = role_arn["user_arn"]
       username = role_arn["username"]
       groups   = ["system:masters"]
+    }
+  ]
+
+  # "http://mlflow-service.mlflow.svc.cluster.local"
+  mlflow_tracking_uri       = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : "not-deployed"
+  sagemaker_access_role_arn = var.deploy_sagemaker ? module.sagemaker[0].sagemaker_access_role_arn : "not-deployed"
+  ecr_repository_name       = var.deploy_sagemaker ? module.sagemaker[0].ecr_repository_name : "not-deployed"
+
+  airflow_variable_list = [
+    {
+      "key"   = "MLFLOW_TRACKING_URI"
+      "value" = local.mlflow_tracking_uri
+    },
+    {
+      "key"   = "SAGEMAKER_ACCESS_ROLE_ARN"
+      "value" = local.sagemaker_access_role_arn
+    },
+    {
+      "key"   = "ECR_REPOSITORY_NAME"
+      "value" = local.ecr_repository_name
     }
   ]
 

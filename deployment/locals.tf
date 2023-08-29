@@ -19,32 +19,22 @@ locals {
   profiles_yaml = yamldecode(file("${path.module}/profiles/user-list.yaml"))["profiles"]
 
   profiles_config = {
-    for profile in local.profiles_yaml : profile["user"] => {
-      name         = profile["user"]
-      email        = profile["email"]
-      firstName    = split(".", profile["user"])[0]
-      lastName     = split(".", profile["user"])[1]
-      airflow_role = lookup(profile, "airflow_role", [])
+    for profile in local.profiles_yaml : profile["username"] => {
+      username  = profile["username"]
+      email     = profile["email"]
+      firstName = split(".", profile["username"])[0]
+      lastName  = split(".", profile["username"])[1]
+      role      = profile["role"]
     }
   }
 
-  # airflow_profiles = [
-  #   for profile in local.profiles_yaml : {
-  #     username  = profile["user"]
-  #     password  = module.user-profiles.user_profile[profile["user"]]["user_password"]
-  #     email     = profile["email"]
-  #     role      = lookup(profile, "airflow_role", [])
-  #     firstName = split(".", profile["user"])[0]
-  #     lastName  = split(".", profile["user"])[1]
-  # }]
-
-  # jupyterhub_admin_user_list = flatten(compact([
-  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "Admin" ? profile["user"] : ""
-  # ]))
-
-  # jupyterhub_allowed_user_list = flatten(compact([
-  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "User" ? profile["user"] : ""
-  # ]))
+  developers_user_access_auth_list = [
+    for role_arn in module.user-profiles.aws_user_access_profile["Developer"] : {
+      userarn  = role_arn["user_arn"]
+      username = role_arn["username"]
+      groups   = ["system:masters"]
+    }
+  ]
 
 }
 

@@ -19,6 +19,8 @@ module "eks" {
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks
   security_group_id_one       = [module.vpc.worker_group_mgmt_one_id]
   security_group_id_two       = [module.vpc.worker_group_mgmt_two_id]
+
+  aws_auth_users_list = local.developers_user_access_auth_list
   # depends_on = [
   #   module.vpc
   # ]
@@ -36,11 +38,9 @@ module "networking" {
 
 
 module "user-profiles" {
-  source = "./modules/user-profiles"
-  #user_env           = var.user_env
+  source   = "./modules/user-profiles"
   profiles = local.profiles_config
-  # kfp_s3_bucket_name = module.kubeflow_components.s3_bucket_name
-  # tags               = local.tags
+
   eks_oidc_provider = module.eks.oidc_provider_arn
 }
 

@@ -1,3 +1,6 @@
+locals {
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+}
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "s3_data_storage" {
@@ -6,12 +9,20 @@ resource "aws_s3_bucket" "s3_data_storage" {
 }
 
 resource "aws_iam_user" "s3_data_bucket_user" {
-  name = var.s3_data_bucket_user_name
+  name = local.s3_data_bucket_user_name
   path = "/"
 }
 
 resource "aws_iam_access_key" "s3_data_bucket_credentials" {
   user = aws_iam_user.s3_data_bucket_user.name
+}
+
+# TODO: needs to be airflow user
+# Airflow user needs to have access to mlflow policy
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_mlflow_policy" {
+  count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
+  user       = local.s3_data_bucket_user_name
+  policy_arn = var.s3_mlflow_bucket_policy_arn
 }
 
 resource "aws_iam_policy" "s3_data_bucket_policy" {

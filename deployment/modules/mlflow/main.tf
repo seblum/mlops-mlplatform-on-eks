@@ -93,10 +93,11 @@ resource "aws_iam_role_policy_attachment" "mlflow_s3_policy" {
 }
 
 # TODO: needs to be airflow user
-resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_name" {
-  user       = var.s3_data_bucket_user_name
-  policy_arn = aws_iam_policy.mlflow_s3_policy.arn
-}
+# Airflow user needs to have access to mlflow policy
+# resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_name" {
+#   user       = var.s3_data_bucket_user_name
+#   policy_arn = aws_iam_policy.mlflow_s3_policy.arn
+# }
 
 
 resource "random_password" "rds_password" {
@@ -135,8 +136,8 @@ resource "helm_release" "mlflow" {
       name      = var.name
     },
     ingress = {
-      host = "mlplatform.seblum.me"
-      path = "/mlflow"
+      host = var.domain_name
+      path = var.domain_suffix
     },
     artifacts = {
       s3_role_arn   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}",

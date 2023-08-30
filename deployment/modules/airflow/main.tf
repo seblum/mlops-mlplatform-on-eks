@@ -18,7 +18,6 @@ locals {
     }
   ]
   airflow_variable_list_full = concat(var.airflow_variable_list, local.airflow_variable_list_addition)
-
 }
 
 data "aws_caller_identity" "current" {}
@@ -48,12 +47,12 @@ module "s3-remote-logging" {
 # Data Storage
 #
 module "s3-data-storage" {
-  source                     = "./data_storage"
-  s3_data_bucket_name        = local.s3_data_bucket_name
-  namespace                  = var.namespace
-  s3_force_destroy           = true
-  s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
-  s3_data_bucket_user_name   = var.s3_data_bucket_user_name
+  source                      = "./data_storage"
+  s3_data_bucket_name         = local.s3_data_bucket_name
+  namespace                   = var.namespace
+  s3_force_destroy            = true
+  s3_data_bucket_secret_name  = local.s3_data_bucket_secret_name
+  s3_mlflow_bucket_policy_arn = var.s3_mlflow_bucket_policy_arn
 }
 
 ################################################################################

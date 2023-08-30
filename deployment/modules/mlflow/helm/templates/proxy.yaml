@@ -55,3 +55,5 @@
 #     - protocol: TCP
 #       port: 80
 #       targetPort: 4180
+
+# https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy

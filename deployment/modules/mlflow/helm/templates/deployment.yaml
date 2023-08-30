@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mlflow
+  name: {{ .Values.deployment.name }}
   labels:
-    app: mlflow
-  namespace: mlflow
+    app: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mlflow
+      app: {{ .Values.deployment.name }}
   template:
     metadata:
       labels:
-        app: mlflow
+        app: {{ .Values.deployment.name }}
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
-      serviceAccount: mlflow-user
+      serviceAccount: {{ .Values.deployment.name }}-user
       containers:
-        - name: mlflow
+        - name: {{ .Values.deployment.name }}
           securityContext: {}
           image: {{ .Values.deployment.image }}
           imagePullPolicy: Always
@@ -38,20 +38,20 @@ spec:
               mlflow server --host=${MLFLOW_HOST} --port=${MLFLOW_PORT} --backend-store-uri=mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOST}:${RDS_PORT}/${DB_NAME} --artifacts-destination=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --default-artifact-root=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY_PREFIX} --serve-artifacts --static-prefix=/mlflow
           envFrom:
             - secretRef:
-                name: mlflow-secret
+                name: {{ .Values.deployment.name }}-secret
             - configMapRef:
-                name: mlflow-config
+                name: {{ .Values.deployment.name }}-config
           ports:
             - name: http
               containerPort: 5000
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /mlflow
+              path: {{ .Values.ingress.path }}
               port: http
           readinessProbe:
             httpGet:
-              path: /mlflow
+              path: {{ .Values.ingress.path }}
               port: http
           resources:
             requests:

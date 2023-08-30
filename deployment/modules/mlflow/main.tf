@@ -1,5 +1,6 @@
 locals {
   s3_bucket_name = "${var.name_prefix}-${var.namespace}-${var.s3_bucket_name}"
+  s3_bucket_path_prefix = "users"
 }
 
 data "aws_caller_identity" "current" {}
@@ -78,7 +79,7 @@ resource "aws_iam_policy" "mlflow_s3_policy" {
         "Condition" : {
           "StringLike" : {
             "s3:prefix" : [
-              "test/*"
+              "${local.s3_bucket_path_prefix}/*"
             ]
           }
         }
@@ -99,7 +100,6 @@ resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_name" {
 
 
 resource "random_password" "rds_password" {
-  #count  = var.generate_db_password ? 1 : 0
   length = 16
   # MLFlow has troubles using special characters
   special = false
@@ -128,42 +128,29 @@ resource "helm_release" "mlflow" {
   create_namespace = var.create_namespace
 
   chart = "${path.module}/helm/"
-  values = [
-    "${file("${path.module}/helm/values.yaml")}"
-  ]
-
-  set {
-    name  = "rds.USERNAME"
-    value = module.rds-mlflow.rds_username
-  }
-  set {
-    name  = "rds.PASSWORD"
-    value = module.rds-mlflow.rds_password
-  }
-  set {
-    name  = "rds.HOST"
-    value = module.rds-mlflow.rds_host
-  }
-  set {
-    name  = "rds.PORT"
-    value = var.rds_port
-  }
-  set {
-    name  = "artifacts.S3_BUCKET"
-    value = local.s3_bucket_name
-  }
-  set {
-    name  = "artifacts.S3_KEY_PREFIX"
-    value = "test"
-  }
-  set {
-    name  = "artifacts.S3_ROLE_ARN"
-    value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}"
-  }
-  set {
-    name  = "DB_NAME"
-    value = module.rds-mlflow.rds_dbname
-  }
+  values = [yamlencode({
+    deployment = {
+      image     = "seblum/mlflow:v2.4.1"
+      namespace = var.namespace
+      name      = var.name
+    },
+    ingress = {
+      host = "mlplatform.seblum.me"
+      path = "/mlflow"
+    },
+    artifacts = {
+      s3_role_arn   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.mlflow_s3_role.name}",
+      s3_key_prefix = local.s3_bucket_path_prefix,
+      s3_bucket     = local.s3_bucket_name,
+    },
+    rds = {
+      host     = module.rds-mlflow.rds_host
+      port     = var.rds_port,
+      username = module.rds-mlflow.rds_username,
+      password = module.rds-mlflow.rds_password,
+      db_name  = module.rds-mlflow.rds_dbname
+    },
+  })]
 }
 
 

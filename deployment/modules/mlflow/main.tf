@@ -1,5 +1,5 @@
 locals {
-  s3_bucket_name = "${var.name_prefix}-${var.namespace}-${var.s3_bucket_name}"
+  s3_bucket_name        = "${var.name_prefix}-${var.namespace}-${var.s3_bucket_name}"
   s3_bucket_path_prefix = "users"
 }
 

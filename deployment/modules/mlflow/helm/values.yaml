@@ -1,8 +1,8 @@
 
 deployment:
   image: seblum/mlflow:v2.4.1
-  namspace: mlflow
   name: mlflow
+  namspace: mlflow
 
 ingress:
   host:

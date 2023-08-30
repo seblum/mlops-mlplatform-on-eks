@@ -1,5 +1,6 @@
-
-##### PROMETHEUS
+################################################################################
+#
+# PROMETHEUS
 #
 resource "helm_release" "prometheus" {
   chart            = "prometheus"
@@ -38,8 +39,9 @@ resource "helm_release" "prometheus-operator-crds" {
 }
 
 
-
-##### GRAFANA
+################################################################################
+#
+# GRAFANA
 #
 resource "helm_release" "grafana" {
   chart            = "grafana"

@@ -1,14 +1,16 @@
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
+data "aws_region" "current" {}
 
 
+################################################################################
+#
 # INFRASTRUCTURE
+#
 module "vpc" {
   source       = "./infrastructure/vpc"
   cluster_name = local.cluster_name
   vpc_name     = local.vpc_name
 }
-
 
 module "eks" {
   source                      = "./infrastructure/eks"
@@ -23,12 +25,12 @@ module "eks" {
   security_group_id_two       = [module.vpc.worker_group_mgmt_two_id]
 
   aws_auth_users_list = local.developers_user_access_auth_list
+  # Unexpected error with the "for_each" loop when including "depends_on"
+  # The cause of this behavior is puzzling
   # depends_on = [
   #   module.vpc
   # ]
-  # if this is in, I get an for_each error. weird
 }
-
 
 module "networking" {
   source                  = "./infrastructure/networking"
@@ -38,7 +40,6 @@ module "networking" {
   domain_name             = var.domain_name
 }
 
-
 module "user-profiles" {
   source            = "./modules/user-profiles"
   profiles          = local.profiles_config
@@ -46,8 +47,10 @@ module "user-profiles" {
 }
 
 
-# CUSTOM TOOLS
-
+################################################################################
+#
+# CUSTOM MODULES
+#
 module "mlflow" {
   count             = var.deploy_mlflow ? 1 : 0
   source            = "./modules/mlflow"
@@ -107,8 +110,6 @@ module "airflow" {
   rds_instance_class          = "db.t3.micro"
   rds_storage_type            = local.rds_storage_type
   rds_max_allocated_storage   = local.rds_max_allocated_storage
-  # periodic updates
-  # log airflow to s3
 
   # TODO: add data access common rule
   s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
@@ -148,7 +149,8 @@ module "jupyterhub" {
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
   helm_chart_name       = "jupyterhub"
   helm_chart_version    = "2.0.0"
-  mlflow_tracking_uri   = "test" #var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : ""
+
+  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : "not-deployed"
 
   depends_on = [
     module.eks

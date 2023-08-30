@@ -20,11 +20,9 @@ data "aws_iam_policy" "AmazonSageMakerReadOnlyAccess" {
 
 # Create Container Registry
 module "ecr" {
-  source = "terraform-aws-modules/ecr/aws"
-
+  source          = "terraform-aws-modules/ecr/aws"
   repository_name = local.ecr_repository_name
 
-  #repository_read_write_access_arns = ["arn:aws:iam::012345678901:role/terraform"]
   repository_lifecycle_policy = jsonencode({
     rules = [
       {
@@ -42,7 +40,6 @@ module "ecr" {
       }
     ]
   })
-
   repository_force_delete = true
   # tags = {
   #   Terraform   = "true"
@@ -53,7 +50,6 @@ module "ecr" {
 # mlflow sagemaker build-and-push-container --build --no-push -c mlflow-sagemaker-deployment
 # https://mlflow.org/docs/latest/cli.html
 resource "null_resource" "docker_packaging" {
-
   provisioner "local-exec" {
     command = <<EOF
 	    docker pull "${local.dockerhub_repository_name}:${local.repository_model_tag}"
@@ -66,7 +62,6 @@ resource "null_resource" "docker_packaging" {
   # triggers = {
   #   "run_at" = timestamp()
   # }
-
   depends_on = [
     module.ecr,
   ]
@@ -124,7 +119,7 @@ resource "helm_release" "sagemaker-dashboard" {
       AWS_REGION            = "${data.aws_region.current.name}"
       AWS_ACCESS_KEY_ID     = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.id}"
       AWS_SECRET_ACCESS_KEY = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.secret}"
-      AWS_ROLE_NAME         = "${aws_iam_role.sagemaker_dashboard_read_access_role.name}" 
+      AWS_ROLE_NAME         = "${aws_iam_role.sagemaker_dashboard_read_access_role.name}"
     }
   })]
 }

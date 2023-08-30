@@ -85,7 +85,9 @@ destroy-modules:
 
 destroy-test:
 	terraform destroy \
-					-target="module.yatai" \
+					-target="module.sagemaker" \
+					-target="module.dashboard" \
+					-target="module.jupyterhub" \
 					-target="module.user-profiles" \
 					-target="module.eks" \
 					-var-file=$(VARS_FILE) -auto-approve

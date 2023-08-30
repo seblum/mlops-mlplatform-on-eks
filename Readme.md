@@ -40,9 +40,17 @@ project
 │       │
 │       └── airflow
 │       │
-│       └── mlflow
+│       └── dashboard
 │       │
 │       └── jupyterhub
+│       │
+│       └── mlflow
+│       │
+│       └── monitoring
+│       │
+│       └── sagemaker
+│       │
+│       └── user-profiles
 ```
 
 ## Features

@@ -4,8 +4,20 @@ variable "create_namespace" {
   default     = true
 }
 
-variable "dockerhub_repository_name" {
-  description = "Name of the DockerHub repository"
+variable "docker_mlflow_sagemaker_base_image" {
+  description = "Name:Tag of the DockerHub repository that has a mlflow sagemaker base image"
+  type        = string
+  default     = ""
+}
+
+variable "domain_name" {
+  description = "Domain name"
+  type        = string
+  default     = ""
+}
+
+variable "domain_suffix" {
+  description = "Domain suffix"
   type        = string
   default     = ""
 }
@@ -18,12 +30,6 @@ variable "name" {
 
 variable "namespace" {
   description = "Namespace"
-  type        = string
-  default     = ""
-}
-
-variable "repository_model_tag" {
-  description = "Tag for the repository model"
   type        = string
   default     = ""
 }

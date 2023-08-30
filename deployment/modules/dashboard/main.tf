@@ -12,8 +12,8 @@ resource "helm_release" "dashboard" {
       namespace = var.namespace
     },
     ingress = {
-      host = "mlplatform.seblum.me"
-      path = "/main"
+      host = var.domain_name
+      path = var.domain_suffix
     }
   })]
 }

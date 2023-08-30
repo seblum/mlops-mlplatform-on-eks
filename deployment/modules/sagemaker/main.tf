@@ -1,8 +1,8 @@
 locals {
-  dockerhub_repository_name = var.dockerhub_repository_name
-  repository_model_tag      = var.repository_model_tag
-  ecr_repository_name       = "mlflow-sagemaker-deployment"
-  iam_name_sagemaker_access = "sagemaker-access"
+  docker_mlflow_sagemaker_base_image = var.docker_mlflow_sagemaker_base_image
+  base_image_tag                     = split(":", var.docker_mlflow_sagemaker_base_image)[1]
+  ecr_repository_name                = "mlflow-sagemaker-deployment"
+  iam_name_sagemaker_access          = "sagemaker-access"
 
   sagemaker_dashboard_read_access_user_name = "sagemaker-dashboard-read-access-user"
   sagemaker_dashboard_read_access_role_name = "sagemaker-dashboard-read-access-role"
@@ -52,10 +52,10 @@ module "ecr" {
 resource "null_resource" "docker_packaging" {
   provisioner "local-exec" {
     command = <<EOF
-	    docker pull "${local.dockerhub_repository_name}:${local.repository_model_tag}"
-      docker tag "${local.dockerhub_repository_name}:${local.repository_model_tag}" "${module.ecr.repository_url}:${local.repository_model_tag}"
+	    docker pull "${local.docker_mlflow_sagemaker_base_image}"
+      docker tag "${local.docker_mlflow_sagemaker_base_image}" "${module.ecr.repository_url}:${local.base_image_tag}"
       aws ecr get-login-password --region ${data.aws_region.current.name} | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com
-	    docker push "${module.ecr.repository_url}:${local.repository_model_tag}"
+	    docker push "${module.ecr.repository_url}:${local.base_image_tag}"
 	    EOF
   }
 
@@ -112,8 +112,8 @@ resource "helm_release" "sagemaker-dashboard" {
       namespace = "${var.namespace}"
     },
     ingress = {
-      host = "mlplatform.seblum.me"
-      path = "/sagemaker"
+      host = "${var.domain_name}"
+      path = "${var.domain_suffix}"
     },
     secret = {
       AWS_REGION            = "${data.aws_region.current.name}"

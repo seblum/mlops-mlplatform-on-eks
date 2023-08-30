@@ -60,6 +60,8 @@ module "mlflow" {
   s3_force_destroy  = local.force_destroy_s3_bucket
   oidc_provider_arn = module.eks.oidc_provider_arn
   name_prefix       = local.name_prefix
+  domain_name       = var.domain_name
+  domain_suffix     = "/mlflow"
   # RDS
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
@@ -73,7 +75,7 @@ module "mlflow" {
   rds_max_allocated_storage   = local.rds_max_allocated_storage
 
   # TODO: add data access common rule
-  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+  # s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
 
   depends_on = [
     module.eks
@@ -91,13 +93,14 @@ module "airflow" {
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
 
-  sagemaker_access_role_arn  = local.sagemaker_access_role_arn
-  s3_data_bucket_secret_name = local.airflow_s3_data_bucket_credentials
-  s3_data_bucket_name        = local.airflow_s3_data_bucket
-  domain_name                = var.domain_name
-  domain_suffix              = "airflow"
-  fernet_key                 = var.airflow_fernet_key
-  airflow_variable_list      = local.airflow_variable_list
+  sagemaker_access_role_arn   = local.sagemaker_access_role_arn
+  s3_mlflow_bucket_policy_arn = var.deploy_mlflow ? module.mlflow[0].mlflow_s3_policy_arn : "not-deployed"
+  s3_data_bucket_secret_name  = local.airflow_s3_data_bucket_credentials
+  s3_data_bucket_name         = local.airflow_s3_data_bucket
+  domain_name                 = var.domain_name
+  domain_suffix               = "airflow"
+  fernet_key                  = var.airflow_fernet_key
+  airflow_variable_list       = local.airflow_variable_list
 
   # RDS
   vpc_id                      = module.vpc.vpc_id
@@ -112,8 +115,9 @@ module "airflow" {
   rds_max_allocated_storage   = local.rds_max_allocated_storage
 
   # TODO: add data access common rule
-  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
-  # HELM
+  # s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+  # additional_s3_policy_arn = module.mlflow.mlflow_s3_policy_arn
+
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
   helm_chart_version    = "8.7.1"
@@ -145,12 +149,11 @@ module "jupyterhub" {
   git_client_secret  = var.jupyterhub_git_client_secret
   proxy_secret_token = var.jupyterhub_proxy_secret_token
 
-  # HELM
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
   helm_chart_name       = "jupyterhub"
   helm_chart_version    = "2.0.0"
 
-  mlflow_tracking_uri   = var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : "not-deployed"
+  mlflow_tracking_uri = var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : "not-deployed"
 
   depends_on = [
     module.eks
@@ -162,25 +165,30 @@ module "monitoring" {
   count             = var.deploy_monitoring ? 1 : 0
   source            = "./modules/monitoring"
   name              = "monitoring"
+  domain_name       = var.domain_name
+  domain_suffix     = "/grafana"
   git_client_id     = var.grafana_git_client_id
   git_client_secret = var.grafana_git_client_secret
 }
 
 
 module "sagemaker" {
-  count     = var.deploy_sagemaker ? 1 : 0
-  source    = "./modules/sagemaker"
-  name      = "sagemaker-dashboard"
-  namespace = "sagemaker-dashboard"
+  count         = var.deploy_sagemaker ? 1 : 0
+  source        = "./modules/sagemaker"
+  name          = "sagemaker-dashboard"
+  namespace     = "sagemaker-dashboard"
+  domain_name   = var.domain_name
+  domain_suffix = "/sagemaker"
 
-  dockerhub_repository_name = "seblum/mlflow-sagemaker-deployment"
-  repository_model_tag      = "v2.3.2"
+  docker_mlflow_sagemaker_base_image = "seblum/mlflow-sagemaker-deployment:v2.3.2"
 }
 
 
 module "dashboard" {
-  count     = var.deploy_dashboard ? 1 : 0
-  source    = "./modules/dashboard"
-  name      = "dashboard"
-  namespace = "dashboard"
+  count         = var.deploy_dashboard ? 1 : 0
+  source        = "./modules/dashboard"
+  name          = "dashboard"
+  namespace     = "dashboard"
+  domain_name   = var.domain_name
+  domain_suffix = "/main"
 }

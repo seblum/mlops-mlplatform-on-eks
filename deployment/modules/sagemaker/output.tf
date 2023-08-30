@@ -10,5 +10,5 @@ output "sagemaker_access_role_arn" {
 
 output "repository_model_tag" {
   description = "Model repository tag for image on ECR and Dockerhub"
-  value       = var.repository_model_tag
+  value       = local.base_image_tag
 }

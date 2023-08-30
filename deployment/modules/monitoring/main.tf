@@ -61,7 +61,7 @@ resource "helm_release" "grafana" {
       ingress = {
         enabled = true
         annotations = {
-          "external-dns.alpha.kubernetes.io/hostname"  = "mlplatform.seblum.me",
+          "external-dns.alpha.kubernetes.io/hostname"  = "${var.domain_name}",
           "alb.ingress.kubernetes.io/scheme"           = "internet-facing",
           "alb.ingress.kubernetes.io/target-type"      = "ip",
           "kubernetes.io/ingress.class"                = "alb",
@@ -69,11 +69,11 @@ resource "helm_release" "grafana" {
           "alb.ingress.kubernetes.io/healthcheck-path" = "/api/health"
         }
         labels   = {}
-        path     = "/grafana"
+        path     = "${var.domain_suffix}"
         pathType = "Prefix"
         hosts = [
-          "mlplatform.seblum.me",
-          "www.mlplatform.seblum.me"
+          "${var.domain_name}",
+          "www.${var.domain_name}"
         ]
       },
       datasources = {
@@ -83,7 +83,7 @@ resource "helm_release" "grafana" {
             {
               name      = "Prometheus"
               type      = "prometheus"
-              url       = "http://prometheus-server.monitoring.svc.cluster.local"
+              url       = "http://prometheus-server.${var.namespace}.svc.cluster.local"
               access    = "proxy"
               isDefault = true
             }
@@ -130,7 +130,7 @@ resource "helm_release" "grafana" {
           allow_embedding = true # enables iframe loading
         },
         server = {
-          domain : "mlplatform.seblum.me"
+          domain : "${var.domain_name}"
           root_url : "%(protocol)s://%(domain)s/grafana/"
           serve_from_sub_path : true
           # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana

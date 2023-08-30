@@ -11,17 +11,3 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8501
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: dashboard-lb
-#   namespace: dashboard
-# spec:
-#   selector:
-#     app: dashboard
-#   type: LoadBalancer
-#   ports:
-#     - protocol: TCP
-#       port: 80
-#       targetPort: 8080

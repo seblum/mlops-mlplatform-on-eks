@@ -5,22 +5,17 @@ resource "helm_release" "dashboard" {
   create_namespace = var.create_namespace
 
   chart = "${path.module}/helm/"
-  values = [
-    "${file("${path.module}/helm/values.yaml")}"
-  ]
-  set {
-    name  = "deployment.image"
-    value = "seblum/vuejs-ml-dashboard:latest"
-  }
-  set {
-    name  = "ingress.host"
-    value = "mlplatform.seblum.me"
-  }
-  set {
-    name  = "ingress.path"
-    value = "/main"
-  }
-
+  values = [yamlencode({
+    deployment = {
+      image     = "seblum/vuejs-ml-dashboard:latest"
+      name      = var.name
+      namespace = var.namespace
+    },
+    ingress = {
+      host = "mlplatform.seblum.me"
+      path = "/main"
+    }
+  })]
 }
 
 

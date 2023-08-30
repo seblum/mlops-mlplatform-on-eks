@@ -1,6 +1,8 @@
 
 deployment:
-  image: 
+  image:
+  name:
+  namespace:
 
 ingress:
   host: 

@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dashboard
+  name: {{ .Values.deployment.name }}
   labels:
-    app: dashboard
-  namespace: dashboard
+    app: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashboard
+      app: {{ .Values.deployment.name }}
   template:
     metadata:
       labels:
-        app: dashboard
+        app: {{ .Values.deployment.name }}
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
-        - name: dashboard
+        - name: {{ .Values.deployment.name }}
           image: {{ .Values.deployment.image }}
           imagePullPolicy: Always
           ports:

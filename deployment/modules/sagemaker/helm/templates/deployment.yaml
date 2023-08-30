@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  labels:
+    app: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.name }}
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: {{ .Values.deployment.name }}
+          image: {{ .Values.deployment.image }}
+          imagePullPolicy: Always
+          env:
+            - name: MLFLOW_PORT
+              value: "5000"
+          envFrom:
+            - secretRef:
+                name: sagemaker-read-access-secret
+          ports:
+            - name: http
+              containerPort: 8501
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.ingress.path }}/healthz
+              port: 8501
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.ingress.path }}/healthz
+              port: 8501
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"

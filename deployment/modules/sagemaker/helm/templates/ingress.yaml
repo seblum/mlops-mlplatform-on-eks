@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.deployment.name }}-ingress
+  namespace: {{ .Values.deployment.namespace }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.host }}
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: mlplatform
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.ingress.path }}/healthz
+spec:
+  rules:
+    - host: www.{{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.deployment.name }}-service
+                port:
+                  number: 80
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.deployment.name }}-service
+                port:
+                  number: 80

@@ -1,0 +1,15 @@
+
+deployment:
+  image:
+  name:
+  namespace:
+
+ingress:
+  host: 
+  path: 
+
+secret:
+  AWS_REGION: 
+  AWS_ACCESS_KEY_ID: 
+  AWS_SECRET_ACCESS_KEY: 
+  AWS_ROLE_NAME:

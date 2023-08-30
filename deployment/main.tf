@@ -166,8 +166,10 @@ module "monitoring" {
 
 
 module "sagemaker" {
-  count  = var.deploy_sagemaker ? 1 : 0
-  source = "./modules/sagemaker"
+  count     = var.deploy_sagemaker ? 1 : 0
+  source    = "./modules/sagemaker"
+  name      = "sagemaker-dashboard"
+  namespace = "sagemaker-dashboard"
 
   dockerhub_repository_name = "seblum/mlflow-sagemaker-deployment"
   repository_model_tag      = "v2.3.2"

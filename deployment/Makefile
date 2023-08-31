@@ -96,7 +96,7 @@ destroy-user-profiles:
 	terraform destroy -target="module.user-profiles" -var-file=$(VARS_FILE) -auto-approve
 
 destroy-modules:
-	terraform apply -target="module.airflow" \
+	terraform destroy -target="module.airflow" \
 					-target="module.dashboard" \
 					-target="module.jupyterhub" \
 					-target="module.mlflow" \

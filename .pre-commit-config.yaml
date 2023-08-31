@@ -7,8 +7,8 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
-      # - id: check-yaml
-      #   exclude: ^.gitlab-ci.yml
+      - id: check-yaml
+        exclude: ^.gitlab-ci.yml
       - id: check-added-large-files
       - id: end-of-file-fixer
       - id: trailing-whitespace

@@ -32,7 +32,7 @@ create-vpc:
 create-eks-cluster:
 	terraform apply	-target="module.user-profiles" \
 					-target="module.eks" \
-					-target="networking" \
+					-target="module.networking" \
 					-var-file=$(VARS_FILE) -auto-approve
 
 # MODULES
@@ -71,10 +71,10 @@ destroy-vpc:
 	terraform destroy -target="module.vpc" -var-file=$(VARS_FILE) -auto-approve
 
 destroy-eks-cluster:
-	terraform destroy -target="module.eks" -var-file=$(VARS_FILE) -auto-approve
-
-destroy-networking:
-	terraform destroy -target="module.networking" -var-file=$(VARS_FILE) -auto-approve
+	terraform destroy   -target="module.networking" \
+						-target="module.eks" \
+						-target="module.user-profiles" \
+						-var-file=$(VARS_FILE) -auto-approve
 
 # MODULES
 destroy-airflow:

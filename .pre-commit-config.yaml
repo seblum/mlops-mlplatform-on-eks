@@ -17,12 +17,6 @@ repos:
         args:
           - "--no-sort-keys"
           - "--autofix"
-  # - repo: https://github.com/pycqa/isort
-  #   rev: 5.10.1
-  #   hooks:
-  #     - id: isort
-  #       name: isort
-  #       args: ["--profile", "black"]
   - repo: https://github.com/psf/black
     rev: 22.6.0
     hooks:
@@ -34,9 +28,16 @@ repos:
       hooks:
       -   id: blacken-docs
           additional_dependencies: [black==22.6.0]
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.22
+    hooks:
+      - id: tflint
+      - id: terraform-validate
+      - id: terraform-fmt
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
-    rev: v1.77.1
+    rev: v1.83.0
     hooks:
       - id: terraform_fmt
       - id: terraform_docs
+      - id: terraform_docs
+      - id: checkov

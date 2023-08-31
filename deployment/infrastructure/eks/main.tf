@@ -51,11 +51,12 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
 
+  # https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
-  manage_aws_auth_configmap       = true
 
-  aws_auth_users = var.aws_auth_users_list
+  manage_aws_auth_configmap = true
+  aws_auth_users            = var.aws_auth_users_list
 
   cluster_addons = {
     coredns = {

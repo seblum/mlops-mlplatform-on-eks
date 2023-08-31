@@ -1,3 +1,4 @@
+data "aws_region" "current" {}
 
 resource "helm_release" "cluster-autoscaler" {
   name             = "cluster-autoscaler"
@@ -9,7 +10,7 @@ resource "helm_release" "cluster-autoscaler" {
 
   set {
     name  = "awsRegion"
-    value = var.aws_region
+    value = data.aws_region.current.name
   }
   set {
     name  = "rbac.serviceAccount.name"

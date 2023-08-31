@@ -10,12 +10,6 @@ variable "aws_auth_users_list" {
   ]
 }
 
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = ""
-}
-
 variable "azs" {
   description = "Availability zones"
   type        = list(any)

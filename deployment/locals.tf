@@ -14,7 +14,6 @@ locals {
   git_sync_branch                    = var.git_sync_branch
   deployment_name                    = "mlplatform"
   name_prefix                        = random_string.random_prefix.result
-  aws_region                         = var.AWS_REGION
 
   # Profiles
   profiles_yaml = yamldecode(file("${path.module}/profiles/user-list.yaml"))["profiles"]

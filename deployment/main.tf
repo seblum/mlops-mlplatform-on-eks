@@ -17,7 +17,6 @@ module "eks" {
   cluster_name                = local.cluster_name
   eks_cluster_version         = "1.24"
   vpc_id                      = module.vpc.vpc_id
-  aws_region                  = local.aws_region
   private_subnets             = module.vpc.private_subnets
   azs                         = module.vpc.azs
   private_subnets_cidr_blocks = module.vpc.private_subnets_cidr_blocks

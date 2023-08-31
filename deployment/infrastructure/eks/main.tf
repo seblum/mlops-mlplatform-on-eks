@@ -441,7 +441,6 @@ module "eks_autoscaler" {
   source                          = "./autoscaler"
   cluster_name                    = local.cluster_name
   cluster_namespace               = local.cluster_namespace
-  aws_region                      = var.aws_region
   cluster_oidc_issuer_url         = module.eks.cluster_oidc_issuer_url
   autoscaler_service_account_name = local.autoscaler_service_account_name
 }

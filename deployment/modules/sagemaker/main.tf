@@ -116,10 +116,10 @@ resource "helm_release" "sagemaker-dashboard" {
       path = "${var.domain_suffix}"
     },
     secret = {
-      AWS_REGION            = "${data.aws_region.current.name}"
-      AWS_ACCESS_KEY_ID     = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.id}"
-      AWS_SECRET_ACCESS_KEY = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.secret}"
-      AWS_ROLE_NAME         = "${aws_iam_role.sagemaker_dashboard_read_access_role.name}"
+      aws_region            = "${data.aws_region.current.name}"
+      aws_access_key_id     = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.id}"
+      aws_secret_access_key = "${aws_iam_access_key.sagemaker_dashboard_read_access_user_credentials.secret}"
+      aws_role_name         = "${aws_iam_role.sagemaker_dashboard_read_access_role.name}"
     }
   })]
 }

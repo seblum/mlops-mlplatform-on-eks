@@ -43,37 +43,37 @@ variable "airflow_git_client_secret" {
 variable "deploy_airflow" {
   description = "Should Airflow be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deploy_dashboard" {
   description = "Should the dashboard be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deploy_jupyterhub" {
   description = "Should JupyterHub be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deploy_mlflow" {
   description = "Should MLflow be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deploy_monitoring" {
   description = "Should monitoring be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deploy_sagemaker" {
   description = "Should Seldon Core be deployed?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "domain_name" {

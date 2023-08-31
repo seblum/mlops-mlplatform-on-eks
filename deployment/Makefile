@@ -17,12 +17,13 @@ wipe-tf-state:
 deploy-all: init \
 	create-vpc \
 	create-eks-cluster \
-	deploy-modules \
+	deploy-modules
 
 destroy-all: init \
 	destroy-modules \
 	destroy-eks-cluster \
-	destroy-vpc \
+	# TODO: delete loadbalancer and zielgruppen - currently done manually
+	destroy-vpc
 
 
 # TERRAFORM APPLY

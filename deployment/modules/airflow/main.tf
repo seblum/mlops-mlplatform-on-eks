@@ -197,16 +197,6 @@ resource "helm_release" "airflow" {
         }
       ],
       variables = local.airflow_variable_list_full
-      # [
-      #   {
-      #     key   = "s3_access_name"
-      #     value = "${local.s3_data_bucket_secret_name}"
-      #   },
-      #   {
-      #     key   = "MLFLOW_TRACKING_URI"
-      #     value = "http://mlflow-service.mlflow.svc.cluster.local"
-      #   }
-      # ]
     },
     serviceAccount = {
       create = true

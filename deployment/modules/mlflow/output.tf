@@ -1,6 +1,6 @@
 output "mlflow_tracking_uri" {
   description = "MLflow tracking URI"
-  value       = "${helm_release.mlflow.metadata[0].name}.${helm_release.mlflow.metadata[0].namespace}.svc.cluster.local"
+  value       = "${helm_release.mlflow.metadata[0].name}-service.${helm_release.mlflow.metadata[0].namespace}.svc.cluster.local"
 }
 
 output "mlflow_s3_policy_arn" {

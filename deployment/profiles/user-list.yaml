@@ -3,11 +3,12 @@ profiles:
     - username: max.mustermann
       email: max@example.com
       role: User
+    - username: susanne.froehlich
+      email: susanne@example.com
+      role: User
     - username: sebastian.blum
       email: sebastian@example.com
       role: Developer
     - username: meredith.musterfrau
       email: meredith@example.com
       role: Developer
-
-

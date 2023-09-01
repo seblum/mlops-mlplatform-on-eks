@@ -1,6 +1,13 @@
 variable "profile" {
-  type        = map(any)
   description = "Profile configuration as object"
+  type        = map(any)
+  default = {
+    "username"  = "max.mustermann"
+    "email"     = "max.mustermann@example.com"
+    "firstName" = "max"
+    "lastName"  = "mustermann"
+    "role"      = "Developer"
+  }
 }
 
 

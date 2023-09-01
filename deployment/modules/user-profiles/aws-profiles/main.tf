@@ -4,8 +4,10 @@ locals {
   role      = var.profile.role
   username  = "${local.firstName}-${local.lastName}"
 }
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
+
 
 resource "aws_iam_user" "this" {
   name = local.username

@@ -29,9 +29,9 @@ locals {
   }
 
   developers_user_access_auth_list = [
-    for role_arn in module.user-profiles.aws_user_access_profile["Developer"] : {
-      userarn  = role_arn["user_arn"]
-      username = role_arn["username"]
+    for user_entry in module.user-profiles.aws_user_access_profile["Developer"] : {
+      userarn  = user_entry["user_arn"]
+      username = user_entry["username"]
       groups   = ["system:masters"]
     }
   ]

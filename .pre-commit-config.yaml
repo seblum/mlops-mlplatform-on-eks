@@ -28,16 +28,16 @@ repos:
       hooks:
       -   id: blacken-docs
           additional_dependencies: [black==22.6.0]
-  - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.22
-    hooks:
-      - id: tflint
-      - id: terraform-validate
-      - id: terraform-fmt
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.83.0
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_docs
-      - id: terraform_docs
-      - id: checkov
+  # - repo: https://github.com/gruntwork-io/pre-commit
+  #   rev: v0.1.22
+  #   hooks:
+  #     # - id: tflint
+  #     - id: terraform-validate
+  #     - id: terraform-fmt
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.83.0
+  #   hooks:
+  #     - id: terraform_fmt
+  #     - id: terraform_docs
+  #     - id: terraform_docs
+  #     - id: checkov

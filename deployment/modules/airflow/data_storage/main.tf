@@ -17,11 +17,10 @@ resource "aws_iam_access_key" "s3_data_bucket_credentials" {
   user = aws_iam_user.s3_data_bucket_user.name
 }
 
-# TODO: needs to be airflow user
-# Airflow user needs to have access to mlflow policy
+# Airflow user needs to have access to mlflow policy. MLflow policy is passed through
 resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_mlflow_policy" {
-  count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
-  user       = local.s3_data_bucket_user_name
+  # count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
+  user       = aws_iam_user.s3_data_bucket_user.name
   policy_arn = var.s3_mlflow_bucket_policy_arn
 }
 
@@ -104,4 +103,3 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
     "AWS_ROLE_NAME"         = "${aws_iam_role.s3_data_bucket_role.name}"
   }
 }
-

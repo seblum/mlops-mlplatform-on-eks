@@ -30,13 +30,13 @@ resource "kubernetes_namespace" "airflow" {
 #
 # Log Storage
 #
-module "s3-remote-logging" {
-  source             = "./remote_logging"
-  s3_log_bucket_name = local.s3_log_bucket_name
-  namespace          = var.namespace
-  s3_force_destroy   = var.s3_force_destroy
-  oidc_provider_arn  = var.oidc_provider_arn
-}
+# module "s3-remote-logging" {
+#   source             = "./remote_logging"
+#   s3_log_bucket_name = local.s3_log_bucket_name
+#   namespace          = var.namespace
+#   s3_force_destroy   = var.s3_force_destroy
+#   oidc_provider_arn  = var.oidc_provider_arn
+# }
 
 ################################################################################
 #

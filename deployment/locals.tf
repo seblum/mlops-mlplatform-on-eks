@@ -38,7 +38,7 @@ locals {
 
   # "http://mlflow-service.mlflow.svc.cluster.local"
   mlflow_tracking_uri       = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : "not-deployed"
-  sagemaker_access_role_arn = var.deploy_sagemaker ? module.sagemaker[0].sagemaker_access_role_arn : "not-deployed"
+  sagemaker_access_role_name = var.deploy_sagemaker ? module.sagemaker[0].sagemaker_access_role_name : "not-deployed"
   ecr_repository_name       = var.deploy_sagemaker ? module.sagemaker[0].ecr_repository_name : "not-deployed"
   ecr_sagemaker_image_tag   = var.deploy_sagemaker ? module.sagemaker[0].repository_model_tag : "not-deployed"
 

@@ -73,9 +73,6 @@ module "mlflow" {
   rds_storage_type            = local.rds_storage_type
   rds_max_allocated_storage   = local.rds_max_allocated_storage
 
-  # TODO: add data access common rule
-  # s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
-
   depends_on = [
     module.eks
   ]
@@ -92,7 +89,7 @@ module "airflow" {
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
 
-  sagemaker_access_role_arn   = local.sagemaker_access_role_arn
+  sagemaker_access_role_name   = local.sagemaker_access_role_name
   s3_mlflow_bucket_policy_arn = var.deploy_mlflow ? module.mlflow[0].mlflow_s3_policy_arn : "not-deployed"
   s3_data_bucket_secret_name  = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name         = local.airflow_s3_data_bucket
@@ -112,10 +109,6 @@ module "airflow" {
   rds_instance_class          = "db.t3.micro"
   rds_storage_type            = local.rds_storage_type
   rds_max_allocated_storage   = local.rds_max_allocated_storage
-
-  # TODO: add data access common rule
-  # s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
-  # additional_s3_policy_arn = module.mlflow.mlflow_s3_policy_arn
 
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
@@ -180,7 +173,6 @@ module "sagemaker" {
   domain_suffix = "/sagemaker"
 
   docker_mlflow_sagemaker_base_image = "seblum/mlflow-sagemaker-deployment:v2.3.2"
-  # s3_mlflow_bucket_policy_arn = var.deploy_mlflow ? module.mlflow[0].mlflow_s3_policy_arn : "not-deployed"
 }
 
 

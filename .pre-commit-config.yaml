@@ -34,10 +34,12 @@ repos:
   #     # - id: tflint
   #     - id: terraform-validate
   #     - id: terraform-fmt
-  # - repo: https://github.com/antonbabenko/pre-commit-terraform
-  #   rev: v1.83.0
-  #   hooks:
-  #     - id: terraform_fmt
-  #     - id: terraform_docs
-  #     - id: terraform_docs
-  #     - id: checkov
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.0
+    hooks:
+      - id: terraform_fmt
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.16.0"
+    hooks:
+      - id: terraform-docs-go
+        args: ["markdown", "table", "--output-file", "Readme.md", "./deployment"]

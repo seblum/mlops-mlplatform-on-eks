@@ -89,7 +89,7 @@ module "airflow" {
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
 
-  sagemaker_access_role_name   = local.sagemaker_access_role_name
+  sagemaker_access_role_name  = local.sagemaker_access_role_name
   s3_mlflow_bucket_policy_arn = var.deploy_mlflow ? module.mlflow[0].mlflow_s3_policy_arn : "not-deployed"
   s3_data_bucket_secret_name  = local.airflow_s3_data_bucket_credentials
   s3_data_bucket_name         = local.airflow_s3_data_bucket

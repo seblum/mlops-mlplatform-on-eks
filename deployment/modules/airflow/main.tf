@@ -30,9 +30,9 @@ resource "kubernetes_namespace" "airflow" {
 # IAM Service Account Roles and Policies
 #
 module "iam-service-account" {
-  source             = "./iam_service_account"
-  namespace          = var.namespace
-  oidc_provider_arn  = var.oidc_provider_arn
+  source                      = "./iam_service_account"
+  namespace                   = var.namespace
+  oidc_provider_arn           = var.oidc_provider_arn
   s3_mlflow_bucket_policy_arn = var.s3_mlflow_bucket_policy_arn
 }
 
@@ -45,6 +45,7 @@ module "s3-data-storage" {
   namespace                   = var.namespace
   s3_data_bucket_name         = local.s3_data_bucket_name
   s3_data_bucket_secret_name  = local.s3_data_bucket_secret_name
+  s3_mlflow_bucket_policy_arn = var.s3_mlflow_bucket_policy_arn
   s3_force_destroy            = true
 }
 

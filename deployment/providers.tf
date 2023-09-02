@@ -15,7 +15,7 @@ terraform {
       version = ">= 5.11.0"
     }
     cloudinit = {
-      source = "hashicorp/cloudinit"
+      source  = "hashicorp/cloudinit"
       version = "2.3.2"
     }
     helm = {
@@ -35,7 +35,7 @@ terraform {
       version = "3.5.1"
     }
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "4.0.4"
     }
   }

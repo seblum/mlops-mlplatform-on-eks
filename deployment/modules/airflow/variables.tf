@@ -167,7 +167,7 @@ variable "rds_storage_type" {
   type        = string
 }
 
-variable "sagemaker_access_role_arn" {
+variable "sagemaker_access_role_name" {
   description = "Sagemaker access role ARN which is stored as secret"
   type        = string
   default     = "none-given"

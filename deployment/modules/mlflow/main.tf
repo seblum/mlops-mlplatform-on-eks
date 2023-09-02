@@ -35,7 +35,7 @@ resource "aws_iam_role" "mlflow_s3_role" {
         "Effect": "Allow",
         "Principal" : {
           "Federated" : [
-            "${var.oidc_provider_arn}" 
+            "${var.oidc_provider_arn}"
           ]
         }
       }
@@ -153,6 +153,3 @@ resource "helm_release" "mlflow" {
     },
   })]
 }
-
-
-

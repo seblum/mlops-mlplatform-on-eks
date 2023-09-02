@@ -33,9 +33,3 @@ variable "namespace" {
   type        = string
   default     = ""
 }
-
-# variable "s3_mlflow_bucket_policy_arn" {
-#   description = "Policy arn to access an additional externally create s3 bucket"
-#   type        = string
-#   default     = ""
-# }

@@ -97,14 +97,6 @@ resource "aws_iam_role_policy_attachment" "sagemaker_access_role_policy" {
   policy_arn = data.aws_iam_policy.AmazonSageMakerFullAccess.arn
 }
 
-
-# resource "aws_iam_role_policy_attachment" "sagemaker_mlflow_access_role_policy" {
-#   role       = aws_iam_role.sagemaker_access_role.name
-#   policy_arn = var.s3_mlflow_bucket_policy_arn
-# }
-
-
-
 # Helm Deployment
 resource "helm_release" "sagemaker-dashboard" {
   name             = var.name

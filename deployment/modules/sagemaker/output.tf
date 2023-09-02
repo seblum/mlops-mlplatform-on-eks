@@ -3,9 +3,9 @@ output "ecr_repository_name" {
   value       = local.ecr_repository_name
 }
 
-output "sagemaker_access_role_arn" {
+output "sagemaker_access_role_name" {
   description = "Access role arn that enables Sagemaker access"
-  value       = aws_iam_role.sagemaker_access_role.arn
+  value       = aws_iam_role.sagemaker_access_role.name
 }
 
 output "repository_model_tag" {

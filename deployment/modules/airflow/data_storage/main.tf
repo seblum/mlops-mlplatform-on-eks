@@ -17,13 +17,6 @@ resource "aws_iam_access_key" "s3_data_bucket_credentials" {
   user = aws_iam_user.s3_data_bucket_user.name
 }
 
-# Airflow user needs to have access to mlflow policy. MLflow policy is passed through
-resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_mlflow_policy" {
-  # count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
-  user       = aws_iam_user.s3_data_bucket_user.name
-  policy_arn = var.s3_mlflow_bucket_policy_arn
-}
-
 resource "aws_iam_policy" "s3_data_bucket_policy" {
   name = "${var.namespace}-s3-data-bucket-policy"
   path = "/"
@@ -109,3 +102,20 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
 #   name = local.s3_data_bucket_user_name
 #   path = "/"
 # }
+
+################################################################################
+#
+# Additional Policies to User
+#
+# Airflow user needs to have access to mlflow policy. MLflow policy is passed through
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_mlflow_policy" {
+  # count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
+  user       = aws_iam_user.s3_data_bucket_user.name
+  policy_arn = var.s3_mlflow_bucket_policy_arn
+}
+
+# Airflow user needs to have access to AWS Sagemaker to use mlflow.sagemaker api
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_sagemaker_policy" {
+  user       = aws_iam_user.s3_data_bucket_user.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}

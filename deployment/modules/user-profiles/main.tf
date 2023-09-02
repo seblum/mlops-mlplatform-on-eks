@@ -35,4 +35,6 @@ resource "aws_iam_role_policy_attachment" "sagemaker_access_user_role_policy" {
 
   role       = each.value
   policy_arn = data.aws_iam_policy.AmazonSageMakerFullAccess.arn
+
+  depends_on = [ module.aws-profiles ]
 }

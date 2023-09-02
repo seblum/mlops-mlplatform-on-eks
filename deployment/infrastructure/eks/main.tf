@@ -51,18 +51,12 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
 
+  # https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
-  manage_aws_auth_configmap       = true
 
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/Jonas_gerth"
-      username = "Jonas_gerth"
-      groups   = ["system:masters"]
-    }
-  ]
-  # aws_auth_users            = local.cluster_users # add users in later step
+  manage_aws_auth_configmap = true
+  aws_auth_users            = var.aws_auth_users_list
 
   cluster_addons = {
     coredns = {
@@ -448,7 +442,6 @@ module "eks_autoscaler" {
   source                          = "./autoscaler"
   cluster_name                    = local.cluster_name
   cluster_namespace               = local.cluster_namespace
-  aws_region                      = var.aws_region
   cluster_oidc_issuer_url         = module.eks.cluster_oidc_issuer_url
   autoscaler_service_account_name = local.autoscaler_service_account_name
 }

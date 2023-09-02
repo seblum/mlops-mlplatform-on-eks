@@ -22,7 +22,7 @@ resource "helm_release" "jupyterhub" {
         }
       },
       extraEnv = {
-        "MLFLOW_TRACKING_URI" = "http://mlflow-service.mlflow.svc.cluster.local"
+        "MLFLOW_TRACKING_URI" = var.mlflow_tracking_uri
       }
     },
     ingress = {

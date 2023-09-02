@@ -1,5 +1,7 @@
+locals {
+  s3_data_bucket_user_name = "airflow-s3-data-bucket-user"
+}
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
 
 resource "aws_s3_bucket" "s3_data_storage" {
   bucket        = var.s3_data_bucket_name
@@ -7,7 +9,7 @@ resource "aws_s3_bucket" "s3_data_storage" {
 }
 
 resource "aws_iam_user" "s3_data_bucket_user" {
-  name = var.s3_data_bucket_user_name
+  name = local.s3_data_bucket_user_name
   path = "/"
 }
 
@@ -88,7 +90,6 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
     namespace = var.namespace
   }
   data = {
-    "AWS_REGION"            = "${data.aws_region.current.name}"
     "AWS_BUCKET"            = "${aws_s3_bucket.s3_data_storage.bucket}"
     "AWS_ACCESS_KEY_ID"     = "${aws_iam_access_key.s3_data_bucket_credentials.id}"
     "AWS_SECRET_ACCESS_KEY" = "${aws_iam_access_key.s3_data_bucket_credentials.secret}"
@@ -96,3 +97,9 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
   }
 }
 
+# Airflow user needs to have access to mlflow policy. MLflow policy is passed through
+resource "aws_iam_user_policy_attachment" "s3_data_bucket_user_mlflow_policy" {
+  # count      = var.s3_mlflow_bucket_policy_arn != "not-deployed" ? 1 : 0
+  user       = aws_iam_user.s3_data_bucket_user.name
+  policy_arn = var.s3_mlflow_bucket_policy_arn
+}

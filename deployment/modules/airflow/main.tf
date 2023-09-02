@@ -5,11 +5,18 @@ locals {
   git_organization_secret_name = "${local.prefix}-organization-git-secret"
   s3_data_bucket_secret_name   = "${var.namespace}-${var.s3_data_bucket_secret_name}"
   s3_data_bucket_name          = "${local.prefix}-${var.s3_data_bucket_name}"
-  s3_log_bucket_name           = "${local.prefix}-log-storage"
+
+  airflow_variable_list_addition = [
+    {
+      key   = "s3_access_name"
+      value = "${local.s3_data_bucket_secret_name}"
+    }
+  ]
+  airflow_variable_list_full = concat(var.airflow_variable_list, local.airflow_variable_list_addition)
 }
 
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
+data "aws_region" "current" {} #
 
 resource "kubernetes_namespace" "airflow" {
   metadata {
@@ -20,14 +27,13 @@ resource "kubernetes_namespace" "airflow" {
 
 ################################################################################
 #
-# Log Storage
+# IAM Service Account Roles and Policies
 #
-module "s3-remote-logging" {
-  source             = "./remote_logging"
-  s3_log_bucket_name = local.s3_log_bucket_name
-  namespace          = var.namespace
-  s3_force_destroy   = var.s3_force_destroy
-  oidc_provider_arn  = var.oidc_provider_arn
+module "iam-service-account" {
+  source                      = "./iam-service-account"
+  namespace                   = var.namespace
+  oidc_provider_arn           = var.oidc_provider_arn
+  s3_mlflow_bucket_policy_arn = var.s3_mlflow_bucket_policy_arn
 }
 
 ################################################################################
@@ -35,12 +41,12 @@ module "s3-remote-logging" {
 # Data Storage
 #
 module "s3-data-storage" {
-  source                     = "./data_storage"
-  s3_data_bucket_name        = local.s3_data_bucket_name
-  namespace                  = var.namespace
-  s3_force_destroy           = true
-  s3_data_bucket_secret_name = local.s3_data_bucket_secret_name
-  s3_data_bucket_user_name   = var.s3_data_bucket_user_name
+  source                      = "./data-storage"
+  namespace                   = var.namespace
+  s3_data_bucket_name         = local.s3_data_bucket_name
+  s3_data_bucket_secret_name  = local.s3_data_bucket_secret_name
+  s3_mlflow_bucket_policy_arn = var.s3_mlflow_bucket_policy_arn
+  s3_force_destroy            = true
 }
 
 ################################################################################
@@ -76,6 +82,30 @@ resource "kubernetes_secret" "airflow_organization_git_secret" {
   data = {
     "GITHUB_CLIENT_ID"     = var.git_client_id
     "GITHUB_CLIENT_SECRET" = var.git_client_secret
+  }
+}
+
+
+# secret with account information
+resource "kubernetes_secret" "aws-account-information" {
+  metadata {
+    name      = "${var.namespace}-aws-account-information"
+    namespace = var.namespace
+  }
+  data = {
+    "AWS_REGION" = "${data.aws_region.current.name}"
+    "AWS_ID"     = "${data.aws_caller_identity.current.account_id}"
+  }
+}
+
+# secret for sagemaker
+resource "kubernetes_secret" "sagemaker-access" {
+  metadata {
+    name      = "${var.namespace}-sagemaker-access"
+    namespace = var.namespace
+  }
+  data = {
+    "AWS_ROLE_NAME_SAGEMAKER" = var.sagemaker_access_role_name # TODO "${var.sagemaker_access_role_arn}"
   }
 }
 
@@ -156,30 +186,21 @@ resource "helm_release" "airflow" {
       executor           = "KubernetesExecutor"
       fernetKey          = var.fernet_key
       webserverSecretKey = "THIS IS UNSAFE!"
-      connections = [
-        {
-          id          = "aws_logs_storage_access"
-          type        = "aws"
-          description = "AWS connection to store logs on S3"
-          extra       = "{\"region_name\": \"${data.aws_region.current.name}\"}"
-        }
-      ],
-      variables = [
-        {
-          key   = "MLFLOW_TRACKING_URI"
-          value = "http://mlflow-service.mlflow.svc.cluster.local"
-        },
-        {
-          key   = "s3_access_name"
-          value = "${local.s3_data_bucket_secret_name}"
-        }
-      ]
+      # connections = [
+      #   {
+      #     id          = "aws_logs_storage_access"
+      #     type        = "aws"
+      #     description = "AWS connection to store logs on S3"
+      #     extra       = "{\"region_name\": \"${data.aws_region.current.name}\"}"
+      #   }
+      # ],
+      variables = local.airflow_variable_list_full
     },
     serviceAccount = {
       create = true
       name   = "airflow-sa"
       annotations = {
-        "eks.amazonaws.com/role-arn" = "${module.s3-remote-logging.s3_log_bucket_role_arn}"
+        "eks.amazonaws.com/role-arn" = "${module.iam-service-account.airflow_service_account_role_arn}"
       }
     },
     scheduler = {

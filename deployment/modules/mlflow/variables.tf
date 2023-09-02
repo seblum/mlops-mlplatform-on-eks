@@ -10,6 +10,18 @@ variable "create_namespace" {
   default     = true
 }
 
+variable "domain_name" {
+  description = "Domain name"
+  type        = string
+  default     = ""
+}
+
+variable "domain_suffix" {
+  description = "Domain suffix"
+  type        = string
+  default     = ""
+}
+
 variable "name" {
   description = "Name"
   type        = string
@@ -100,11 +112,11 @@ variable "s3_bucket_name" {
   default     = ""
 }
 
-variable "s3_data_bucket_user_name" {
-  description = "User name for the S3 data bucket"
-  type        = string
-  default     = ""
-}
+# variable "s3_data_bucket_user_name" {
+#   description = "User name for the S3 data bucket"
+#   type        = string
+#   default     = ""
+# }
 
 variable "s3_force_destroy" {
   description = "Set to true to disable protection against S3 bucket being destroyed. Use only for dev!"

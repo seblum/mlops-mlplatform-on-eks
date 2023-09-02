@@ -14,11 +14,6 @@ variable "cluster_oidc_issuer_url" {
   description = "cluster OIDC issuer url"
 }
 
-variable "aws_region" {
-  type        = string
-  description = "AWS region"
-}
-
 variable "autoscaler_service_account_name" {
   type        = string
   description = "Name of the cluster autoscaler service account"

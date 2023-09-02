@@ -5,9 +5,17 @@ resource "helm_release" "dashboard" {
   create_namespace = var.create_namespace
 
   chart = "${path.module}/helm/"
-  values = [
-    "${file("${path.module}/helm/values.yaml")}"
-  ]
+  values = [yamlencode({
+    deployment = {
+      image     = "seblum/vuejs-ml-dashboard:latest"
+      name      = var.name
+      namespace = var.namespace
+    },
+    ingress = {
+      host = var.domain_name
+      path = var.domain_suffix
+    }
+  })]
 }
 
 

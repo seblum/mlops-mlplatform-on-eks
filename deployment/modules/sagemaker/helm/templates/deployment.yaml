@@ -21,18 +21,24 @@ spec:
         - name: {{ .Values.deployment.name }}
           image: {{ .Values.deployment.image }}
           imagePullPolicy: Always
+          env:
+            - name: MLFLOW_PORT
+              value: "5000"
+          envFrom:
+            - secretRef:
+                name: sagemaker-read-access-secret
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8501
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health/liveness
-              port: 80
+              path: {{ .Values.ingress.path }}/healthz
+              port: 8501
           readinessProbe:
             httpGet:
-              path: /health/readiness
-              port: 80
+              path: {{ .Values.ingress.path }}/healthz
+              port: 8501
           resources:
             requests:
               memory: "64Mi"

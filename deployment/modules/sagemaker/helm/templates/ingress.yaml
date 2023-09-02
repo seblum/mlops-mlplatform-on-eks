@@ -9,7 +9,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/group.name: mlplatform
-    alb.ingress.kubernetes.io/healthcheck-path: /health/liveness
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.ingress.path }}/healthz
 spec:
   rules:
     - host: www.{{ .Values.ingress.host }}

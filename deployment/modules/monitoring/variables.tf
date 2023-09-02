@@ -4,6 +4,18 @@ variable "create_namespace" {
   default     = true
 }
 
+variable "domain_name" {
+  description = "Domain name"
+  type        = string
+  default     = ""
+}
+
+variable "domain_suffix" {
+  description = "Domain suffix"
+  type        = string
+  default     = ""
+}
+
 variable "git_client_id" {
   description = "Client ID for Git integration"
   type        = string
@@ -15,21 +27,6 @@ variable "git_client_secret" {
   type        = string
   default     = ""
 }
-
-# variable "helm_chart_repository" {
-#   type        = string
-#   description = "Repository URL or path to the location of the helm repo"
-# }
-
-# variable "helm_chart_name" {
-#   type        = string
-#   description = "Name of the helm chart"
-# }
-
-# variable "helm_chart_version" {
-#   type        = string
-#   description = "Version of the helm chart"
-# }
 
 variable "name" {
   description = "Name"

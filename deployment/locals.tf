@@ -14,37 +14,48 @@ locals {
   git_sync_branch                    = var.git_sync_branch
   deployment_name                    = "mlplatform"
   name_prefix                        = random_string.random_prefix.result
-  aws_region                         = var.AWS_REGION
+
   # Profiles
   profiles_yaml = yamldecode(file("${path.module}/profiles/user-list.yaml"))["profiles"]
 
   profiles_config = {
-    for profile in local.profiles_yaml : profile["user"] => {
-      name         = profile["user"]
-      email        = profile["email"]
-      firstName    = split(".", profile["user"])[0]
-      lastName     = split(".", profile["user"])[1]
-      airflow_role = lookup(profile, "airflow_role", [])
+    for profile in local.profiles_yaml : profile["username"] => {
+      username  = profile["username"]
+      email     = profile["email"]
+      firstName = split(".", profile["username"])[0]
+      lastName  = split(".", profile["username"])[1]
+      role      = profile["role"]
     }
   }
 
-  # airflow_profiles = [
-  #   for profile in local.profiles_yaml : {
-  #     username  = profile["user"]
-  #     password  = module.user-profiles.user_profile[profile["user"]]["user_password"]
-  #     email     = profile["email"]
-  #     role      = lookup(profile, "airflow_role", [])
-  #     firstName = split(".", profile["user"])[0]
-  #     lastName  = split(".", profile["user"])[1]
-  # }]
+  developers_user_access_auth_list = [
+    for user_entry in module.user-profiles.aws_user_access_profile["Developer"] : {
+      userarn  = user_entry["user_arn"]
+      username = user_entry["username"]
+      groups   = ["system:masters"]
+    }
+  ]
 
-  # jupyterhub_admin_user_list = flatten(compact([
-  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "Admin" ? profile["user"] : ""
-  # ]))
+  # "http://mlflow-service.mlflow.svc.cluster.local"
+  mlflow_tracking_uri        = var.deploy_mlflow ? module.mlflow[0].mlflow_tracking_uri : "not-deployed"
+  sagemaker_access_role_name = var.deploy_sagemaker ? module.sagemaker[0].sagemaker_access_role_name : "not-deployed"
+  ecr_repository_name        = var.deploy_sagemaker ? module.sagemaker[0].ecr_repository_name : "not-deployed"
+  ecr_sagemaker_image_tag    = var.deploy_sagemaker ? module.sagemaker[0].repository_model_tag : "not-deployed"
 
-  # jupyterhub_allowed_user_list = flatten(compact([
-  #   for profile in local.profiles_yaml : profile["jupyter_role"] == "User" ? profile["user"] : ""
-  # ]))
+  airflow_variable_list = [
+    {
+      "key"   = "MLFLOW_TRACKING_URI"
+      "value" = local.mlflow_tracking_uri
+    },
+    {
+      "key"   = "ECR_REPOSITORY_NAME"
+      "value" = local.ecr_repository_name
+    },
+    {
+      "key"   = "ECR_SAGEMAKER_IMAGE_TAG"
+      "value" = local.ecr_sagemaker_image_tag
+    },
+  ]
 
 }
 

@@ -1,10 +1,14 @@
+# types for role: User, Developer
 profiles:
-    - user: admin.master
-      airflow_role: Admin
-      email: admin@example.com
-      jupyter_role: Admin
-    - user: sebastian.blum
-      airflow_role: Admin
+    - username: max.mustermann
+      email: max@example.com
+      role: User
+    - username: susanne.froehlich
+      email: susanne@example.com
+      role: User
+    - username: sebastian.blum
       email: sebastian@example.com
-      jupyter_role: User
-
+      role: Developer
+    - username: meredith.musterfrau
+      email: meredith@example.com
+      role: Developer

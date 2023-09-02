@@ -54,17 +54,3 @@ To delete a load balancer and a NAT gateway, you can use the following AWS CLI c
     ```
 
 Please be cautious while using these commands, as they will permanently delete the specified resources. Make sure you are confident about the resources you are deleting and their impact on your environment.
-
-## Kubernetes Commands:
-
-1. **Export Namespace Configuration:**
-   To export the configuration of a namespace (e.g., "airflow") to a JSON file named "admins.json," use the following command:
-   ```
-   kubectl get namespace airflow -o json > admins.json
-   ```
-2. **Finalize Namespace Deletion:**
-   To finalize the deletion of a namespace (e.g., "airflow") after its resources have been removed, use the following command:
-   ```
-   kubectl replace --raw "/api/v1/namespaces/airflow/finalize" -f ./admins.json
-   ```
-

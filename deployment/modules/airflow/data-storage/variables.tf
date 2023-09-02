@@ -16,10 +16,10 @@ variable "s3_data_bucket_secret_name" {
   default     = ""
 }
 
-variable "s3_data_bucket_user_name" {
-  description = "Username for accessing the S3 Data Bucket"
+variable "s3_mlflow_bucket_policy_arn" {
+  description = "Policy ARN of an MLflow bucket to attach to a user"
   type        = string
-  default     = ""
+  default     = "not-deployed"
 }
 
 variable "s3_force_destroy" {

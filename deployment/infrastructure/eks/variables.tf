@@ -1,12 +1,18 @@
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = ""
+variable "aws_auth_users_list" {
+  description = "List of aws auth users of the EKS cluster"
+  type        = list(any)
+  default = [
+    {
+      userarn  = "arn:aws:iam::CURRENT_ACCOUNT_ID:user/USER_NAME"
+      username = "USER_NAME"
+      groups   = ["system:masters"]
+    }
+  ]
 }
 
 variable "azs" {
   description = "Availability zones"
-  type        = list(string)
+  type        = list(any)
   default     = [""]
 }
 

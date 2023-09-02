@@ -180,6 +180,7 @@ module "sagemaker" {
   domain_suffix = "/sagemaker"
 
   docker_mlflow_sagemaker_base_image = "seblum/mlflow-sagemaker-deployment:v2.3.2"
+  # s3_mlflow_bucket_policy_arn = var.deploy_mlflow ? module.mlflow[0].mlflow_s3_policy_arn : "not-deployed"
 }
 
 

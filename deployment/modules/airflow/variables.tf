@@ -195,11 +195,6 @@ variable "s3_mlflow_bucket_policy_arn" {
   default     = ""
 }
 
-# variable "s3_data_bucket_user_name" {
-#   description = "User name for S3 data bucket"
-#   type        = string
-# }
-
 variable "vpc_id" {
   description = "VPC of the EKS cluster"
   type        = string

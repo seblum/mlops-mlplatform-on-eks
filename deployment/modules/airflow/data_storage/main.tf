@@ -103,3 +103,9 @@ resource "kubernetes_secret" "s3_data_bucket_access_credentials" {
     "AWS_ROLE_NAME"         = "${aws_iam_role.s3_data_bucket_role.name}"
   }
 }
+
+# get aws full sagemaker to user
+# resource "aws_iam_user" "s3_data_bucket_user" {
+#   name = local.s3_data_bucket_user_name
+#   path = "/"
+# }

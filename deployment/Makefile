@@ -22,8 +22,11 @@ deploy-all: init \
 destroy-all: init \
 	destroy-modules \
 	destroy-eks-cluster \
-	# TODO: delete loadbalancer and zielgruppen - currently done manually
 	destroy-vpc
+
+# TODO: delete loadbalancer and zielgruppen - currently done manually
+# aws elbv2 describe-load-balancers --query "LoadBalancers[?starts_with(LoadBalancerName,'loadbalancer-alb-')].LoadBalancerArn" --output text | tr "\t" "\n" | xargs -I{} aws elbv2 delete-load-balancer --load-balancer-arn {}
+
 
 
 # TERRAFORM APPLY

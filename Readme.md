@@ -75,7 +75,7 @@ The project *ML Platform on EKS* provides a comprehensive machine learning platf
 
 ## Installation / Deployment
 
-Follow the deployment sets and its prerequistes in the dedidacted [Installation Document](./Installation.md).
+Follow the deployment setup and its prerequistes in the dedidacted [Installation Document](./Installation.md).
 
 ## Contributing
 

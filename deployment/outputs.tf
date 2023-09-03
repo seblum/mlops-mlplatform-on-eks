@@ -1,8 +1,3 @@
-output "aws_region" {
-  description = "AWS region"
-  value       = data.aws_region.current.name
-}
-
 output "cluster_name" {
   description = "Kubernetes Cluster Name"
   value       = local.cluster_name
@@ -19,5 +14,6 @@ output "developers_user_access_auth_list" {
 # }
 
 output "airflow_variable_list" {
+  description = "List of Variables added to the Airflow deployments as Airflow Variables"
   value = local.airflow_variable_list
 }

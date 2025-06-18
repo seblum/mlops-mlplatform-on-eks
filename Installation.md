@@ -43,6 +43,24 @@ For a more in-depth walkthrough and troubleshooting guidance, consult the [AWS R
 Once you have these prerequisites in place, you'll be well-prepared to proceed with the deployment of the ML Platform.
 
 
+## Bootstrap AWS Backend
+
+Before deploying the main infrastructure, you need to set up the S3 bucket for the Terraform state and a DynamoDB table for state locking. A dedicated Terraform configuration is provided to automate this process.
+
+1.  Navigate to the bootstrap directory:
+    ```bash
+    cd deployment/bootstrap
+    ```
+2.  Initialize Terraform:
+    ```bash
+    terraform init
+    ```
+3.  Apply the configuration:
+    ```bash
+    terraform apply
+    ```
+This will create the S3 bucket and DynamoDB table with the default names (`mlplatform-terraform-state` and `mlplatform-terraform-locks`). This step only needs to be performed once for your AWS account. After the resources are created, you can proceed with the main deployment.
+
 ## Deployment
 
 To deploy the ML platform on AWS EKS:

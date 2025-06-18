@@ -5,14 +5,14 @@ terraform {
     bucket = "mlplatform-terraform-state"
     key    = "terraform.tfstate"
     region = "eu-central-1"
-    # dynamodb_table = "aws-locks"
+    dynamodb_table = "mlplatform-terraform-locks"
     encrypt = true
   }
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.11.0"
+      version = "5.11.0"
     }
     cloudinit = {
       source  = "hashicorp/cloudinit"
@@ -24,7 +24,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.22.0"
+      version = "2.22.0"
     }
     null = {
       source  = "hashicorp/null"
@@ -43,8 +43,6 @@ terraform {
 
 provider "aws" {
   region     = var.AWS_REGION
-  access_key = var.AWS_ACCESS_KEY
-  secret_key = var.AWS_SECRET_KEY
 }
 
 provider "kubernetes" {

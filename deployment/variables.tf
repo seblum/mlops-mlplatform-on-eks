@@ -1,15 +1,3 @@
-variable "AWS_ACCESS_KEY" {
-  description = "AWS access key id"
-  type        = string
-  default     = ""
-}
-
-variable "AWS_SECRET_KEY" {
-  description = "AWS secret access key"
-  type        = string
-  default     = ""
-}
-
 variable "AWS_REGION" {
   description = "AWS region"
   type        = string

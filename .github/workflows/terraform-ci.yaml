@@ -1,0 +1,34 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    paths:
+      - '**.tf'
+      - 'deployment/**'
+      - 'tests/**'
+      - '.github/workflows/terraform-ci.yaml'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      - name: Pre-commit checks
+        uses: pre-commit/action@v3.0.0
+
+      - name: Run Terratest
+        run: |
+          go test ./tests/... -v 

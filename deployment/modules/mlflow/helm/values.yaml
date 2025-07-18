@@ -19,3 +19,10 @@ artifacts:
   s3_bucket:
   s3_key_prefix:
   s3_role_arn: 
+
+externalSecrets:
+  enabled: false
+  storeRef:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+  rdsSecretName: "mlflow-rds" 

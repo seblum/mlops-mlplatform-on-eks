@@ -6,4 +6,4 @@ output "release_name" {
 output "namespace" {
   description = "Kubernetes namespace where operator is deployed"
   value       = helm_release.external_secrets.namespace
-} 
+}

@@ -4,7 +4,7 @@ locals {
 }
 
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
+data "aws_region" "current" {} #
 
 module "external_dns_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
@@ -75,4 +75,3 @@ resource "helm_release" "external_dns" {
     txtOwnerId = "${var.name}"
   })]
 }
-

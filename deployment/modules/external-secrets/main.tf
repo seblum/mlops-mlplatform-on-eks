@@ -37,4 +37,4 @@ resource "helm_release" "external_secrets" {
 
   lint          = true
   dependency_update = true
-} 
+}

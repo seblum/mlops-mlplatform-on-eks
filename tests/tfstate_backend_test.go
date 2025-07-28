@@ -25,4 +25,4 @@ func TestTfstateBackendModule(t *testing.T) {
   // Initialize and validate (no apply to keep tests cheap)
   _, err := terraform.InitAndValidateE(t, terraformOptions)
   assert.NoError(t, err)
-} 
+}

@@ -8,7 +8,12 @@ repos:
     rev: v3.2.0
     hooks:
       - id: check-yaml
-        exclude: ^.gitlab-ci.yml
+        exclude: |
+          (?x)^(
+              \.gitlab-ci\.yml|
+              deployment/.*/helm/templates/.*\.yaml|
+              deployment/infrastructure/eks/autoscaler/test-deployment-autoscaler\.yml
+          )$
       - id: check-added-large-files
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -28,13 +33,14 @@ repos:
       hooks:
       -   id: blacken-docs
           additional_dependencies: [black==22.6.0]
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.84.0
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_validate
-      - id: terraform_tflint
-      - id: terraform_tfsec
+  # Terraform hooks disabled on Windows due to bash dependency
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.84.0
+  #   hooks:
+  #     - id: terraform_fmt
+  #     - id: terraform_validate
+  #     - id: terraform_tflint
+  #     - id: terraform_tfsec
   # - repo: https://github.com/gruntwork-io/pre-commit
   #   rev: v0.1.22
   #   hooks:

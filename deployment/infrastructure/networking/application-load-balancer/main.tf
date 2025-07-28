@@ -4,7 +4,7 @@ locals {
 }
 
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {} # 
+data "aws_region" "current" {} #
 
 module "aws_load_balancer_controller_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"

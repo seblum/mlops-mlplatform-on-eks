@@ -84,4 +84,4 @@ If something goes wrong:
 3. Once fixed, re-enable ESO and apply again.
 
 ---
-Last updated: {{< date >}} 
+Last updated: {{< date >}}

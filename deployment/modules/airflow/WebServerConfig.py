@@ -9,12 +9,8 @@ class CustomSecurityManager(AirflowSecurityManager):
     def get_oauth_user_info(self, provider, resp):
         if provider == "github":
             user_data = self.appbuilder.sm.oauth_remotes[provider].get("user").json()
-            emails_data = (
-                self.appbuilder.sm.oauth_remotes[provider].get("user/emails").json()
-            )
-            teams_data = (
-                self.appbuilder.sm.oauth_remotes[provider].get("user/teams").json()
-            )
+            emails_data = self.appbuilder.sm.oauth_remotes[provider].get("user/emails").json()
+            teams_data = self.appbuilder.sm.oauth_remotes[provider].get("user/teams").json()
 
             # unpack the user's name
             first_name = ""
@@ -67,9 +63,7 @@ SECURITY_MANAGER_CLASS = CustomSecurityManager
 
 # registration configs
 AUTH_USER_REGISTRATION = True  # allow users who are not already in the FAB DB
-AUTH_USER_REGISTRATION_ROLE = (
-    "Public"  # this role will be given in addition to any AUTH_ROLES_MAPPING
-)
+AUTH_USER_REGISTRATION_ROLE = "Public"  # this role will be given in addition to any AUTH_ROLES_MAPPING
 
 # the list of providers which the user can choose from
 OAUTH_PROVIDERS = [

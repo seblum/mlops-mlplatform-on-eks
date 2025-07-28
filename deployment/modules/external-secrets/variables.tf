@@ -50,4 +50,4 @@ variable "labels" {
   description = "Additional labels to apply"
   type        = map(string)
   default     = {}
-} 
+}

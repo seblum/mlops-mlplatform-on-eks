@@ -17,6 +17,3 @@ resource "helm_release" "dashboard" {
     }
   })]
 }
-
-
-

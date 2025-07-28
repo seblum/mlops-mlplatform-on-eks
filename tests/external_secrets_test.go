@@ -19,4 +19,4 @@ func TestExternalSecretsModule(t *testing.T) {
 
   _, err := terraform.InitAndValidateE(t, terraformOptions)
   assert.NoError(t, err)
-} 
+}

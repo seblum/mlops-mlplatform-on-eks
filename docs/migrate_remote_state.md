@@ -70,4 +70,4 @@ If you need to revert to local state:
 * Enable server-side encryption (already enforced by module).
 
 ---
-Last updated: {{< date >}} 
+Last updated: {{< date >}}

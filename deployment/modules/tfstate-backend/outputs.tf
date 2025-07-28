@@ -6,4 +6,4 @@ output "bucket_name" {
 output "lock_table_name" {
   description = "Name of the DynamoDB table used for state locking"
   value       = aws_dynamodb_table.this.name
-} 
+}

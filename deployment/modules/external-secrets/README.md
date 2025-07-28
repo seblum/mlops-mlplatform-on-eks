@@ -54,4 +54,4 @@ resource "aws_iam_role_policy" "sm_access" {
 }
 ```
 
-Refer to the AWS Secrets Manager docs for least-privilege policy examples. 
+Refer to the AWS Secrets Manager docs for least-privilege policy examples.

@@ -32,5 +32,3 @@ kubectl replace --raw "/api/v1/namespaces/yatai-system/finalize" -f ./admins.jso
 kubectl get namespace sagemaker-dashboard -o json > admins.json
 kubectl replace --raw "/api/v1/namespaces/sagemaker-dashboard/finalize" -f ./admins.json
 ```
-
-

@@ -5,5 +5,5 @@ deployment:
   namespace:
 
 ingress:
-  host: 
-  path: 
+  host:
+  path:

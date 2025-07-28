@@ -52,11 +52,11 @@ terraform {
 
 ## Security & Compliance
 
-* Bucket encryption is enforced (SSE-S3). 
+* Bucket encryption is enforced (SSE-S3).
 * Bucket is private with all public access blocked.
 * Bucket has versioning enabled to allow recovery of previous state versions.
 * `prevent_destroy` lifecycle rule helps avoid accidental state deletion.
 
 ## License
 
-MIT - see [LICENSE](../../../LICENSE) 
+MIT - see [LICENSE](../../../LICENSE)

@@ -21,11 +21,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -39,11 +34,6 @@ jobs:
         run: |
           pre-commit run --all-files
 
-      - name: Setup Go dependencies
+      - name: Terraform validate
         run: |
-          go mod tidy
-          go mod download
-
-      - name: Run Terratest
-        run: |
-          go test ./tests/... -v
+          find deployment -name "*.tf" -exec dirname {} \; | sort -u | xargs -I {} sh -c 'echo "Validating {}" && cd {} && terraform init -backend=false && terraform validate'

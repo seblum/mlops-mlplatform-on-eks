@@ -39,9 +39,8 @@ jobs:
         run: |
           pre-commit run --all-files
 
-      - name: Initialize Go module and dependencies
+      - name: Setup Go dependencies
         run: |
-          go mod init github.com/seblum/mlops-mlplatform-on-eks
           go mod tidy
           go mod download
 

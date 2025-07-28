@@ -12,7 +12,8 @@ repos:
           (?x)^(
               \.gitlab-ci\.yml|
               deployment/.*/helm/templates/.*\.yaml|
-              deployment/infrastructure/eks/autoscaler/test-deployment-autoscaler\.yml
+              deployment/infrastructure/eks/autoscaler/test-deployment-autoscaler\.yml|
+              deployment/modules/.*/helm/templates/.*\.yaml
           )$
       - id: check-added-large-files
       - id: end-of-file-fixer

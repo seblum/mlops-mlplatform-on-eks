@@ -1,14 +1,6 @@
 terraform {
   required_version = ">= 1.5.3"
 
-  backend "s3" {
-    bucket         = "REPLACE_ME_BUCKET"
-    key            = "bootstrap/terraform.tfstate"
-    region         = "REPLACE_ME_REGION"
-    dynamodb_table = "REPLACE_ME_DYNAMODB_TABLE"
-    encrypt        = true
-  }
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"

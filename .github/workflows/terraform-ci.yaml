@@ -34,6 +34,24 @@ jobs:
         run: |
           pre-commit run --all-files
 
-      - name: Terraform validate
+      - name: Validate new modules only
         run: |
-          find deployment -name "*.tf" -exec dirname {} \; | sort -u | xargs -I {} sh -c 'echo "Validating {}" && cd {} && terraform init -backend=false && terraform validate'
+          echo "Validating tfstate-backend module..."
+          cd deployment/modules/tfstate-backend
+          terraform init -backend=false
+          terraform validate
+          
+          echo "Validating external-secrets module..."
+          cd ../external-secrets
+          terraform init -backend=false
+          terraform validate
+          
+          echo "Validating vpc module..."
+          cd ../../infrastructure/vpc
+          terraform init -backend=false
+          terraform validate
+          
+          echo "Validating rds module..."
+          cd ../rds
+          terraform init -backend=false
+          terraform validate

@@ -39,8 +39,12 @@ jobs:
         run: |
           pre-commit run --all-files
 
+      - name: Initialize Go module and dependencies
+        run: |
+          go mod init github.com/seblum/mlops-mlplatform-on-eks
+          go mod tidy
+          go mod download
+
       - name: Run Terratest
         run: |
-          go mod init test
-          go mod tidy
           go test ./tests/... -v 

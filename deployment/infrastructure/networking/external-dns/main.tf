@@ -8,7 +8,7 @@ data "aws_region" "current" {} #
 
 module "external_dns_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "5.11.1"
+  version                       = "~> 5.52"
   create_role                   = true
   role_name                     = local.external_dns_service_account_role_name
   provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")

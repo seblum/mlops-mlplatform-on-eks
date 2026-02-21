@@ -9,7 +9,7 @@ resource "helm_release" "prometheus" {
   create_namespace = var.create_namespace
 
   repository = "https://prometheus-community.github.io/helm-charts"
-  version    = "19.7.2"
+  version    = "27.3.0"
 
   values = [
     yamlencode({
@@ -35,7 +35,7 @@ resource "helm_release" "prometheus-operator-crds" {
   create_namespace = var.create_namespace
 
   repository = "https://prometheus-community.github.io/helm-charts"
-  version    = "5.1.0"
+  version    = "17.0.2"
 }
 
 
@@ -50,7 +50,7 @@ resource "helm_release" "grafana" {
   create_namespace = var.create_namespace
 
   repository = "https://grafana.github.io/helm-charts/"
-  version    = "6.57.4"
+  version    = "8.8.4"
 
   values = [
     yamlencode({

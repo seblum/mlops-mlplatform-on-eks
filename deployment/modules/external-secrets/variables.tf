@@ -25,7 +25,7 @@ variable "chart_name" {
 variable "chart_version" {
   description = "Chart version"
   type        = string
-  default     = "0.9.11"
+  default     = "0.12.1"
 }
 
 variable "create_service_account" {

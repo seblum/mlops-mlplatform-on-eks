@@ -15,7 +15,7 @@ module "vpc" {
 module "eks" {
   source                      = "./infrastructure/eks"
   cluster_name                = local.cluster_name
-  eks_cluster_version         = "1.24"
+  eks_cluster_version         = "1.32"
   vpc_id                      = module.vpc.vpc_id
   private_subnets             = module.vpc.private_subnets
   azs                         = module.vpc.azs
@@ -68,7 +68,7 @@ module "mlflow" {
   rds_port                    = 5432
   rds_name                    = "mlflow"
   rds_engine                  = "mysql"
-  rds_engine_version          = "8.0.33"
+  rds_engine_version          = "8.0.40"
   rds_instance_class          = "db.t3.micro"
   rds_storage_type            = local.rds_storage_type
   rds_max_allocated_storage   = local.rds_max_allocated_storage
@@ -105,14 +105,14 @@ module "airflow" {
   rds_port                    = 5000
   rds_name                    = "airflow"
   rds_engine                  = "postgres"
-  rds_engine_version          = "13.11" # end of support may 2024
+  rds_engine_version          = "16.4"
   rds_instance_class          = "db.t3.micro"
   rds_storage_type            = local.rds_storage_type
   rds_max_allocated_storage   = local.rds_max_allocated_storage
 
   helm_chart_repository = "https://airflow-helm.github.io/charts"
   helm_chart_name       = "airflow"
-  helm_chart_version    = "8.7.1"
+  helm_chart_version    = "8.9.0"
 
   git_username       = local.git_username
   git_token          = local.git_token
@@ -143,7 +143,7 @@ module "jupyterhub" {
 
   helm_chart_repository = "https://jupyterhub.github.io/helm-chart/"
   helm_chart_name       = "jupyterhub"
-  helm_chart_version    = "2.0.0"
+  helm_chart_version    = "3.3.8"
 
   mlflow_tracking_uri = var.deploy_mlflow ? module.mlflow.mlflow_tracking_uri : "not-deployed"
 

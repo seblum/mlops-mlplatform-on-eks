@@ -5,7 +5,7 @@ resource "helm_release" "cluster-autoscaler" {
   namespace        = var.cluster_namespace
   repository       = "https://kubernetes.github.io/autoscaler"
   chart            = "cluster-autoscaler"
-  version          = "9.10.7"
+  version          = "9.43.2"
   create_namespace = false
 
   set {
@@ -37,7 +37,7 @@ resource "helm_release" "cluster-autoscaler" {
 
 module "iam_assumable_role_admin" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "~> 4.0"
+  version                       = "~> 5.52"
   create_role                   = true
   role_name                     = "cluster-autoscaler"
   provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")

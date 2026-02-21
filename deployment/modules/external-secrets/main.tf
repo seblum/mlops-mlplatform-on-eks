@@ -2,7 +2,15 @@ terraform {
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.9.0"
+      version = ">= 2.17.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.35.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 6.0.0"
     }
   }
 }
@@ -35,6 +43,38 @@ resource "helm_release" "external_secrets" {
     })
   ]
 
-  lint          = true
+  lint              = true
   dependency_update = true
+}
+
+data "aws_region" "current" {}
+
+# ClusterSecretStore: allows ExternalSecret resources in any namespace to pull
+# from AWS Secrets Manager using the IRSA-annotated service account.
+resource "kubernetes_manifest" "cluster_secret_store" {
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ClusterSecretStore"
+    metadata = {
+      name = "aws-secrets-manager"
+    }
+    spec = {
+      provider = {
+        aws = {
+          service = "SecretsManager"
+          region  = data.aws_region.current.name
+          auth = {
+            jwt = {
+              serviceAccountRef = {
+                name      = var.service_account_name
+                namespace = var.namespace
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.external_secrets]
 }

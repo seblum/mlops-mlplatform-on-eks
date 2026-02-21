@@ -42,7 +42,7 @@ data "aws_caller_identity" "current" {}
 #
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.5.1"
+  version = "~> 21.0"
 
   cluster_name              = local.cluster_name
   cluster_version           = var.eks_cluster_version
@@ -160,7 +160,7 @@ module "eks" {
 #  Role for Service Account
 module "vpc_cni_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.0"
+  version = "~> 5.52"
 
   role_name_prefix      = "VPC-CNI-IRSA"
   attach_vpc_cni_policy = true
@@ -181,7 +181,7 @@ module "vpc_cni_irsa" {
 #
 module "ebs_csi_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "5.11.1"
+  version                       = "~> 5.52"
   create_role                   = true
   role_name                     = local.ebs_csi_service_account_role_name
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")

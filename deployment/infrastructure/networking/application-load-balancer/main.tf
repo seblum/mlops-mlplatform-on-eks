@@ -8,7 +8,7 @@ data "aws_region" "current" {} #
 
 module "aws_load_balancer_controller_controller_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "5.11.1"
+  version                       = "~> 5.52"
   create_role                   = true
   role_name                     = local.aws_load_balancer_controller_service_account_role_name
   provider_url                  = replace(var.cluster_oidc_issuer_url, "https://", "")
@@ -35,7 +35,7 @@ resource "helm_release" "aws-load-balancer-controller" {
   values = [yamlencode({
     clusterName = var.cluster_name
     image = {
-      tag = "v2.4.2"
+      tag = "v2.11.0"
     },
     serviceAccount = {
       name = "${local.aws_load_balancer_controller_service_account_name}"

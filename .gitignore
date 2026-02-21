@@ -36,8 +36,12 @@ override.tf.json
 
 mlflow_test
 *.tfvars
+# Terramate: keep generated backend.tf and providers*.tf committed
+# so that `check_gen_code = true` can verify CI agrees with repo.
+# Ignore per-stack init/plan artefacts.
+stacks/**/.terraform/
+stacks/**/.terraform.lock.hcl
+stacks/**/tfplan.binary
+# Legacy paths no longer used
 eks_terraform/.terraform.lock.hcl
-.DS_Store
 eks_terraform/.DS_Store
-eks_terraform/.terraform.lock.hcl
-deployment/.terraform.lock.hcl

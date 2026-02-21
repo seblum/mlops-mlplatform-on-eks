@@ -39,7 +39,7 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Terraform fmt check
-        run: terraform fmt -check -recursive deployment/
+        run: terraform fmt -check -recursive stacks/ components/
 
       - name: List changed stacks
         id: list
